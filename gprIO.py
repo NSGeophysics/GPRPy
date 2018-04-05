@@ -11,13 +11,10 @@ def readdt1(filename):
         samples, = struct.unpack('f',datafile.read(4))
         samples = int(samples)
         dimtrace = samples*2+128
-        #print(samples)
-        #print(datafile.tell())
         datafile.seek(-dimtrace,2) # 2 stands for end of file
         #print(datafile.tell())
         max_traces, = struct.unpack('f',datafile.read(4))
         max_traces = int(max_traces)
-        #print(max_traces)
         # Initialize matrix
         data = np.zeros((samples,max_traces))
         head = np.zeros((headlen,max_traces))
