@@ -1,0 +1,24 @@
+1234
+Data Collected with pE PRO (2011-00114-00) 
+2017-04-10 
+NUMBER OF TRACES   = 531 
+NUMBER OF PTS/TRC  = 1500 
+TIMEZERO AT POINT  = 3.18 
+TOTAL TIME WINDOW  = 1200.000 
+STARTING POSITION  = 0.0000 
+FINAL POSITION     = 1060.0000 
+STEP SIZE USED     = 2.0000 
+POSITION UNITS     = ft 
+NOMINAL FREQUENCY  = 50.00 
+ANTENNA SEPARATION = 3.0000 
+PULSER VOLTAGE (V) = 12 
+NUMBER OF STACKS   = 8 
+SURVEY MODE        = Reflection 
+STACKING TYPE      = F1, P8, DynaQ OFF 
+DVL Serial#        = 0051-7179-0014
+Control Mod Serial#= 0022-7132-0014
+Transmitter Serial#= 0024-6738-0009
+Receiver Serial#   = 0025-7129-0018
+Start DVL Battery  = 12.39V
+Start Rx Battery   = 12.42V
+Start Tx Battery   = 12.54V 12.50V
