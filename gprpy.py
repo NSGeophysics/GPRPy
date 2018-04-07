@@ -56,7 +56,7 @@ class gprpy2d:
         plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                 max(self.profilePos),
                                                 max(self.twtt),
-                                                min(self.twtt)])
+                                                min(self.twtt)], aspect="auto")
 
         if timelim is not None:
             plt.ylim(timelim)
@@ -64,4 +64,6 @@ class gprpy2d:
 
         if profilelim is not None:
             plt.xlim(profilelim)
+
+        plt.show()
         
