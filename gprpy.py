@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 import gprIO_DT1
 
 class gprpy2d:
@@ -45,6 +46,15 @@ class gprpy2d:
             outfile.write("import gprpy\n")
             for i in range(0,len(self.history)):
                 outfile.write(self.history[i] + "\n")
+
+
+    #def save(filename)
+    ## Saving the objects:
+    #with open('objs.pkl', 'w') as f:  # Python 3: open(..., 'wb')
+    #    pickle.dump([obj0, obj1, obj2], f)
+    ## Getting back the objects:
+    #with open('objs.pkl') as f:  # Python 3: open(..., 'rb')
+    #    obj0, obj1, obj2 = pickle.load(f)
 
     #def setRange(self, profilerange):
     #    # Only use this if the step size is not accurate
