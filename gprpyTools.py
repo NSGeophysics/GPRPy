@@ -28,3 +28,10 @@ def timeZeroAdjust(data):
             newdata[:,tr] = data[:,tr]
 
     return newdata
+
+
+
+
+#def remMeanTrace(data):
+    
+
