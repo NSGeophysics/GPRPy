@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import gprIO_DT1
+import gprpyTools as tools
 
 class gprpy2d:
     def __init__(self,filename=None,desciption=None): #,profilerange=None):
@@ -11,8 +12,7 @@ class gprpy2d:
         if filename is not None:
             self.importdata(filename)
 
-        #if profilerange is not None:
-        #   self.setRange(profilerange)
+        self.previous = None
         
     def importdata(self,filename):
         file_name, file_ext = os.path.splitext(filename)
@@ -46,7 +46,11 @@ class gprpy2d:
             outfile.write("import gprpy\n")
             for i in range(0,len(self.history)):
                 outfile.write(self.history[i] + "\n")
-
+                
+    def undo(self):
+        self.data = self.previous
+        del self.history[-1]
+        
 
     #def save(filename)
     ## Saving the objects:
@@ -76,4 +80,18 @@ class gprpy2d:
             plt.xlim(profilelim)
 
         plt.show()
+        
+
+    ####### Processing #######
+
+    def timeZeroAdjust(self):
+        # Save previous
+        self.previous = self.data
+        
+        self.data = tools.timeZeroAdjust(self.data)
+        
+        # Put what you did in history
+        histstr = "mygpr.timeZeroAdjust()"
+        self.history.append(histstr)
+
         

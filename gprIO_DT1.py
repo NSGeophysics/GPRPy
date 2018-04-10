@@ -32,7 +32,7 @@ def readdt1(filename):
                 pnt, = struct.unpack('h',datafile.read(2))
                 data[k,j] = pnt
             datafile.seek(dimtrace*(j+1),0) 
-    return data
+    return np.asmatrix(data)
 
         
        

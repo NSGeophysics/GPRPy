@@ -22,9 +22,6 @@ import numpy as np
 class GPRPyApp:
 
     def __init__(self,master):
-        # Prepare the frame
-        frame = tk.Frame(master)        
-        frame.pack()
         self.window = master
 
         
@@ -34,32 +31,50 @@ class GPRPyApp:
         # Show splash screen
         fig=Figure(figsize=(8,5))
         a=fig.add_subplot(111)
-        splash=signal.ricker(100,4)
+        splash=signal.ricker(50,4)
         a.plot(splash)
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().pack(side="bottom")
+        #canvas.get_tk_widget().pack(side="bottom")
+        canvas.get_tk_widget().grid(row=1,column=0,columnspan=6,rowspan=8)
         canvas.draw()
  
         # Initialize plotting variables
         #plotvars = {}
         #plotvars["maxyval"] = 10000000
         
-        # Load data
-        self.LoadButton = tk.Button(
-            frame, text="Import Data", fg="black",
-            command=lambda : self.loadData(proj))            
-        self.LoadButton.pack(side="left")
 
         # Refreshing plot
-        self.plotButton = tk.Button(
-            frame, text="Refresh Plot",
+        plotButton = tk.Button(
+            text="Refresh Plot",
             command=lambda : self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
                                                maxyval=float(myv.get()),
                                                contrast=float(contr.get())))
-        self.plotButton.pack(side="left")
+        plotButton.config(height = 2, width = 10)
+        plotButton.grid(row=0,column=0)
 
+        # Undo Button
+        undoButton = tk.Button(
+            text="Undo",
+            command=lambda : proj.undo())
+        undoButton.config(height = 2, width = 10)
+        undoButton.grid(row=0,column=1)
+        
+        # Load data
+        LoadButton = tk.Button(
+            text="Import Data", fg="black",
+            command=lambda : self.loadData(proj))
+        LoadButton.config(height = 2, width = 10)         
+        LoadButton.grid(row=0,column=6)
+
+        # TimeZero Adjust
+        TZAButton = tk.Button(
+            text="Time Zero Adj", fg="black",
+            command=lambda : proj.timeZeroAdjust())
+        TZAButton.config(height = 2, width = 10)         
+        TZAButton.grid(row=1,column=6)
+        
         # Print Figure
         #self.printButton = tk.Button(
         #    frame, text="Print Figure", fg="black",
@@ -74,22 +89,24 @@ class GPRPyApp:
              
         # y limit
         myvtext = tk.StringVar()
-        myvtext.set("Maximum y value")
-        myvlabel = tk.Label(master, textvariable=myvtext,height=4)
-        myvlabel.pack(side="left")
+        myvtext.set("Max y value")
+        myvlabel = tk.Label(master, textvariable=myvtext,height = 2,width = 8)
+        myvlabel.grid(row=0,column=2)
+
         myv = tk.StringVar()
         maxybox = tk.Entry(master, textvariable=myv)
-        maxybox.pack(side="left")
-        myv.set("1000")
+        maxybox.grid(row=0,column=3)
+        maxybox.config(width=8)
+        myv.set("1000000")
 
         # Contrast
         contrtext = tk.StringVar()
         contrtext.set("Contrast")
-        contrlabel = tk.Label(master, textvariable=contrtext,height=4)
-        contrlabel.pack(side="left")
+        contrlabel = tk.Label(master, textvariable=contrtext,height = 2,width = 8)
+        contrlabel.grid(row=0,column=4)
         contr = tk.StringVar()
-        contrbox = tk.Entry(master, textvariable=contr)
-        contrbox.pack(side="left")
+        contrbox = tk.Entry(master, textvariable=contr,width=8)
+        contrbox.grid(row=0,column=5)
         contr.set("1")
 
         
@@ -115,7 +132,7 @@ class GPRPyApp:
                  vmin=-stdcont/contrast, vmax=stdcont/contrast)
         
         #if maxyval < max(proj.twtt):
-        a.set_ylim([0,maxyval])
+        a.set_ylim([0,min(maxyval,max(proj.twtt))])
         a.invert_yaxis()
 
         a.get_xaxis().set_visible(True)
@@ -131,7 +148,9 @@ class GPRPyApp:
         #a.set_clim([-stdcont/contrast, stdcont/contrast])
             
         #canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().pack(side="bottom")
+        #canvas.get_tk_widget().pack(side="bottom")
+        canvas.get_tk_widget().grid(row=1,column=0,columnspan=5)
+        #canvas.get_tk_widget().place(relx=0.,rely=0.2,anchor="c")
         canvas.draw()
         
 
