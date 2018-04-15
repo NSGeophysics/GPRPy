@@ -140,3 +140,14 @@ class gprpy2d:
         # Put in history
         histstr = "mygpr.dewow(%d)" %(window)
         self.history.append(histstr)
+
+
+    def remMeanTrace(self,ntraces):
+        # Save previous
+        self.previous = self.data
+
+        self.data = tools.remMeanTrace(self.data,ntraces)
+        
+        # Put in history
+        histstr = "mygpr.remMeanTrace(%d)" %(ntraces)
+        self.history.append(histstr)

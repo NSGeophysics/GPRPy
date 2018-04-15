@@ -42,8 +42,8 @@ def dewow(data,window):
         averages = np.zeros(trace.shape)
         # Calculate and subtract running mean
         for i in range(0,data.shape[0]):
-            winstart = i - np.floor(window/2.0)
-            winend = i + np.floor(window/2.0)
+            winstart = int(i - np.floor(window/2.0))
+            winend = int(i + np.floor(window/2.0))
             # If running mean window goes outside of range,
             # set range to "beginning until length"
             if winstart < 0:
@@ -52,14 +52,30 @@ def dewow(data,window):
             # Or to "end-length to end"
             if winend > len(trace):
                 winstart = len(trace) - window
-                winend = len(trace)
-            #print("window for trace %d is %d" %(tr,len(trace[winstart:winend])) )
-            #print(np.mean(trace[winstart:winend]))
-            #averages[i] = np.mean( trace[winstart:winend])       
+                winend = len(trace)     
             newdata[i,tr] = trace[i] - np.mean(trace[winstart:winend])
     print('done with dewow')
     return newdata
 
-#def remMeanTrace(data):
-    
+
+def remMeanTrace(data,ntraces):
+    newdata = np.asmatrix(np.zeros(data.shape))
+    tottraces = data.shape[1]
+    # For each trace
+    for tr in tqdm(range(0,data.shape[1])):
+        winstart = int(tr - np.floor(ntraces/2.0))
+        winend = int(tr + np.floor(ntraces/2.0))
+        if winstart < 0:
+            winstart = 0
+            winend = min(ntraces,tottraces)
+        if winend > tottraces:
+            winstart = max(tottraces - ntraces,0)
+            winend = tottraces
+        avgtr = np.zeros(data[:,tr].shape)
+       
+        for i in range(winstart,winend):
+            avgtr = avgtr + data[:,i]
+        avgtr = avgtr/float(winend-winstart)
+        newdata[:,tr] = data[:,tr] - avgtr
+    return newdata
 

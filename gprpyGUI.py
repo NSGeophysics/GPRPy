@@ -77,6 +77,22 @@ class GPRPyApp:
         DewowButton.grid(row=2, column=7, sticky='nsew')
         
 
+        # Rem mean trace
+        remMeanTraceButton = tk.Button(
+            text="Rem mean tr", fg="black",
+            command=lambda : [self.remMeanTrace(proj),
+                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                                                maxyval=float(myv.get()),
+                                                contrast=float(contr.get()),
+                                                color=colvar.get())])
+        remMeanTraceButton.config(height = 1, width = 10)         
+        remMeanTraceButton.grid(row=3, column=7, sticky='nsew')
+
+
+
+
+
+        
         # Save data
         SaveButton = tk.Button(
             text="Save Data", fg="black",
@@ -159,8 +175,10 @@ class GPRPyApp:
         proj.dewow(window=window)
         
 
+    def remMeanTrace(self,proj):
+        ntraces = sd.askinteger("Input","Remove mean over how many traces?")
+        proj.remMeanTrace(ntraces=ntraces)
         
-
         
     def loadData(self,proj):
         filename = fd.askopenfilename( filetypes= (("GPRPy", ".gpr"),

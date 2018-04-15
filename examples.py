@@ -2,16 +2,20 @@ import gprpy as gp
 import matplotlib.pyplot as plt
 import numpy as np
 
-filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
+#filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
+filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
+
+proj.remMeanTrace(10)
+
 
 #proj.timeZeroAdjust()
 #proj.save('testsave')
 #proj2 = gp.gprpy2d('./testsave.gpr')
 
 
-#proj.showTWTT(timelim=[0,700])
-proj.printTWTT('testfig',timelim=[0,700])
+proj.showTWTT(timelim=[0,700])
+#proj.printTWTT('testfig',timelim=[0,700])
 #proj.prepTWTTfig(timelim=[0,700])
 #plt.show()
 
