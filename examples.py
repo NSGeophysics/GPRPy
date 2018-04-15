@@ -5,18 +5,26 @@ import numpy as np
 filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
 proj = gp.gprpy2d(filename)
 
-#proj.showTWTT(timelim=[0,200])
+#proj.timeZeroAdjust()
+#proj.save('testsave')
+#proj2 = gp.gprpy2d('./testsave.gpr')
+
+
+#proj.showTWTT(timelim=[0,700])
+proj.printTWTT('testfig',timelim=[0,700])
+#proj.prepTWTTfig(timelim=[0,700])
 #plt.show()
 
+#proj.dewow(100000000000000)
+#proj.writeHistory("histtest.py")
+
+#proj.timeZeroAdjust()
+#proj.writeHistory("histtest1.py")
+#proj.undo()
+#proj2.writeHistory("histtest2.py")
 
 
-proj.timeZeroAdjust()
-proj.writeHistory("histtest1.py")
-proj.undo()
-proj.writeHistory("histtest2.py")
-
-
-#proj.showTWTT(timelim=[0,200])
+#proj2.showTWTT()
 #plt.show()
 
 

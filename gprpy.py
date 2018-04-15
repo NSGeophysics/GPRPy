@@ -29,11 +29,23 @@ class gprpy2d:
                                     self.info["N_pts_per_trace"])
                 
             # Put what you did in history
-            histstr = "mygpr.importdata(" + filename + ")"
+            histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
             
         elif file_ext==".DZT":
-            pass
+            print("DZT Not yet implemented")
+            
+        elif file_ext==".gpr":
+            #print("Not yet ready")
+            ## Getting back the objects:
+            with open(filename, 'rb') as f:
+                data, info, profilePos, twtt, history = pickle.load(f)
+            self.data = data
+            self.info = info
+            self.profilePos = profilePos
+            self.twtt = twtt
+            self.history = history
+            
         else:
             print("Can only read dt1 or dzt files")
 
@@ -52,34 +64,58 @@ class gprpy2d:
         del self.history[-1]
         
 
-    #def save(filename)
-    ## Saving the objects:
-    #with open('objs.pkl', 'w') as f:  # Python 3: open(..., 'wb')
-    #    pickle.dump([obj0, obj1, obj2], f)
-    ## Getting back the objects:
-    #with open('objs.pkl') as f:  # Python 3: open(..., 'rb')
-    #    obj0, obj1, obj2 = pickle.load(f)
+    def save(self,filename):
+        # Saving the objects:
+        # Want to force the file name .gpr
+        file_name, file_ext = os.path.splitext(filename)
+        if not(file_ext=='.gpr'):
+            filename = filename + '.gpr'
+        with open(filename, 'wb') as f:  
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history], f)
+        print("Saved " + filename)
+        # Add to history string
+        histstr = "mygpr.save('%s')" %(filename)
+        self.history.append(histstr)
 
     #def setRange(self, profilerange):
     #    # Only use this if the step size is not accurate
     #    self.profilerange=[min(profilerange),max(profilerange)]
     #    histstr = "mygpr.setRange([%f, %f])" %(min(profilerange),max(profilerange))
     #    self.history.append(histstr)
-            
-    def showTWTT(self, color="gray", timelim=None, profilelim=None):
+
+    # This is a helper function
+    def prepTWTTfig(self, color="gray", timelim=None, profilelim=None):
         plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                 max(self.profilePos),
                                                 max(self.twtt),
-                                                min(self.twtt)], aspect="auto")
-
+                                                min(self.twtt)],aspect="auto")
         if timelim is not None:
             plt.ylim(timelim)
             plt.gca().invert_yaxis()
-
         if profilelim is not None:
             plt.xlim(profilelim)
+        #plt.gca().set_ylim([0,min(maxyval,max(proj.twtt))])
+        #plt.gca().invert_yaxis()
+        plt.gca().get_xaxis().set_visible(True)
+        plt.gca().get_yaxis().set_visible(True)
+        plt.gca().set_ylabel("two-way travel time [ns]")
+        plt.gca().set_xlabel("profile position")
+        plt.gca().xaxis.tick_top()
+        plt.gca().xaxis.set_label_position('top')
+       
+    
+    def showTWTT(self, **kwargs):
+        self.prepTWTTfig(**kwargs)
+        plt.show(block=False)
 
-        plt.show()
+
+    def printTWTT(self, figname, **kwargs):
+        self.prepTWTTfig(**kwargs)
+        plt.savefig(figname, format='pdf')
+        plt.close('all')
+        # Put what you did in history
+        histstr = "mygpr.printTWTT('%s')" %(figname)
+        self.history.append(histstr)
         
 
     ####### Processing #######
@@ -94,4 +130,13 @@ class gprpy2d:
         histstr = "mygpr.timeZeroAdjust()"
         self.history.append(histstr)
 
-        
+
+    def dewow(self,window):
+        # Save previous
+        self.previous = self.data
+
+        self.data = tools.dewow(self.data,window)
+
+        # Put in history
+        histstr = "mygpr.dewow(%d)" %(window)
+        self.history.append(histstr)

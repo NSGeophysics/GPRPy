@@ -1,5 +1,7 @@
 import numpy as np
-
+# For progress bar
+import time
+from tqdm import tqdm
 
 
 def timeZeroAdjust(data):
@@ -31,6 +33,32 @@ def timeZeroAdjust(data):
 
 
 
+
+def dewow(data,window):
+    newdata = np.asmatrix(np.zeros(data.shape))   
+    # For each trace
+    for tr in tqdm(range(0,data.shape[1])):
+        trace = data[:,tr]
+        averages = np.zeros(trace.shape)
+        # Calculate and subtract running mean
+        for i in range(0,data.shape[0]):
+            winstart = i - np.floor(window/2.0)
+            winend = i + np.floor(window/2.0)
+            # If running mean window goes outside of range,
+            # set range to "beginning until length"
+            if winstart < 0:
+                winstart = 0
+                winend = window
+            # Or to "end-length to end"
+            if winend > len(trace):
+                winstart = len(trace) - window
+                winend = len(trace)
+            #print("window for trace %d is %d" %(tr,len(trace[winstart:winend])) )
+            #print(np.mean(trace[winstart:winend]))
+            #averages[i] = np.mean( trace[winstart:winend])       
+            newdata[i,tr] = trace[i] - np.mean(trace[winstart:winend])
+    print('done with dewow')
+    return newdata
 
 #def remMeanTrace(data):
     
