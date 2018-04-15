@@ -11,3 +11,4 @@
 * TODO Add topo correct: Load two files: one with x,y,z or x,z coordinates, one with corresponding profile points
 
 * TODO make help available for buttons when mouse-over 
+* TODO make logo and put it into splash screen
