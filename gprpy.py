@@ -4,15 +4,22 @@ import matplotlib.pyplot as plt
 import pickle
 import gprIO_DT1
 import gprpyTools as tools
+import copy
 
 class gprpy2d:
     def __init__(self,filename=None,desciption=None): #,profilerange=None):
         self.history = ["mygpr = gprpy.gprpy2d()"]
+
+        # Initialize previous for undo
+        self.previous = {
+            "data" : None,
+            "twtt" : None,
+            "info" : None,
+            "profilePos" : None,
+            "history" : None}
         
         if filename is not None:
-            self.importdata(filename)
-
-        self.previous = None
+            self.importdata(filename)                 
         
     def importdata(self,filename):
         file_name, file_ext = os.path.splitext(filename)
@@ -60,8 +67,16 @@ class gprpy2d:
                 outfile.write(self.history[i] + "\n")
                 
     def undo(self):
-        self.data = self.previous
-        del self.history[-1]
+        self.data = self.previous["data"]
+        self.twtt = self.previous["twtt"]
+        self.info = self.previous["info"]
+        self.profilePos = self.previous["profilePos"]
+        # Make sure to not keep deleting history
+        # when applying undo several times. 
+        histsav = copy.copy(self.previous["history"])
+        del histsav[-1]
+        self.history = histsav
+        print("undo")
         
 
     def save(self,filename):
@@ -77,18 +92,23 @@ class gprpy2d:
         histstr = "mygpr.save('%s')" %(filename)
         self.history.append(histstr)
 
+        
     #def setRange(self, profilerange):
     #    # Only use this if the step size is not accurate
     #    self.profilerange=[min(profilerange),max(profilerange)]
     #    histstr = "mygpr.setRange([%f, %f])" %(min(profilerange),max(profilerange))
     #    self.history.append(histstr)
 
+
+    
     # This is a helper function
-    def prepTWTTfig(self, color="gray", timelim=None, profilelim=None):
+    def prepTWTTfig(self, color="gray", contrast=1.0, timelim=None, profilelim=None):
+        stdcont = np.argmax(abs(self.data)) 
         plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                 max(self.profilePos),
                                                 max(self.twtt),
-                                                min(self.twtt)],aspect="auto")
+                                                min(self.twtt)],
+                   aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
         if timelim is not None:
             plt.ylim(timelim)
             plt.gca().invert_yaxis()
@@ -102,6 +122,8 @@ class gprpy2d:
         plt.gca().set_xlabel("profile position")
         plt.gca().xaxis.tick_top()
         plt.gca().xaxis.set_label_position('top')
+        
+        return contrast, color, timelim, profilelim
        
     
     def showTWTT(self, **kwargs):
@@ -110,19 +132,19 @@ class gprpy2d:
 
 
     def printTWTT(self, figname, **kwargs):
-        self.prepTWTTfig(**kwargs)
+        contrast, color, timelim, profilelim = self.prepTWTTfig(**kwargs)
         plt.savefig(figname, format='pdf')
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printTWTT('%s')" %(figname)
+        histstr = "mygpr.printTWTT('%s', color='%s', contrast=%f, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
         self.history.append(histstr)
         
 
     ####### Processing #######
 
     def timeZeroAdjust(self):
-        # Save previous
-        self.previous = self.data
+        # Store previous state for undo
+        self.storePrevious()
         
         self.data = tools.timeZeroAdjust(self.data)
         
@@ -132,8 +154,8 @@ class gprpy2d:
 
 
     def dewow(self,window):
-        # Save previous
-        self.previous = self.data
+        # Store previous state for undo
+        self.storePrevious()
 
         self.data = tools.dewow(self.data,window)
 
@@ -143,11 +165,31 @@ class gprpy2d:
 
 
     def remMeanTrace(self,ntraces):
-        # Save previous
-        self.previous = self.data
+        # Store previous state for undo
+        self.storePrevious()
 
         self.data = tools.remMeanTrace(self.data,ntraces)
         
         # Put in history
         histstr = "mygpr.remMeanTrace(%d)" %(ntraces)
         self.history.append(histstr)
+
+
+    def toDepth(self,velocity):
+        # Store previous state for undo
+        self.storePrevious()
+        
+        self.twtt = self.twtt * velocity/2.0
+
+        # Put in history
+        histstr = "mygpr.toDepth(%f)" %(velocity)
+        self.history.append(histstr)
+            
+
+
+    def storePrevious(self):        
+        self.previous["data"] = self.data
+        self.previous["twtt"] = self.twtt
+        self.previous["info"] = self.info
+        self.previous["profilePos"] = self.profilePos
+        self.previous["history"] = self.history

@@ -103,7 +103,7 @@ class GPRPyApp:
         # Print Figure
         PrintButton = tk.Button(
             text="Print Figure", fg="black",
-            command=lambda : self.printTWTTFig(proj=proj,fig=fig))
+            command=lambda : self.printTWTTFig(proj=proj,fig=fig,maxyval=myv.get(),contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
         PrintButton.grid(row=14, column=7, sticky='nsew')
 
@@ -225,11 +225,11 @@ class GPRPyApp:
         canvas.draw()
         
 
-    def printTWTTFig(self,proj,fig):
+    def printTWTTFig(self,proj,fig,maxyval,contrast,color):
         figname = fd.asksaveasfilename(defaultextension=".pdf")        
         fig.savefig(figname, format='pdf')        
         # Put what you did in history        
-        histstr = "mygpr.printTWTT('%s')" %(figname)
+        histstr = "mygpr.printTWTT('%s', color='%s', contrast=%f, timelim=[0,%f])" %(figname,color,contrast,maxyval)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
         
