@@ -181,9 +181,9 @@ class GPRPyApp:
         
         
     def loadData(self,proj):
-        filename = fd.askopenfilename( filetypes= (("GPRPy", ".gpr"),
-                                                   ("Sensors and Software", "*.DT1"),
-                                                   ("GSSI", ".DZT")))
+        filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
+                                                   ("Sensors and Software (.DT1)", "*.DT1"),
+                                                   ("GSSI (.DZT)", "*.DZT")))
         proj.importdata(filename=filename)
         print("Loaded " + filename)
 
