@@ -26,6 +26,7 @@ class GPRPyApp:
     def __init__(self,master):
         self.window = master
 
+        master.title("GPRPy")
         
         # Initialize the gprpy
         proj = gp.gprpy2d()
