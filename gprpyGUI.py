@@ -121,8 +121,8 @@ class GPRPyApp:
         plotButton = tk.Button(
             text="Refresh Plot",
             command=lambda : self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
-                                               maxyval=float(myv.get()),
-                                               contrast=float(contr.get()),
+                                               maxyval=myv.get(),
+                                               contrast=contr.get(),
                                                color=colvar.get()))
         plotButton.config(height = 1, width = 10)
         plotButton.grid(row=0, column=6, sticky='nsew')
@@ -145,21 +145,21 @@ class GPRPyApp:
         myvtext.set("Max y value")
         myvlabel = tk.Label(master, textvariable=myvtext,height = 1,width = 10)
         myvlabel.grid(row=0, column=1, sticky='nsew')
-        myv = tk.StringVar()
+        myv = tk.DoubleVar()
         maxybox = tk.Entry(master, textvariable=myv)
         maxybox.grid(row=0, column=2, sticky='nsew')
         maxybox.config(width=8)
-        myv.set("1000000")
+        myv.set("1000000.0")
 
         # Contrast
         contrtext = tk.StringVar()
         contrtext.set("Contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 8)
         contrlabel.grid(row=0, column=3, sticky='nsew')
-        contr = tk.StringVar()
+        contr = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=contr, width=8)
         contrbox.grid(row=0, column=4, sticky='nsew')
-        contr.set("1")
+        contr.set("1.0")
 
         # Mode switch for figure color
         colvar=tk.StringVar()

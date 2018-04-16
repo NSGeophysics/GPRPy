@@ -1,6 +1,6 @@
-* TODO Make y-range integer only (similar to input in dewow)
+* DONE Make y-range double only (similar to input in dewow)
 
-* TODO Make contrast integer only (similar to input in dewow)
+* DONE Make contrast double only (similar to input in dewow)
 
 * TODO In history, when printing, add y-range/contrast into history string
 
@@ -12,3 +12,5 @@
 
 * TODO make help available for buttons when mouse-over 
 * TODO make logo and put it into splash screen
+* DONE make fast dewow for large windows
+* DONE make fast rem avg trace for large ntraces
