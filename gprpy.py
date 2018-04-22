@@ -16,7 +16,8 @@ class gprpy2d:
             "twtt" : None,
             "info" : None,
             "profilePos" : None,
-            "history" : None}
+            "history" : None,
+            "velocity" : None}
         
         if filename is not None:
             self.importdata(filename)                 
@@ -34,10 +35,15 @@ class gprpy2d:
             self.twtt = np.linspace(self.info["TZ_at_pt"],
                                     self.info["Total_time_window"],
                                     self.info["N_pts_per_trace"])
-                
+
+            self.velocity = None
+            self.depth = None
+            self.topoCorrected = False
             # Put what you did in history
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
+           
+            
             
         elif file_ext==".DZT":
             print("DZT Not yet implemented")
@@ -46,12 +52,15 @@ class gprpy2d:
             #print("Not yet ready")
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history = pickle.load(f)
+                data, info, profilePos, twtt, history, velocity, depth, topoCorrected = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
             self.twtt = twtt
             self.history = history
+            self.velocity = velocity
+            self.depth = depth
+            self.topoCorrected = topoCorrected
             
         else:
             print("Can only read dt1 or dzt files")
@@ -71,6 +80,9 @@ class gprpy2d:
         self.twtt = self.previous["twtt"]
         self.info = self.previous["info"]
         self.profilePos = self.previous["profilePos"]
+        self.velocity = self.previous["velocity"]
+        self.depth = self.previous["depth"]
+        self.topoCorrected = self.previous["topoCorrected"]
         # Make sure to not keep deleting history
         # when applying undo several times. 
         histsav = copy.copy(self.previous["history"])
@@ -86,7 +98,7 @@ class gprpy2d:
         if not(file_ext=='.gpr'):
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
-            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history], f)
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -102,13 +114,25 @@ class gprpy2d:
 
     
     # This is a helper function
-    def prepTWTTfig(self, color="gray", contrast=1.0, timelim=None, profilelim=None):
-        stdcont = np.argmax(abs(self.data)) 
-        plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
-                                                max(self.profilePos),
-                                                max(self.twtt),
-                                                min(self.twtt)],
-                   aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
+    def prepProfileFig(self, color="gray", contrast=1.0, timelim=None, profilelim=None):
+        stdcont = np.argmax(abs(self.data))
+
+        if self.velocity is None:
+            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
+                                                    max(self.profilePos),
+                                                    max(self.twtt),
+                                                    min(self.twtt)],
+                       aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
+            plt.gca().set_ylabel("two-way travel time [ns]")
+        else:
+             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
+                                                    max(self.profilePos),
+                                                    max(self.depth),
+                                                    min(self.depth)],
+                    aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
+             plt.gca().set_ylabel("depth [m]")
+             
+            
         if timelim is not None:
             plt.ylim(timelim)
             plt.gca().invert_yaxis()
@@ -118,7 +142,10 @@ class gprpy2d:
         #plt.gca().invert_yaxis()
         plt.gca().get_xaxis().set_visible(True)
         plt.gca().get_yaxis().set_visible(True)
-        plt.gca().set_ylabel("two-way travel time [ns]")
+        
+        if self.topoCorrected:
+            plt.gca().set_ylabel("elevation [m]")
+
         plt.gca().set_xlabel("profile position")
         plt.gca().xaxis.tick_top()
         plt.gca().xaxis.set_label_position('top')
@@ -126,17 +153,17 @@ class gprpy2d:
         return contrast, color, timelim, profilelim
        
     
-    def showTWTT(self, **kwargs):
-        self.prepTWTTfig(**kwargs)
+    def showProfile(self, **kwargs):
+        self.prepProfileFig(**kwargs)
         plt.show(block=False)
 
 
-    def printTWTT(self, figname, **kwargs):
-        contrast, color, timelim, profilelim = self.prepTWTTfig(**kwargs)
+    def printProfile(self, figname, **kwargs):
+        contrast, color, timelim, profilelim = self.prepProfileFig(**kwargs)
         plt.savefig(figname, format='pdf')
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printTWTT('%s', color='%s', contrast=%f, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%f, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
         self.history.append(histstr)
         
 
@@ -175,14 +202,15 @@ class gprpy2d:
         self.history.append(histstr)
 
 
-    def toDepth(self,velocity):
+    def setVelocity(self,velocity):
         # Store previous state for undo
         self.storePrevious()
-        
-        self.twtt = self.twtt * velocity/2.0
+
+        self.velocity = velocity
+        self.depth = self.twtt * velocity/2.0
 
         # Put in history
-        histstr = "mygpr.toDepth(%f)" %(velocity)
+        histstr = "mygpr.setVelocity(%f)" %(velocity)
         self.history.append(histstr)
             
 
@@ -193,3 +221,6 @@ class gprpy2d:
         self.previous["info"] = self.info
         self.previous["profilePos"] = self.profilePos
         self.previous["history"] = self.history
+        self.previous["velocity"] = self.velocity
+        self.previous["depth"] = self.depth
+        self.previous["topoCorrected"] = self.topoCorrected

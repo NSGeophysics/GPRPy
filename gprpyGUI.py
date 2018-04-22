@@ -48,7 +48,7 @@ class GPRPyApp:
         LoadButton = tk.Button(
             text="Import Data", fg="black",
             command=lambda : [self.loadData(proj),
-                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                 maxyval=float(myv.get()),
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
@@ -59,7 +59,7 @@ class GPRPyApp:
         TZAButton = tk.Button(
             text="Time Zero Adj", fg="black",
             command=lambda : [proj.timeZeroAdjust(),
-                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                 maxyval=float(myv.get()),
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
@@ -70,7 +70,7 @@ class GPRPyApp:
         DewowButton = tk.Button(
             text="Dewow", fg="black",
             command=lambda : [self.dewow(proj),
-                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                 maxyval=float(myv.get()),
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
@@ -82,7 +82,7 @@ class GPRPyApp:
         remMeanTraceButton = tk.Button(
             text="Rem mean tr", fg="black",
             command=lambda : [self.remMeanTrace(proj),
-                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                 maxyval=float(myv.get()),
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
@@ -90,6 +90,22 @@ class GPRPyApp:
         remMeanTraceButton.grid(row=3, column=7, sticky='nsew')
 
 
+
+        # Gain: row 4
+
+
+        # Set Velocity: row 11
+        setVelButton = tk.Button(
+            text="Set velocity", fg="black",
+            command=lambda : [self.setVelocity(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                   maxyval=float(myv.get()),
+                                                   contrast=float(contr.get()),
+                                                   color=colvar.get())])
+        setVelButton.config(height = 1, width = 10)         
+        setVelButton.grid(row=11, column=7, sticky='nsew')
+
+        # Topo Correct row 12
 
 
 
@@ -104,7 +120,7 @@ class GPRPyApp:
         # Print Figure
         PrintButton = tk.Button(
             text="Print Figure", fg="black",
-            command=lambda : self.printTWTTFig(proj=proj,fig=fig,maxyval=myv.get(),contrast=contr.get(),color=colvar.get()))
+            command=lambda : self.printProfileFig(proj=proj,fig=fig,maxyval=myv.get(),contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
         PrintButton.grid(row=14, column=7, sticky='nsew')
 
@@ -121,7 +137,7 @@ class GPRPyApp:
         # Refreshing plot
         plotButton = tk.Button(
             text="Refresh Plot",
-            command=lambda : self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+            command=lambda : self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                maxyval=myv.get(),
                                                contrast=contr.get(),
                                                color=colvar.get()))
@@ -132,7 +148,7 @@ class GPRPyApp:
         undoButton = tk.Button(
             text="Undo",
             command=lambda : [proj.undo(),
-                              self.plotTWTTData(proj,fig=fig,a=a,canvas=canvas,
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                 maxyval=float(myv.get()),
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
@@ -179,7 +195,12 @@ class GPRPyApp:
     def remMeanTrace(self,proj):
         ntraces = sd.askinteger("Input","Remove mean over how many traces?")
         proj.remMeanTrace(ntraces=ntraces)
-        
+
+
+    def setVelocity(self,proj):
+        velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
+        proj.setVelocity(velocity)
+
         
     def loadData(self,proj):
         filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
@@ -193,7 +214,6 @@ class GPRPyApp:
         filename = fd.asksaveasfilename(defaultextension=".gpr")
         proj.save(filename)
        
-
         
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
@@ -201,23 +221,38 @@ class GPRPyApp:
         print("Wrote history to " + filename)
 
 
-    def plotTWTTData(self,proj,fig,a,canvas,maxyval,contrast,color):
+    def plotProfileData(self,proj,fig,a,canvas,maxyval,contrast,color):
         print("plotting, y-max " + str(maxyval))
         #color="gray"
 
-        stdcont = np.argmax(abs(proj.data))        
-        a.imshow(proj.data,cmap=color,extent=[min(proj.profilePos),
-                                              max(proj.profilePos),
-                                              max(proj.twtt),
-                                              min(proj.twtt)],
-                 aspect="auto",
-                 vmin=-stdcont/contrast, vmax=stdcont/contrast)
+        a.clear()
         
-        a.set_ylim([0,min(maxyval,max(proj.twtt))])
+        stdcont = np.argmax(abs(proj.data))
+        if proj.velocity is None:
+            a.imshow(proj.data,cmap=color,extent=[min(proj.profilePos),
+                                                  max(proj.profilePos),
+                                                  max(proj.twtt),
+                                                  min(proj.twtt)],
+                     aspect="auto",
+                     vmin=-stdcont/contrast, vmax=stdcont/contrast)
+            a.set_ylim([0,min(maxyval,max(proj.twtt))])
+            a.set_ylabel("two-way travel time [ns]")
+        else:
+            a.imshow(proj.data,cmap=color,extent=[min(proj.profilePos),
+                                                  max(proj.profilePos),
+                                                  max(proj.depth),
+                                                  min(proj.depth)],
+                     aspect="auto",
+                     vmin=-stdcont/contrast, vmax=stdcont/contrast)
+            a.set_ylim([0,min(maxyval,max(proj.depth))])
+            a.set_ylabel("depth [m]")
+
+        if proj.topoCorrected:
+            a.set_ylabel("elevation [m]")
+            
         a.invert_yaxis()
         a.get_xaxis().set_visible(True)
-        a.get_yaxis().set_visible(True)
-        a.set_ylabel("two-way travel time [ns]")
+        a.get_yaxis().set_visible(True)                    
         a.set_xlabel("profile position")
         a.xaxis.tick_top()
         a.xaxis.set_label_position('top')
@@ -226,11 +261,11 @@ class GPRPyApp:
         canvas.draw()
         
 
-    def printTWTTFig(self,proj,fig,maxyval,contrast,color):
+    def printProfileFig(self,proj,fig,maxyval,contrast,color):
         figname = fd.asksaveasfilename(defaultextension=".pdf")        
         fig.savefig(figname, format='pdf')        
         # Put what you did in history        
-        histstr = "mygpr.printTWTT('%s', color='%s', contrast=%f, timelim=[0,%f])" %(figname,color,contrast,maxyval)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%f, timelim=[0,%f])" %(figname,color,contrast,maxyval)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
         
