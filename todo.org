@@ -1,21 +1,18 @@
-* TODO Test plotting and printing both regular and GUI
-
+* TODO [#A] Test plotting and printing both regular and GUI
+* TODO [#A] Put dewow before time-zero adjust
+* TODO [#A] Add AGC and TPOW gain. Put the buttons next to each other, make all other buttons two column span
+* TODO [#A] Add topo correct: Load two files: one with x,y,z or x,z coordinates, one with corresponding profile points
+* TODO [#A] Organize .py files such that only gprpy, gprpyGUI are in the main folder and the others are in a subfolder
+* TODO [#B] make help available for buttons when mouse-over 
+* TODO [#B] make logo and put it into splash screen
+* TODO [#B] add filtering: high cut
+* TODO [#C] add filtering: spectral
+* TODO [#C] add deconvolution
 * DONE Change such that print with depth now shows meters as unit
-
-
 * DONE Make y-range double only (similar to input in dewow)
-
 * DONE Make contrast double only (similar to input in dewow)
-
 * DONE In history, when printing, add y-range/contrast into history string
-
-* TODO Add AGC and TPOW gain. Put the buttons next to each other, make all other buttons two column span
-
 * DONE Add todepth: Need to provide velocity
-
-* TODO Add topo correct: Load two files: one with x,y,z or x,z coordinates, one with corresponding profile points
-
-* TODO make help available for buttons when mouse-over 
-* TODO make logo and put it into splash screen
 * DONE make fast dewow for large windows
 * DONE make fast rem avg trace for large ntraces
+
