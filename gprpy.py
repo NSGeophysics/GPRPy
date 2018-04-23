@@ -2,8 +2,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
-import gprIO_DT1
-import gprpyTools as tools
+import toolbox.gprIO_DT1 as gprIO_DT1
+import toolbox.gprpyTools as tools
 import copy
 
 class gprpy2d:
@@ -98,7 +98,7 @@ class gprpy2d:
         if not(file_ext=='.gpr'):
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
-            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth], f)
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.topoCorrected], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -163,7 +163,7 @@ class gprpy2d:
         plt.savefig(figname, format='pdf')
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%f, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
         self.history.append(histstr)
         
 
@@ -210,7 +210,7 @@ class gprpy2d:
         self.depth = self.twtt * velocity/2.0
 
         # Put in history
-        histstr = "mygpr.setVelocity(%f)" %(velocity)
+        histstr = "mygpr.setVelocity(%g)" %(velocity)
         self.history.append(histstr)
             
 

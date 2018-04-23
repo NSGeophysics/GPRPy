@@ -55,16 +55,6 @@ class GPRPyApp:
         LoadButton.config(height = 1, width = 10)         
         LoadButton.grid(row=0, column=7, sticky='nsew')
 
-        # TimeZero Adjust
-        TZAButton = tk.Button(
-            text="Time Zero Adj", fg="black",
-            command=lambda : [proj.timeZeroAdjust(),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
-                                                maxyval=float(myv.get()),
-                                                contrast=float(contr.get()),
-                                                color=colvar.get())])
-        TZAButton.config(height = 1, width = 10)         
-        TZAButton.grid(row=1, column=7, sticky='nsew')
 
         # Dewow
         DewowButton = tk.Button(
@@ -75,7 +65,22 @@ class GPRPyApp:
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
         DewowButton.config(height = 1, width = 10)         
-        DewowButton.grid(row=2, column=7, sticky='nsew')
+        DewowButton.grid(row=1, column=7, sticky='nsew')
+
+
+        
+        # TimeZero Adjust
+        TZAButton = tk.Button(
+            text="Time Zero Adj", fg="black",
+            command=lambda : [proj.timeZeroAdjust(),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                maxyval=float(myv.get()),
+                                                contrast=float(contr.get()),
+                                                color=colvar.get())])
+        TZAButton.config(height = 1, width = 10)         
+        TZAButton.grid(row=2, column=7, sticky='nsew')
+
+        
         
 
         # Rem mean trace
@@ -265,7 +270,7 @@ class GPRPyApp:
         figname = fd.asksaveasfilename(defaultextension=".pdf")        
         fig.savefig(figname, format='pdf')        
         # Put what you did in history        
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%f, timelim=[0,%f])" %(figname,color,contrast,maxyval)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, timelim=[0,%g])" %(figname,color,contrast,maxyval)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
         

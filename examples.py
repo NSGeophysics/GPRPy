@@ -6,15 +6,18 @@ filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
 #filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
 
-proj.toDepth(0.1)
+proj.printProfile('test1')
 
-proj.showTWTT()
+proj.setVelocity(0.1)
+
+proj.printProfile('test2')
+
 
 #proj.remMeanTrace(1000000)
 
 #proj.dewow(100000000)
 
-#proj.printTWTT('testfig.pdf',timelim=[0,700])
+#proj.printProfile('testfig.pdf',timelim=[0,700])
 
 #proj.writeHistory("test1.py")
 
@@ -71,4 +74,4 @@ proj.showTWTT()
 
 
 
-plt.show()
+#plt.show()
