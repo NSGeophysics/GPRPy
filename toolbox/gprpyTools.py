@@ -90,3 +90,9 @@ def remMeanTrace(data,ntraces):
             
     return newdata
 
+#def tpowGain(data,twtt,power):
+#    factor = np.reshape(twtt**(float(power)),
+#                                        (len(twtt),1)))
+#    factmat = np.matlib.repmat(factor,(data).shape[1]))
+#
+#    return np.multiply(data,factmat)

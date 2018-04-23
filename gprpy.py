@@ -202,6 +202,13 @@ class gprpy2d:
         self.history.append(histstr)
 
 
+    #def tpowGain(self,power):
+    #    # Store previous state for undo
+    #    self.storePrevious()
+    #    
+    #    self.data = tools.tpowGain
+        
+
     def setVelocity(self,velocity):
         # Store previous state for undo
         self.storePrevious()
