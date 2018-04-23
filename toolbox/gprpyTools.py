@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.matlib as matlib 
 # For progress bar
 import time
 from tqdm import tqdm
@@ -90,9 +91,8 @@ def remMeanTrace(data,ntraces):
             
     return newdata
 
-#def tpowGain(data,twtt,power):
-#    factor = np.reshape(twtt**(float(power)),
-#                                        (len(twtt),1)))
-#    factmat = np.matlib.repmat(factor,(data).shape[1]))
-#
-#    return np.multiply(data,factmat)
+def tpowGain(data,twtt,power):
+    factor = np.reshape(twtt**(float(power)),(len(twtt),1))
+    factmat = matlib.repmat(factor,1,data.shape[1])
+    
+    return np.multiply(data,factmat)

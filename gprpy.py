@@ -194,19 +194,21 @@ class gprpy2d:
     def remMeanTrace(self,ntraces):
         # Store previous state for undo
         self.storePrevious()
-
-        self.data = tools.remMeanTrace(self.data,ntraces)
-        
+        # apply
+        self.data = tools.remMeanTrace(self.data,ntraces)        
         # Put in history
         histstr = "mygpr.remMeanTrace(%d)" %(ntraces)
         self.history.append(histstr)
 
 
-    #def tpowGain(self,power):
-    #    # Store previous state for undo
-    #    self.storePrevious()
-    #    
-    #    self.data = tools.tpowGain
+    def tpowGain(self,power=0.0):
+        # Store previous state for undo
+        self.storePrevious()
+        # apply tpowGain
+        self.data = tools.tpowGain(self.data,self.twtt,power)
+        # Put in history
+        histstr = "mygpr.tpowGain(%g)" %(power)
+        self.history.append(histstr)
         
 
     def setVelocity(self,velocity):

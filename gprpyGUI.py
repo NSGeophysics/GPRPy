@@ -21,6 +21,8 @@ import gprpy as gp
 from scipy import signal
 import numpy as np
 
+colsp=2
+
 class GPRPyApp:
 
     def __init__(self,master):
@@ -53,7 +55,7 @@ class GPRPyApp:
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
         LoadButton.config(height = 1, width = 10)         
-        LoadButton.grid(row=0, column=7, sticky='nsew')
+        LoadButton.grid(row=0, column=7, sticky='nsew',columnspan=colsp)
 
 
         # Dewow
@@ -65,7 +67,7 @@ class GPRPyApp:
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
         DewowButton.config(height = 1, width = 10)         
-        DewowButton.grid(row=1, column=7, sticky='nsew')
+        DewowButton.grid(row=1, column=7, sticky='nsew',columnspan=colsp)
 
 
         
@@ -78,7 +80,7 @@ class GPRPyApp:
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
         TZAButton.config(height = 1, width = 10)         
-        TZAButton.grid(row=2, column=7, sticky='nsew')
+        TZAButton.grid(row=2, column=7, sticky='nsew',columnspan=colsp)
 
         
         
@@ -92,12 +94,26 @@ class GPRPyApp:
                                                 contrast=float(contr.get()),
                                                 color=colvar.get())])
         remMeanTraceButton.config(height = 1, width = 10)         
-        remMeanTraceButton.grid(row=3, column=7, sticky='nsew')
+        remMeanTraceButton.grid(row=3, column=7, sticky='nsew',columnspan=colsp)
 
 
 
         # Gain: row 4
+        tpowButton = tk.Button(
+            text="tpow", fg="black",
+            command=lambda : [self.tpowGain(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                   maxyval=float(myv.get()),
+                                                   contrast=float(contr.get()),
+                                                   color=colvar.get())])
+        tpowButton.config(height=1, width=1)
+        tpowButton.grid(row=4, column=7, sticky='nsew')
 
+        agcButton = tk.Button(
+            text="AGC",fg="black", command=None)
+        agcButton.config(height=1, width=1)
+        agcButton.grid(row=4, column=8, sticky='nsew')
+        
 
         # Set Velocity: row 11
         setVelButton = tk.Button(
@@ -108,10 +124,10 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         setVelButton.config(height = 1, width = 10)         
-        setVelButton.grid(row=11, column=7, sticky='nsew')
+        setVelButton.grid(row=11, column=7, sticky='nsew',columnspan=colsp)
 
         # Topo Correct row 12
-
+        
 
 
         
@@ -120,22 +136,24 @@ class GPRPyApp:
             text="Save Data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
-        SaveButton.grid(row=13, column=7, sticky='nsew')
+        SaveButton.grid(row=13, column=7, sticky='nsew',columnspan=colsp)
 
         # Print Figure
         PrintButton = tk.Button(
             text="Print Figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig,maxyval=myv.get(),contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
-        PrintButton.grid(row=14, column=7, sticky='nsew')
+        PrintButton.grid(row=14, column=7, sticky='nsew',columnspan=colsp)
 
         # Write history
         HistButton = tk.Button(
             text="Write history", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 10)         
-        HistButton.grid(row=15, column=7, sticky='nsew')
+        HistButton.grid(row=15, column=7, sticky='nsew',columnspan=colsp)
         
+
+
         
         ## Plotting
         
@@ -202,6 +220,11 @@ class GPRPyApp:
         proj.remMeanTrace(ntraces=ntraces)
 
 
+    def tpowGain(self,proj):
+        power = sd.askfloat("Input","Power for tpow gain?")
+        proj.tpowGain(power=power)
+        
+        
     def setVelocity(self,proj):
         velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
         proj.setVelocity(velocity)

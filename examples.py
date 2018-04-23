@@ -6,11 +6,17 @@ filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
 #filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
 
-proj.printProfile('test1')
+proj.tpowGain(1.5)
 
-proj.setVelocity(0.1)
+#proj.showProfile()
 
-proj.printProfile('test2')
+#plt.show()
+
+proj.printProfile('test1.pdf')
+
+#proj.setVelocity(0.1)
+
+#proj.printProfile('test2')
 
 
 #proj.remMeanTrace(1000000)
