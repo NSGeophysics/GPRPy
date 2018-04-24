@@ -96,3 +96,27 @@ def tpowGain(data,twtt,power):
     factmat = matlib.repmat(factor,1,data.shape[1])
     
     return np.multiply(data,factmat)
+
+
+def agcGain(data,window):
+    eps=1e-8
+    newdata = np.asmatrix(np.zeros(data.shape))
+    # For each trace
+    for tr in tqdm(range(0,data.shape[1])):
+        trace = data[:,tr]
+        energy = np.zeros(trace.shape)
+        for i in range(0,len(trace)):
+            winstart = int(i - np.floor(window/2.0))
+            winend = int(i + np.floor(window/2.0))
+            # If running mean window goes outside of range,
+            # set range to "beginning until length"
+            if winstart < 0:
+                winstart = 0
+                winend = window
+            # Or to "end-length to end"
+            if winend > len(trace):
+                winstart = len(trace) - window
+                winend = len(trace)     
+            energy[i] = np.max(np.linalg.norm(trace[winstart:winend]) ,eps)
+        newdata[:,tr] = np.divide(data[:,tr],energy)
+        
