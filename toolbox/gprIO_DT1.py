@@ -1,6 +1,5 @@
 import struct
 import numpy as np
-import array
 import re # Regular expressions
 
 def readdt1(filename):
