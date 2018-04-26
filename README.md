@@ -1,7 +1,7 @@
 # GPRPy
 Ground Penetrating Radar processing and visualization software for python 3.
 
-![alt text](https://github.com/NSGeophysics/GPRPy/gprPy.png)
+![alt text](https://github.com/NSGeophysics/GPRPy/blob/master/gprPy.png)
 
 
 To install python, either check out https://www.anaconda.com/download/
