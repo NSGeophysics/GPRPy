@@ -117,6 +117,8 @@ def agcGain(data,window):
             if winend > len(trace):
                 winstart = len(trace) - window
                 winend = len(trace)     
-            energy[i] = np.max(np.linalg.norm(trace[winstart:winend]) ,eps)
+            energy[i] = np.max([np.linalg.norm(trace[winstart:winend]) ,eps])
         newdata[:,tr] = np.divide(data[:,tr],energy)
-        
+    return newdata
+
+

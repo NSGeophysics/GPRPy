@@ -110,7 +110,12 @@ class GPRPyApp:
         tpowButton.grid(row=4, column=7, sticky='nsew')
 
         agcButton = tk.Button(
-            text="AGC",fg="black", command=None)
+            text="AGC",fg="black",
+            command=lambda : [self.agcGain(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                   maxyval=float(myv.get()),
+                                                   contrast=float(contr.get()),
+                                                   color=colvar.get())])
         agcButton.config(height=1, width=1)
         agcButton.grid(row=4, column=8, sticky='nsew')
         
@@ -224,6 +229,11 @@ class GPRPyApp:
         power = sd.askfloat("Input","Power for tpow gain?")
         proj.tpowGain(power=power)
         
+
+    def agcGain(self,proj):
+        window = sd.askinteger("Input","Window length for AGC?")
+        proj.agcGain(window=window)
+    
         
     def setVelocity(self,proj):
         velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
@@ -255,7 +265,8 @@ class GPRPyApp:
 
         a.clear()
         
-        stdcont = np.argmax(abs(proj.data))
+        stdcont = np.max(abs(proj.data))
+        
         if proj.velocity is None:
             a.imshow(proj.data,cmap=color,extent=[min(proj.profilePos),
                                                   max(proj.profilePos),

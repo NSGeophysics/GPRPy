@@ -209,6 +209,15 @@ class gprpy2d:
         # Put in history
         histstr = "mygpr.tpowGain(%g)" %(power)
         self.history.append(histstr)
+
+    def agcGain(self,window=10):
+        # Store previous state for undo
+        self.storePrevious()
+        # apply agcGain
+        self.data = tools.agcGain(self.data,window)
+        # Put in history
+        histstr = "mygpr.agcGain(%d)" %(float(window))
+        self.history.append(histstr)
         
 
     def setVelocity(self,velocity):
