@@ -104,12 +104,6 @@ class gprpy2d:
         histstr = "mygpr.save('%s')" %(filename)
         self.history.append(histstr)
 
-        
-    #def setRange(self, profilerange):
-    #    # Only use this if the step size is not accurate
-    #    self.profilerange=[min(profilerange),max(profilerange)]
-    #    histstr = "mygpr.setRange([%f, %f])" %(min(profilerange),max(profilerange))
-    #    self.history.append(histstr)
 
 
     
@@ -168,6 +162,16 @@ class gprpy2d:
         
 
     ####### Processing #######
+
+    def setRange(self,minPos,maxPos):
+        # Adjust the length of the profile, in case the trigger wheel is not
+        # Calibrated
+        # Store previous state for undo
+        self.storePrevious()
+        self.profilePos=np.linspace(minPos,maxPos,np.size(self.profilePos))
+        histstr = "mygpr.setRange(%g,%g)" %(minPos,maxPos)
+        self.history.append(histstr)
+    
 
     def timeZeroAdjust(self):
         # Store previous state for undo
@@ -232,6 +236,28 @@ class gprpy2d:
         self.history.append(histstr)
             
 
+    def topoCorrect(self,topofile,positions=None):
+        if self.velocity is None:
+            print("First need to set velocity!")
+            return
+        
+        topoPos,topoVal = tools.prepTopo(topofile,positions)
+        #plt.plot(topoPos,topoVal)
+        #plt.show()
+        self.data = tools.correctTopo(self.data, velocity=self.velocity,
+                                profilePos=self.profilePos, topoPos=topoPos,
+                                topoVal=topoVal)
+        # Put in history
+        if positions is None:
+            histstr = "mygpr.topoCorrect(%s)" %(topofile)
+        elif type(positions) is int:
+            histstr = "mygpr.topoCorrect(%s,%d)" %(topofile,positions)
+        elif type(positions) is float:
+            histstr = "mygpr.topoCorrect(%s,%g)" %(topofile,positions)
+        elif type(positions) is str:
+            histstr = "mygpr.topoCorrect(%s,%s)" %(topofile,positions)
+        self.history.append(histstr)
+        
 
     def storePrevious(self):        
         self.previous["data"] = self.data

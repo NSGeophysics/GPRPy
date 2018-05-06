@@ -1,5 +1,6 @@
 import numpy as np
-import numpy.matlib as matlib 
+import numpy.matlib as matlib
+import scipy.interpolate as interp
 # For progress bar
 import time
 from tqdm import tqdm
@@ -122,3 +123,66 @@ def agcGain(data,window):
     return newdata
 
 
+def prepTopo(topofile,position=None):
+    # Read topofile, see if it is two columns or three columns.
+    # Here I'm using numpy's loadtxt. There are more advanced readers around
+    # but this one should do for this simple situation
+    delimiter = ','
+    topotable = np.loadtxt(topofile,delimiter=delimiter)
+    topomat = np.asmatrix(topotable)
+    # Depending if the table has two or three columns,
+    # need to treat it differently
+    if topomat.shape[1] is 3:
+        # Turn the three-dimensional positions into along-profile
+        # distances
+        topoVal=topomat[:,2]
+        npos = topomat.shape[0]
+        steplen = np.sqrt(
+            np.power( topomat[1:npos,0]-topomat[0:npos-1,0] ,2.0) + 
+            np.power( topomat[1:npos,1]-topomat[0:npos-1,1] ,2.0)
+        )
+        alongdist = np.cumsum(steplen)
+        topoPos = np.append(0,alongdist)
+    elif topomat.shape[1] is 2:
+        topoPos=topomat[:,0]
+        topoVal=topomat[:,1]
+        
+    return topoPos, topoVal
+
+def correctTopo(data, velocity, profilePos, topoPos, topoVal):
+    # The variable "topoPos" provides the along-profile coordinates
+    # for which the topography is given. 
+    # We allow several possibilities to provide topoPos:
+    # If None is given, then we assume that they are regularly
+    # spaced along the profile
+    if topoPos is None:
+        topoPos = np.linspace(np.min(profilePos),np.max(profilePos),
+                              np.size(topoVal))
+    # If it's an integer or a float, then it gives the evenly spaced
+    # intervals
+    elif type(topoPos) is int:
+        topoPos = np.arange(np.min(profilePos),np.max(profilePos),
+                            float(topoPos))
+    elif type(topoPos) is float:
+        topoPos = np.arange(np.min(profilePos),np.max(profilePos),
+                            topoPos)
+    # Or it could be a file giving the actual along-profile positions    
+    elif type(topoPos) is str:
+        delimiter = ','
+        topopostable = np.loadtxt(topoPos,delimiter=delimiter)
+
+    # Next we need to interpolate the topography
+    elev = interp.pchip_interpolate(topoPos,topoVal,profilePos)
+
+    # Turn each elevation point into a two way travel-time shift.
+    # It's two-way travel time
+    etime = 2*elev/velocity
+
+    print("Not yet finished. Continue as in GPR-O elevCorrect")
+
+    return data
+
+    
+    
+
+    

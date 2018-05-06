@@ -3,16 +3,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
+topofile = 'exampledata/SnS/ComOffs/GPS.xyz'
 #filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
 
-proj.agcGain(20)
+proj.setVelocity(0.1)
+
+proj.topoCorrect(topofile) 
+
+#proj.agcGain(20)
 
 #proj.showProfile()
 
 #plt.show()
 
-proj.printProfile('test1.pdf')
+#proj.printProfile('test1.pdf')
 
 #proj.setVelocity(0.1)
 
