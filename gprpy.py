@@ -246,7 +246,8 @@ class gprpy2d:
         #plt.show()
         self.data = tools.correctTopo(self.data, velocity=self.velocity,
                                 profilePos=self.profilePos, topoPos=topoPos,
-                                topoVal=topoVal)
+                                      topoVal=topoVal,
+                                      timeStep=self.twtt[1]-self.twtt[0])
         # Put in history
         if positions is None:
             histstr = "mygpr.topoCorrect(%s)" %(topofile)

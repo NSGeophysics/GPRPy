@@ -149,7 +149,7 @@ def prepTopo(topofile,position=None):
         
     return topoPos, topoVal
 
-def correctTopo(data, velocity, profilePos, topoPos, topoVal):
+def correctTopo(data, velocity, profilePos, topoPos, topoVal, timeStep):
     # The variable "topoPos" provides the along-profile coordinates
     # for which the topography is given. 
     # We allow several possibilities to provide topoPos:
@@ -174,9 +174,13 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal):
     # Next we need to interpolate the topography
     elev = interp.pchip_interpolate(topoPos,topoVal,profilePos)
 
+    elevdiff = elev-np.min(elev)
     # Turn each elevation point into a two way travel-time shift.
     # It's two-way travel time
-    etime = 2*elev/velocity
+    etime = 2*elevdiff/velocity
+
+    # Calculate the time shift for each trace
+    tshift = (np.round(etime/timeStep)).astype(int)
 
     print("Not yet finished. Continue as in GPR-O elevCorrect")
 
