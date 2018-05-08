@@ -1,5 +1,6 @@
 * DONE [#A] Add AGC. Button and gprpytool are already there
-* TODO [#A] Add topo correct: Load two files: one with x,y,z or x,z coordinates, one with corresponding profile points
+* DONE [#A] Add topo correct: Load two files: one with x,y,z or x,z coordinates, one with corresponding profile points
+* TODO [#A] Make depth / topoCorrect plots 1:1 aspect ratio
 * TODO [#A] Add "grid" button to show a grid over the figure
 * TODO [#B] make help available for buttons when mouse-over 
 * TODO [#B] make logo and put it into splash screen

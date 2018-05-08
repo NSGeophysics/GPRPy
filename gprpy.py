@@ -17,7 +17,8 @@ class gprpy2d:
             "info" : None,
             "profilePos" : None,
             "history" : None,
-            "velocity" : None}
+            "velocity" : None,
+            "maxTopo": None}
         
         if filename is not None:
             self.importdata(filename)                 
@@ -38,7 +39,7 @@ class gprpy2d:
 
             self.velocity = None
             self.depth = None
-            self.topoCorrected = False
+            self.maxTopo = None
             # Put what you did in history
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
@@ -52,7 +53,7 @@ class gprpy2d:
             #print("Not yet ready")
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history, velocity, depth, topoCorrected = pickle.load(f)
+                data, info, profilePos, twtt, history, velocity, depth, maxTopo = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
@@ -60,7 +61,7 @@ class gprpy2d:
             self.history = history
             self.velocity = velocity
             self.depth = depth
-            self.topoCorrected = topoCorrected
+            self.maxTopo = maxTopo
             
         else:
             print("Can only read dt1 or dzt files")
@@ -82,7 +83,7 @@ class gprpy2d:
         self.profilePos = self.previous["profilePos"]
         self.velocity = self.previous["velocity"]
         self.depth = self.previous["depth"]
-        self.topoCorrected = self.previous["topoCorrected"]
+        self.maxTopo = self.previous["maxTopo"]
         # Make sure to not keep deleting history
         # when applying undo several times. 
         histsav = copy.copy(self.previous["history"])
@@ -98,7 +99,7 @@ class gprpy2d:
         if not(file_ext=='.gpr'):
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
-            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.topoCorrected], f)
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.maxTopo], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -109,7 +110,7 @@ class gprpy2d:
     
     # This is a helper function
     def prepProfileFig(self, color="gray", contrast=1.0, timelim=None, profilelim=None):
-        stdcont = np.argmax(abs(self.data))
+        stdcont = np.nanmax(np.abs(self.data)[:])
 
         if self.velocity is None:
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
@@ -118,14 +119,20 @@ class gprpy2d:
                                                     min(self.twtt)],
                        aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
             plt.gca().set_ylabel("two-way travel time [ns]")
-        else:
+        elif self.maxTopo is None:
              plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                     max(self.profilePos),
                                                     max(self.depth),
                                                     min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
              plt.gca().set_ylabel("depth [m]")
-             
+        else:
+            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
+                                                    max(self.profilePos),
+                                                    max(self.depth)+self.maxTopo,
+                                                    min(self.depth)+self.maxTopo],
+                    aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
+            plt.gca().set_ylabel("elevation [m]")
             
         if timelim is not None:
             plt.ylim(timelim)
@@ -137,8 +144,7 @@ class gprpy2d:
         plt.gca().get_xaxis().set_visible(True)
         plt.gca().get_yaxis().set_visible(True)
         
-        if self.topoCorrected:
-            plt.gca().set_ylabel("elevation [m]")
+            
 
         plt.gca().set_xlabel("profile position")
         plt.gca().xaxis.tick_top()
@@ -236,28 +242,25 @@ class gprpy2d:
         self.history.append(histstr)
             
 
-    def topoCorrect(self,topofile,positions=None):
+    def topoCorrect(self,topofile):
         if self.velocity is None:
             print("First need to set velocity!")
             return
+
+        # Store previous state for undo
+        self.storePrevious()
         
-        topoPos,topoVal = tools.prepTopo(topofile,positions)
+        topoPos,topoVal = tools.prepTopo(topofile)
         #plt.plot(topoPos,topoVal)
         #plt.show()
-        self.data = tools.correctTopo(self.data, velocity=self.velocity,
-                                profilePos=self.profilePos, topoPos=topoPos,
-                                      topoVal=topoVal,
-                                      timeStep=self.twtt[1]-self.twtt[0])
+        self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
+                                                              profilePos=self.profilePos, topoPos=topoPos,
+                                                              topoVal=topoVal, twtt=self.twtt)
+
         # Put in history
-        if positions is None:
-            histstr = "mygpr.topoCorrect(%s)" %(topofile)
-        elif type(positions) is int:
-            histstr = "mygpr.topoCorrect(%s,%d)" %(topofile,positions)
-        elif type(positions) is float:
-            histstr = "mygpr.topoCorrect(%s,%g)" %(topofile,positions)
-        elif type(positions) is str:
-            histstr = "mygpr.topoCorrect(%s,%s)" %(topofile,positions)
+        histstr = "mygpr.topoCorrect(%s)" %(topofile)
         self.history.append(histstr)
+        
         
 
     def storePrevious(self):        
@@ -268,4 +271,4 @@ class gprpy2d:
         self.previous["history"] = self.history
         self.previous["velocity"] = self.velocity
         self.previous["depth"] = self.depth
-        self.previous["topoCorrected"] = self.topoCorrected
+        self.previous["maxTopo"] = self.maxTopo

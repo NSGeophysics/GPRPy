@@ -7,15 +7,21 @@ topofile = 'exampledata/SnS/ComOffs/GPS.xyz'
 #filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
 
+proj.dewow(100000000000000)
+
+proj.timeZeroAdjust()
+
+proj.remMeanTrace(1000000)
+
+proj.tpowGain(1.4)
+
 proj.setVelocity(0.1)
 
-proj.topoCorrect(topofile) 
+proj.topoCorrect(topofile)
 
-#proj.agcGain(20)
+proj.showProfile(color="bwr")
 
-#proj.showProfile()
-
-#plt.show()
+plt.show()
 
 #proj.printProfile('test1.pdf')
 

@@ -92,11 +92,14 @@ def remMeanTrace(data,ntraces):
             
     return newdata
 
+
+
 def tpowGain(data,twtt,power):
     factor = np.reshape(twtt**(float(power)),(len(twtt),1))
     factmat = matlib.repmat(factor,1,data.shape[1])
     
     return np.multiply(data,factmat)
+
 
 
 def agcGain(data,window):
@@ -123,7 +126,8 @@ def agcGain(data,window):
     return newdata
 
 
-def prepTopo(topofile,position=None):
+
+def prepTopo(topofile):
     # Read topofile, see if it is two columns or three columns.
     # Here I'm using numpy's loadtxt. There are more advanced readers around
     # but this one should do for this simple situation
@@ -149,7 +153,10 @@ def prepTopo(topofile,position=None):
         
     return topoPos, topoVal
 
-def correctTopo(data, velocity, profilePos, topoPos, topoVal, timeStep):
+
+
+
+def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
     # The variable "topoPos" provides the along-profile coordinates
     # for which the topography is given. 
     # We allow several possibilities to provide topoPos:
@@ -179,12 +186,31 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, timeStep):
     # It's two-way travel time
     etime = 2*elevdiff/velocity
 
+    timeStep=twtt[1]-twtt[0]
+    
     # Calculate the time shift for each trace
     tshift = (np.round(etime/timeStep)).astype(int)
 
-    print("Not yet finished. Continue as in GPR-O elevCorrect")
+    maxup = np.max(tshift)
 
-    return data
+    # We want the highest elevation to be zero time.
+    # Need to shift by the greatest amount, where  we are the lowest
+    tshift = np.max(tshift) - tshift
+
+    # Make new datamatrix
+    newdata = np.empty((data.shape[0]+maxup,data.shape[1]))
+    newdata[:] = np.nan
+
+    # Set new twtt
+    newtwtt = np.arange(0, twtt[-1] + maxup*timeStep, timeStep)
+
+    nsamples = len(twtt)
+    # Enter every trace at the right place into newdata
+    for pos in range(0,len(profilePos)):
+        #print(type(tshift[pos][0]))
+        newdata[tshift[pos][0]:tshift[pos][0]+nsamples ,pos] = np.squeeze(data[:,pos])
+
+    return newdata, newtwtt, np.max(elev)
 
     
     
