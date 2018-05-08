@@ -311,6 +311,8 @@ class GPRPyApp:
                      vmin=-stdcont/contrast, vmax=stdcont/contrast)
             a.set_ylim([0,min(maxyval,max(proj.depth))])
             a.set_ylabel("depth [m]")
+            #a.axis('equal')
+            #a.autoscale(tight=True)
             a.invert_yaxis()
         else:
             a.imshow(proj.data,cmap=color,extent=[min(proj.profilePos),
@@ -323,6 +325,9 @@ class GPRPyApp:
                 maxyval = 0            
             a.set_ylim([ max(maxyval,proj.maxTopo-max(proj.depth)) ,proj.maxTopo])
             a.set_ylabel("elevation [m]")
+            #a.axis('equal')
+            #a.autoscale(tight=True)
+           
             
         
         a.get_xaxis().set_visible(True)

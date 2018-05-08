@@ -139,8 +139,7 @@ class gprpy2d:
             plt.gca().invert_yaxis()
         if profilelim is not None:
             plt.xlim(profilelim)
-        #plt.gca().set_ylim([0,min(maxyval,max(proj.twtt))])
-        #plt.gca().invert_yaxis()
+
         plt.gca().get_xaxis().set_visible(True)
         plt.gca().get_yaxis().set_visible(True)
         
@@ -251,8 +250,6 @@ class gprpy2d:
         self.storePrevious()
         
         topoPos,topoVal = tools.prepTopo(topofile)
-        #plt.plot(topoPos,topoVal)
-        #plt.show()
         self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
                                                               profilePos=self.profilePos, topoPos=topoPos,
                                                               topoVal=topoVal, twtt=self.twtt)
