@@ -109,9 +109,9 @@ class gprpy2d:
 
     
     # This is a helper function
-    def prepProfileFig(self, color="gray", contrast=1.0, timelim=None, profilelim=None):
-        stdcont = np.nanmax(np.abs(self.data)[:])
-
+    def prepProfileFig(self, color="gray", contrast=1.0, maxyval=None, ylimits=None, profilelim=None):
+        stdcont = np.nanmax(np.abs(self.data)[:])       
+        
         if self.velocity is None:
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                     max(self.profilePos),
@@ -119,6 +119,9 @@ class gprpy2d:
                                                     min(self.twtt)],
                        aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
             plt.gca().set_ylabel("two-way travel time [ns]")
+            plt.gca().set_ylim([0,min(maxyval,max(self.twtt))])
+            plt.gca().invert_yaxis()
+            
         elif self.maxTopo is None:
              plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                     max(self.profilePos),
@@ -126,30 +129,32 @@ class gprpy2d:
                                                     min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
              plt.gca().set_ylabel("depth [m]")
+             plt.gca().set_ylim([0,min(maxyval,max(self.depth))])
+             plt.gca().invert_yaxis()
         else:
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                     max(self.profilePos),
-                                                    max(self.depth)+self.maxTopo,
-                                                    min(self.depth)+self.maxTopo],
+                                                    self.maxTopo-max(self.depth),
+                                                    self.maxTopo-min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
             plt.gca().set_ylabel("elevation [m]")
+            if maxyval > self.maxTopo:
+                maxyval = 0    
+            plt.gca().set_ylim([max(maxyval,self.maxTopo-max(self.depth)) ,self.maxTopo])
             
-        if timelim is not None:
-            plt.ylim(timelim)
-            plt.gca().invert_yaxis()
+        if ylimits is not None:
+            plt.ylim(ylimits)
+            
         if profilelim is not None:
             plt.xlim(profilelim)
 
         plt.gca().get_xaxis().set_visible(True)
-        plt.gca().get_yaxis().set_visible(True)
-        
-            
-
+        plt.gca().get_yaxis().set_visible(True)                
         plt.gca().set_xlabel("profile position")
         plt.gca().xaxis.tick_top()
         plt.gca().xaxis.set_label_position('top')
         
-        return contrast, color, timelim, profilelim
+        return contrast, color, maxyval, profilelim
        
     
     def showProfile(self, **kwargs):
@@ -158,11 +163,11 @@ class gprpy2d:
 
 
     def printProfile(self, figname, **kwargs):
-        contrast, color, timelim, profilelim = self.prepProfileFig(**kwargs)
+        contrast, color, maxyval, profilelim = self.prepProfileFig(**kwargs)
         plt.savefig(figname, format='pdf')
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, timelim=%s, profilelim=%s)" %(figname,color,contrast,timelim,profilelim)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, maxyval=%s, profilelim=%s)" %(figname,color,contrast,maxyval,profilelim)
         self.history.append(histstr)
         
 
@@ -255,7 +260,7 @@ class gprpy2d:
                                                               topoVal=topoVal, twtt=self.twtt)
 
         # Put in history
-        histstr = "mygpr.topoCorrect(%s)" %(topofile)
+        histstr = "mygpr.topoCorrect('%s')" %(topofile)
         self.history.append(histstr)
         
         

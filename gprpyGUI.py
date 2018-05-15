@@ -344,7 +344,7 @@ class GPRPyApp:
         figname = fd.asksaveasfilename(defaultextension=".pdf")        
         fig.savefig(figname, format='pdf')        
         # Put what you did in history        
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, timelim=[0,%g])" %(figname,color,contrast,maxyval)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, maxyval=%g)" %(figname,color,contrast,maxyval)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
         
