@@ -454,10 +454,11 @@ class GPRPyApp:
         
 
     def printProfileFig(self,proj,fig,yrng,xrng,asp,contrast,color):
-        figname = fd.asksaveasfilename(defaultextension=".pdf")        
-        fig.savefig(figname, format='pdf')        
+        figname = fd.asksaveasfilename(defaultextension=".pdf")
+        dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
+        fig.savefig(figname, format='pdf', dpi=dpi)        
         # Put what you did in history        
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
         

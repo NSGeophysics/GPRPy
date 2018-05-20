@@ -149,7 +149,7 @@ class gprpy2d:
             plt.xlim(xrng)
 
         if asp is not None:
-            a.set_aspect(asp)
+            plt.gca().set_aspect(asp)
 
         plt.gca().get_xaxis().set_visible(True)
         plt.gca().get_yaxis().set_visible(True)                
@@ -165,12 +165,12 @@ class gprpy2d:
         plt.show(block=False)
 
 
-    def printProfile(self, figname, **kwargs):
+    def printProfile(self, figname, dpi=None, **kwargs):
         contrast, color, yrng, xrng, asp = self.prepProfileFig(**kwargs)
-        plt.savefig(figname, format='pdf')
+        plt.savefig(figname, format='pdf', dpi=dpi)
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp)
+        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
         self.history.append(histstr)
         
 
