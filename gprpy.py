@@ -52,10 +52,10 @@ class gprpy2d:
             self.data, self.info = gprIO_DZT.readdzt(filename)
 
             self.profilePos = self.info["startposition"]+np.linspace(0.0,
-                                                                data.shape[1]/self.info["scpmeter"],
-                                                                data.shape[1])
+                                                                     self.data.shape[1]/self.info["scpmeter"],
+                                                                     self.data.shape[1])
             
-            self.twtt = np.linspace(0,self.info["nnanosecptrace"],self.info["sptrace"])
+            self.twtt = np.linspace(0,self.info["nanosecptrace"],self.info["sptrace"])
 
             self.velocity = None
             self.depth = None

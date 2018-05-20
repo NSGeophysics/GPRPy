@@ -74,6 +74,8 @@ def readdzt(filename):
     datvec = datvec - (2**bpdatum)/2.
 
     # reshape into matrix
-    data = np.reshape(datvec,sptrace,len(datvec)/sptrace)
+    print(sptrace)
+    print(int(len(datvec)/sptrace))
+    data = np.reshape(datvec,[sptrace,int(len(datvec)/sptrace)])
     
     return np.asmatrix(data), info
