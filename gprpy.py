@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import toolbox.gprIO_DT1 as gprIO_DT1
+import toolbox.gprIO_DZT as gprIO_DZT
 import toolbox.gprpyTools as tools
 import copy
 
@@ -25,6 +26,7 @@ class gprpy2d:
         
     def importdata(self,filename):
         file_name, file_ext = os.path.splitext(filename)
+        
         if file_ext==".DT1":
             self.data=gprIO_DT1.readdt1(filename)
             self.info=gprIO_DT1.readdt1Header(file_name + ".HD")
@@ -43,14 +45,27 @@ class gprpy2d:
             # Put what you did in history
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
-           
-            
+                    
             
         elif file_ext==".DZT":
-            print("DZT Not yet implemented")
+
+            self.data, self.info = gprIO_DZT.readdzt(filename)
+
+            self.profilePos = self.info["startposition"]+np.linspace(0.0,
+                                                                data.shape[1]/self.info["scpmeter"],
+                                                                data.shape[1])
             
+            self.twtt = np.linspace(0,self.info["nnanosecptrace"],self.info["sptrace"])
+
+            self.velocity = None
+            self.depth = None
+            self.maxTopo = None
+            # Put what you did in history
+            histstr = "mygpr.importdata('%s')" %(filename)
+            self.history.append(histstr)
+    
+                      
         elif file_ext==".gpr":
-            #print("Not yet ready")
             ## Getting back the objects:
             with open(filename, 'rb') as f:
                 data, info, profilePos, twtt, history, velocity, depth, maxTopo = pickle.load(f)
