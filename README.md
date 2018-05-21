@@ -19,6 +19,10 @@ or
 
 `pip3 install numpy`
 
+or 
+
+`conda install numpy`
+
 
 #### To run the GUI:
 
