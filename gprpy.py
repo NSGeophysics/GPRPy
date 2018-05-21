@@ -203,10 +203,8 @@ class gprpy2d:
 
     def timeZeroAdjust(self):
         # Store previous state for undo
-        self.storePrevious()
-        
-        self.data = tools.timeZeroAdjust(self.data)
-        
+        self.storePrevious()        
+        self.data = tools.timeZeroAdjust(self.data)      
         # Put what you did in history
         histstr = "mygpr.timeZeroAdjust()"
         self.history.append(histstr)
@@ -216,12 +214,22 @@ class gprpy2d:
         # Store previous state for undo
         self.storePrevious()
         # set new profile positions
-        self.profilePos = np.linspace(minPos,maxPos,len(self.profilePos))
-        
+        self.profilePos = np.linspace(minPos,maxPos,len(self.profilePos))       
         # Put what you did in history
         histstr = "mygpr.adjProfile(%g,%g)" %(minPos,maxPos)
         self.history.append(histstr)   
         
+    def setZeroTime(self,newZeroTime):
+        # Store previous state for undo
+        self.storePrevious()
+        # Find index of value that is nearest to newZeroTime
+        zeroind = np.abs(self.twtt - newZeroTime).argmin() 
+        # Cut out everything before
+        self.twtt = self.twtt[zeroind:] - newZeroTime
+        self.data = self.data[zeroind:,:]
+        # Put what you did in history
+        histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
+        self.history.append(histstr)  
         
     def dewow(self,window):
         # Store previous state for undo
@@ -275,15 +283,13 @@ class gprpy2d:
         self.history.append(histstr)
             
 
-    def topoCorrect(self,topofile):
+    def topoCorrect(self,topofile,delimiter=','):
         if self.velocity is None:
             print("First need to set velocity!")
             return
-
         # Store previous state for undo
         self.storePrevious()
-        
-        topoPos,topoVal = tools.prepTopo(topofile)
+        topoPos,topoVal = tools.prepTopo(topofile,delimiter)
         self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
                                                               profilePos=self.profilePos, topoPos=topoPos,
                                                               topoVal=topoVal, twtt=self.twtt)

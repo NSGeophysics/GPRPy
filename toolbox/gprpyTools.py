@@ -127,11 +127,11 @@ def agcGain(data,window):
 
 
 
-def prepTopo(topofile):
+def prepTopo(topofile,delimiter=','):
     # Read topofile, see if it is two columns or three columns.
     # Here I'm using numpy's loadtxt. There are more advanced readers around
     # but this one should do for this simple situation
-    delimiter = ','
+    #delimiter = ','
     topotable = np.loadtxt(topofile,delimiter=delimiter)
     topomat = np.asmatrix(topotable)
     # Depending if the table has two or three columns,
@@ -139,7 +139,7 @@ def prepTopo(topofile):
     if topomat.shape[1] is 3:
         # Turn the three-dimensional positions into along-profile
         # distances
-        topoVal=topomat[:,2]
+        topoVal = topomat[:,2]
         npos = topomat.shape[0]
         steplen = np.sqrt(
             np.power( topomat[1:npos,0]-topomat[0:npos-1,0] ,2.0) + 
@@ -148,8 +148,9 @@ def prepTopo(topofile):
         alongdist = np.cumsum(steplen)
         topoPos = np.append(0,alongdist)
     elif topomat.shape[1] is 2:
-        topoPos=topomat[:,0]
-        topoVal=topomat[:,1]
+        topoPos = topomat[:,0]
+        topoVal = topomat[:,1]
+        topoPos = np.squeeze(np.asarray(topoPos))
         
     return topoPos, topoVal
 

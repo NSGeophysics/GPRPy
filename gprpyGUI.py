@@ -46,9 +46,9 @@ class GPRPyApp:
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7,rowspan=15,sticky='nsew')
-        canvas.draw()
- 
+        canvas.draw() 
 
+        
         # Load data
         LoadButton = tk.Button(
             text="Import Data", fg="black",
@@ -76,6 +76,20 @@ class GPRPyApp:
         AdjProfileButton.config(height = 1, width = 10)         
         AdjProfileButton.grid(row=2, column=rightcol, sticky='nsew',columnspan=colsp)
 
+        # Set new zero time
+        SetZeroTimeButton = tk.Button(
+            text="Set Zero Time", fg="black",
+            command=lambda : [self.setZeroTime(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                   yrng=self.yrng,
+                                                   xrng=self.xrng,
+                                                   asp=self.asp,
+                                                   contrast=float(contr.get()),
+                                                   color=colvar.get())])
+        SetZeroTimeButton.config(height = 1, width = 10)         
+        SetZeroTimeButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)    
+            
+        
         
         # Dewow
         DewowButton = tk.Button(
@@ -88,7 +102,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         DewowButton.config(height = 1, width = 10)         
-        DewowButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)
+        DewowButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
 
 
         
@@ -103,7 +117,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         TZAButton.config(height = 1, width = 10)         
-        TZAButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        TZAButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         
@@ -119,11 +133,11 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         remMeanTraceButton.config(height = 1, width = 10)         
-        remMeanTraceButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
+        remMeanTraceButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
 
 
 
-        # Gain: row 4
+        # Gain: row 7
         tpowButton = tk.Button(
             text="tpow", fg="black",
             command=lambda : [self.tpowGain(proj),
@@ -134,7 +148,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         tpowButton.config(height=1, width=1)
-        tpowButton.grid(row=6, column=rightcol, sticky='nsew')
+        tpowButton.grid(row=7, column=rightcol, sticky='nsew')
 
         agcButton = tk.Button(
             text="AGC",fg="black",
@@ -146,10 +160,10 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         agcButton.config(height=1, width=1)
-        agcButton.grid(row=6, column=rightcol+1, sticky='nsew')
+        agcButton.grid(row=7, column=rightcol+1, sticky='nsew')
         
 
-        # Set Velocity: row 11
+        # Set Velocity: row 8
         setVelButton = tk.Button(
             text="Set velocity", fg="black",
             command=lambda : [self.setVelocity(proj),
@@ -160,9 +174,9 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         setVelButton.config(height = 1, width = 10)         
-        setVelButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
 
-        # Topo Correct row 12
+        # Topo Correct row 9
         topoCorrectButton = tk.Button(
             text="Topo Correct", fg="black",
             command=lambda : [self.topoCorrect(proj),
@@ -173,7 +187,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         topoCorrectButton.config(height = 1, width = 10)
-        topoCorrectButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         # Save data
@@ -288,7 +302,7 @@ class GPRPyApp:
                                                   color=colvar.get()))
         plotButton.config(height = 1, width = 10)
         plotButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
-        
+                
 
         
 
@@ -318,6 +332,10 @@ class GPRPyApp:
         maxPos = sd.askfloat("Input","End x coordinate")
         proj.adjProfile(minPos=minPos,maxPos=maxPos)
         self.xrng=[minPos,maxPos]
+
+    def setZeroTime(self,proj):
+        newZeroTime = sd.askfloat("Input","New zero time")
+        proj.setZeroTime(newZeroTime=newZeroTime)
         
         
     def dewow(self,proj):
@@ -350,10 +368,15 @@ class GPRPyApp:
         if proj.velocity is None:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
-
-        mesbox.showinfo("Select file",'Choose csv file containing the topography points. Columns can be "Northing, Easting, Elevation" or "Profile, Elevation"')
+        mesbox.showinfo("Select file",'Choose file containing the topography points. Columns can be "Northing, Easting, Elevation" or "Profile, Elevation"')
         topofile = fd.askopenfilename()
-        proj.topoCorrect(topofile)
+        #delimiter = sd.askstring("Input","Value delimiter? Example: ',' (comma) or '\t' (tab) ")
+        commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
+        if commasep:
+            delimiter = ','
+        else:
+            delimiter = '\t'            
+        proj.topoCorrect(topofile,delimiter)
         self.prevyrng=self.yrng
         self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo]
         
@@ -451,6 +474,13 @@ class GPRPyApp:
         
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
         canvas.draw()
+
+        # Allow for cursor coordinates being displayed        
+        def moved(event):
+            canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
+                  
+        canvas.mpl_connect('button_press_event', moved)
+        tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
         
 
     def printProfileFig(self,proj,fig,yrng,xrng,asp,contrast,color):
@@ -461,6 +491,8 @@ class GPRPyApp:
         histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
+    
+
         
 root = tk.Tk()
 
