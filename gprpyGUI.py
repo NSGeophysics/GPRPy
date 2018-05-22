@@ -52,7 +52,7 @@ class GPRPyApp:
         
         # Load data
         LoadButton = tk.Button(
-            text="Import Data", fg="black",
+            text="import data", fg="black",
             command=lambda : [self.loadData(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -66,7 +66,7 @@ class GPRPyApp:
 
         # Adjust profile length; if trigger wheel is not good
         AdjProfileButton = tk.Button(
-            text="Adj Profile", fg="black",
+            text="adj profile", fg="black",
             command=lambda : [self.adjProfile(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -79,7 +79,7 @@ class GPRPyApp:
 
         # Set new zero time
         SetZeroTimeButton = tk.Button(
-            text="Set Zero Time", fg="black",
+            text="set zero time", fg="black",
             command=lambda : [self.setZeroTime(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -94,7 +94,7 @@ class GPRPyApp:
         
         # Dewow
         DewowButton = tk.Button(
-            text="Dewow", fg="black",
+            text="dewow", fg="black",
             command=lambda : [self.dewow(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -109,7 +109,7 @@ class GPRPyApp:
         
         # TimeZero Adjust
         TZAButton = tk.Button(
-            text="Time Zero Adj", fg="black",
+            text="time zero adj", fg="black",
             command=lambda : [proj.timeZeroAdjust(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -125,7 +125,7 @@ class GPRPyApp:
 
         # Rem mean trace
         remMeanTraceButton = tk.Button(
-            text="Rem mean tr", fg="black",
+            text="rem mean tr", fg="black",
             command=lambda : [self.remMeanTrace(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -152,7 +152,7 @@ class GPRPyApp:
         tpowButton.grid(row=7, column=rightcol, sticky='nsew')
 
         agcButton = tk.Button(
-            text="AGC",fg="black",
+            text="agc",fg="black",
             command=lambda : [self.agcGain(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -166,7 +166,7 @@ class GPRPyApp:
 
         # Set Velocity: row 8
         setVelButton = tk.Button(
-            text="Set velocity", fg="black",
+            text="set velocity", fg="black",
             command=lambda : [self.setVelocity(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -179,7 +179,7 @@ class GPRPyApp:
 
         # Topo Correct row 9
         topoCorrectButton = tk.Button(
-            text="Topo Correct", fg="black",
+            text="topo correct", fg="black",
             command=lambda : [self.topoCorrect(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -192,11 +192,24 @@ class GPRPyApp:
 
 
         # Put new functionality here
+
+        # show hyperbola, remove hyperbola:
+        # Buttons next to each other
+        hypOnButton = tk.Button(
+            text="show hyperb", fg="black",
+            command=lambda : [self.showHyp(proj,a), canvas.draw()])
+        hypOnButton.config(height = 1, width = 5)
+        hypOnButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+
+        
+        # Pick points
+        # Button to start picking:
+        # With each click I add a point
         
         
         # Save data
         SaveButton = tk.Button(
-            text="Save Data", fg="black",
+            text="save data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
         SaveButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
@@ -204,7 +217,7 @@ class GPRPyApp:
         
         # Print Figure
         PrintButton = tk.Button(
-            text="Print Figure", fg="black",
+            text="print figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig,yrng=self.yrng,xrng=self.xrng,asp=self.asp,contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
         PrintButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
@@ -212,7 +225,7 @@ class GPRPyApp:
         
         # Write history
         HistButton = tk.Button(
-            text="Write history", fg="black",
+            text="write history", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 10)         
         HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
@@ -224,7 +237,7 @@ class GPRPyApp:
 
         # Undo Button
         undoButton = tk.Button(
-            text="Undo",
+            text="undo",
             command=lambda : [proj.undo(),
                               self.resetYrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
@@ -239,7 +252,7 @@ class GPRPyApp:
 
         # X range
         XrngButton = tk.Button(
-            text="Set x-range", fg="black",
+            text="set x-range", fg="black",
             command=lambda : [self.setXrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -253,7 +266,7 @@ class GPRPyApp:
 
         # Y range
         YrngButton = tk.Button(
-            text="Set y-range", fg="black",
+            text="set y-range", fg="black",
             command=lambda : [self.setYrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -266,7 +279,7 @@ class GPRPyApp:
 
         # Aspect
         AspButton = tk.Button(
-            text="Aspect Ratio", fg="black",
+            text="aspect ratio", fg="black",
             command=lambda : [self.setAspect(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
@@ -280,7 +293,7 @@ class GPRPyApp:
 
         # Contrast
         contrtext = tk.StringVar()
-        contrtext.set("Contrast")
+        contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 6)
         contrlabel.grid(row=0, column=4, sticky='nsew')
         contr = tk.DoubleVar()
@@ -297,7 +310,7 @@ class GPRPyApp:
 
         # Refreshing plot
         plotButton = tk.Button(
-            text="Refresh Plot",
+            text="refresh plot",
             command=lambda : self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                   yrng=self.yrng,
                                                   xrng=self.xrng,
@@ -477,6 +490,7 @@ class GPRPyApp:
         
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
         canvas.draw()
+                    
 
         # Allow for cursor coordinates being displayed        
         def moved(event):
@@ -484,6 +498,20 @@ class GPRPyApp:
                   
         canvas.mpl_connect('button_press_event', moved)
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
+
+
+
+    # Show hyperbola
+    def showHyp(self,proj,a):
+        x0 = sd.askfloat("Input","Hyperbola center on profile [m]")
+        t0 = sd.askfloat("Input","Hyperbola apex location (two-way travel time [ns])")
+        v  = sd.askfloat("Input","Estimated velocity [m/ns]")
+        # t0 is two-way travel time
+        y=proj.profilePos-x0
+        d=v*t0/2.0
+        k=np.sqrt(d**2 + np.power(y,2))
+        t2=2*k/v
+        a.plot(proj.profilePos,t2,'--c',linewidth=3)
         
 
     def printProfileFig(self,proj,fig,yrng,xrng,asp,contrast,color):
