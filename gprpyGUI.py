@@ -191,13 +191,16 @@ class GPRPyApp:
         topoCorrectButton.config(height = 1, width = 10)
         topoCorrectButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
 
+
+        # Put new functionality here
+        
         
         # Save data
         SaveButton = tk.Button(
             text="Save Data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
-        SaveButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         # Print Figure
@@ -205,7 +208,7 @@ class GPRPyApp:
             text="Print Figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig,yrng=self.yrng,xrng=self.xrng,asp=self.asp,contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
-        PrintButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         # Write history
@@ -213,7 +216,7 @@ class GPRPyApp:
             text="Write history", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 10)         
-        HistButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         
 
 
