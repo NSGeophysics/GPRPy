@@ -10,17 +10,15 @@ import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
 from tkinter import messagebox as mesbox
-
 import matplotlib as mpl
 mpl.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-#import matplotlib.pyplot as plt
-
 import gprpy as gp
-
 from scipy import signal
 import numpy as np
+import toolbox.splash as splash
+
 
 colsp=2
 rightcol=7
@@ -40,8 +38,10 @@ class GPRPyApp:
         # Show splash screen
         fig=Figure(figsize=(8,5))
         a=fig.add_subplot(111)
-        splash=signal.ricker(50,4)
-        a.plot(splash)
+        splash.showSplash(a)
+        # splash=signal.ricker(50,4)
+        # a.plot(splash)
+        
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
@@ -304,7 +304,6 @@ class GPRPyApp:
         plotButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
                 
 
-        
 
     def setYrng(self):
         ylow = sd.askfloat("Input","Min Y value")
