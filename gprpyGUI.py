@@ -200,7 +200,7 @@ class GPRPyApp:
             text="Save Data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
-        SaveButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         # Print Figure
