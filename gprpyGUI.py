@@ -15,7 +15,6 @@ mpl.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import gprpy as gp
-from scipy import signal
 import numpy as np
 import toolbox.splash as splash
 import os
