@@ -9,19 +9,21 @@ or https://www.python.org/
 
 #### Requires:
 
-numpy, scipy, matplotlib, pickle, tkinter, struct, re
+numpy, scipy, matplotlib, pickle, tkinter, struct, re, tqdm, Pmw
 
-you can install each of them by running
+Of these, numpy, scipy, matplotlib, pickle, tkinter, struct, and re often come preinstalled. 
 
-`pip install numpy`
+You can install missing packages (perhaps tqdm and Pmw) by running
+
+`pip install tqdm Pmw`
 
 or
 
-`pip3 install numpy`
+`pip3 install tqdm Pmw`
 
 or 
 
-`conda install numpy`
+`conda install tqdm Pmw`
 
 If pip or conda can't find a specific package (for example pickle), then it may already be installed.
 

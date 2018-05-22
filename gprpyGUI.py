@@ -18,6 +18,7 @@ import gprpy as gp
 import numpy as np
 import toolbox.splash as splash
 import os
+import Pmw
 
 
 colsp=2
@@ -29,6 +30,8 @@ class GPRPyApp:
         self.window = master
 
         master.title("GPRPy")
+
+        self.balloon = Pmw.Balloon()
         
         # Initialize the gprpy
         proj = gp.gprpy2d()
@@ -61,7 +64,7 @@ class GPRPyApp:
                                                    color=colvar.get())])
         LoadButton.config(height = 1, width = 10)         
         LoadButton.grid(row=0, column=rightcol, sticky='nsew',columnspan=colsp,rowspan=2)
-
+        self.balloon.bind(LoadButton,"Load .gpr, .DT1, or .DZT data.")
 
         # Adjust profile length; if trigger wheel is not good
         AdjProfileButton = tk.Button(
@@ -75,6 +78,9 @@ class GPRPyApp:
                                                    color=colvar.get())])
         AdjProfileButton.config(height = 1, width = 10)         
         AdjProfileButton.grid(row=2, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(AdjProfileButton,
+                          "Adjust the profile length to \n"
+                          "known start and end positions.")
 
         # Set new zero time
         SetZeroTimeButton = tk.Button(
@@ -88,8 +94,10 @@ class GPRPyApp:
                                                    color=colvar.get())])
         SetZeroTimeButton.config(height = 1, width = 10)         
         SetZeroTimeButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)    
-            
-        
+        self.balloon.bind(SetZeroTimeButton,
+                          "Set the two-way travel time that \n" 
+                          "that corresponds to the surface.")
+                
         
         # Dewow
         DewowButton = tk.Button(
@@ -103,7 +111,10 @@ class GPRPyApp:
                                                    color=colvar.get())])
         DewowButton.config(height = 1, width = 10)         
         DewowButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(DewowButton,
+                          "Trace-wise low-cut filter. Removes\n" 
+                          "from each trace a running mean of\n"
+                          "chosen window width.")                          
 
         
         # TimeZero Adjust
@@ -118,7 +129,12 @@ class GPRPyApp:
                                                    color=colvar.get())])
         TZAButton.config(height = 1, width = 10)         
         TZAButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(TZAButton,
+                         'Automatically shifts each trace up or down\n'
+                         'such that the maximum aplitudes of the individual\n'
+                         'traces align. Can lead to problems when the maxima\n' 
+                         'are not in the air waves. If the results are bad,\n' 
+                         'use the "undo" button.')
         
         
 
@@ -134,7 +150,11 @@ class GPRPyApp:
                                                    color=colvar.get())])
         remMeanTraceButton.config(height = 1, width = 10)         
         remMeanTraceButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(remMeanTraceButton,
+                          "Removes from each traces the average\n" 
+                          "of its surrounding traces. This can be\n"
+                          "useful to remove air waves, or\n" 
+                          "horizontal features.")
 
 
         # Gain: row 7
@@ -149,7 +169,13 @@ class GPRPyApp:
                                                    color=colvar.get())])
         tpowButton.config(height=1, width=1)
         tpowButton.grid(row=7, column=rightcol, sticky='nsew')
+        self.balloon.bind(tpowButton,
+                          "t-power gain. Increases the power of the\n"
+                          "signal by a factor of (two-way travel time)^p,\n"
+                          "where the user provides p. This gain is often\n" 
+                          "less aggressive than agc.")
 
+        
         agcButton = tk.Button(
             text="agc",fg="black",
             command=lambda : [self.agcGain(proj),
@@ -161,6 +187,25 @@ class GPRPyApp:
                                                    color=colvar.get())])
         agcButton.config(height=1, width=1)
         agcButton.grid(row=7, column=rightcol+1, sticky='nsew')
+        self.balloon.bind(agcButton,
+                          "Automatic gain controll. Normalizes the power\n"
+                          "of the signal per given sample window along\n" 
+                          "each trace.")
+
+        # show hyperbola
+        hypButton = tk.Button(
+            text="show hyperb", fg="black",
+            command=lambda : [self.showHyp(proj,a), canvas.draw()])
+        hypButton.config(height = 1, width = 5)
+        hypButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(hypButton,
+                          "Draws a hyperbola depending on profile position,\n"
+                          "two-way travel time, and estimated velocity. This\n" 
+                          "can be used to find the subsurface velocity when\n"
+                          "a hyperbola is visible in the data.\n"
+                          "The plotted hyperbola will disappear when the image\n" 
+                          "is refreshed.")
+
         
 
         # Set Velocity: row 8
@@ -174,7 +219,11 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         setVelButton.config(height = 1, width = 10)         
-        setVelButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(setVelButton,
+                          "Set the known subsurface radar velocity. This will\n" 
+                          "turn the y-axis from two-way travel time to depth.\n"
+                          "This step is necessary for topographic correction.")
 
         # Topo Correct row 9
         topoCorrectButton = tk.Button(
@@ -187,15 +236,13 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         topoCorrectButton.config(height = 1, width = 10)
-        topoCorrectButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(topoCorrectButton,
+                          "Reads a comma- or tab-separated file containing\n" 
+                          "either 3 columns (easting, northing, elevation)\n" 
+                          "or two columns (profile position, elevation).\n" 
+                          "All coordinates in meters.")                                                      
 
-
-        # show hyperbola
-        hypOnButton = tk.Button(
-            text="show hyperb", fg="black",
-            command=lambda : [self.showHyp(proj,a), canvas.draw()])
-        hypOnButton.config(height = 1, width = 5)
-        hypOnButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
 
         # Put new functionality here
         
@@ -211,7 +258,14 @@ class GPRPyApp:
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
         SaveButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(SaveButton,
+                          'saves the processed data including its history in a\n'
+                          '.gpr file. The resulting file will contain absolute\n'
+                          'path names of the used data and topography files.\n'
+                          'Visualization settings such as "set x-range" or\n'
+                          '"contrast" will not be saved.')
 
+        
         
         # Print Figure
         PrintButton = tk.Button(
@@ -219,7 +273,12 @@ class GPRPyApp:
             command=lambda : self.printProfileFig(proj=proj,fig=fig,yrng=self.yrng,xrng=self.xrng,asp=self.asp,contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
         PrintButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(PrintButton,
+                          "Saves the current visible figure in a pdf with \n"
+                          "chosen resolution. If there is a hyperbola on\n" 
+                          "the current figure, then the hyperbola will also\n"
+                          "appear on the printed figure.")
+        
         
         # Write history
         HistButton = tk.Button(
@@ -227,7 +286,15 @@ class GPRPyApp:
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 10)         
         HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
-        
+        self.balloon.bind(HistButton,
+                          'Saves the history of the current status as a\n'
+                          'python script which can be run directly from\n'
+                          'the command prompt. If the current data is\n'  
+                          'from a .gpr file, then the python script will\n'
+                          'contain all steps going back to the raw data.\n'
+                          'The script will not contain visualization settings\n'
+                          'such as x-range settings, unless the "print figure"\n'
+                          'command was used.')
 
 
         
@@ -246,7 +313,14 @@ class GPRPyApp:
                                                    color=colvar.get())])
         undoButton.config(height = 1, width = 10)
         undoButton.grid(row=0, column=0, sticky='nsew',rowspan=2)
-                
+        self.balloon.bind(undoButton,
+                          '"Undoes" the most recent processing step and\n' 
+                          'sets the data back to its previous state.\n' 
+                          'This also removes the most recent processing\n'
+                          'step from the history. Does not revert\n' 
+                          'visualization settings such as "set x-range"\n'
+                          'etc.')
+        
 
         # X range
         XrngButton = tk.Button(
@@ -260,7 +334,8 @@ class GPRPyApp:
                                                    color=colvar.get())])
         XrngButton.config(height = 1, width = 10)         
         XrngButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
-
+        self.balloon.bind(XrngButton,"Set the x-axis display limits.")
+        
 
         # Y range
         YrngButton = tk.Button(
@@ -274,6 +349,7 @@ class GPRPyApp:
                                                    color=colvar.get())])
         YrngButton.config(height = 1, width = 10)         
         YrngButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
         # Aspect
         AspButton = tk.Button(
@@ -287,6 +363,7 @@ class GPRPyApp:
                                                    color=colvar.get())])                              
         AspButton.config(height = 1, width = 10)         
         AspButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
+        self.balloon.bind(AspButton, "Set the aspect ratio between x- and y-axis.")
         
 
         # Contrast
@@ -294,16 +371,22 @@ class GPRPyApp:
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 6)
         contrlabel.grid(row=0, column=4, sticky='nsew')
+        self.balloon.bind(contrlabel,"Set color saturation")
         contr = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=contr, width=4)
         contrbox.grid(row=1, column=4, sticky='nsew')
         contr.set("1.0")
+        
 
         # Mode switch for figure color
         colvar=tk.StringVar()
         colvar.set("gray")
         colswitch = tk.OptionMenu(master,colvar,"gray","bwr")
         colswitch.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        self.balloon.bind(colswitch,
+                          "Choose between gray-scale\n"
+                          "and red-white-blue (rwb)\n" 
+                          "data representation.")
 
 
         # Refreshing plot
@@ -317,7 +400,10 @@ class GPRPyApp:
                                                   color=colvar.get()))
         plotButton.config(height = 1, width = 10)
         plotButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
-                
+        self.balloon.bind(plotButton,
+                          "Refreshes the figure after changes\n"
+                          "in the visualization settings. Also\n"
+                          "removes any plotted hyperbolae.")
 
 
     def setYrng(self):
@@ -382,7 +468,7 @@ class GPRPyApp:
         if proj.velocity is None:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
-        mesbox.showinfo("Select file",'Choose file containing the topography points. Columns can be "Northing, Easting, Elevation" or "Profile, Elevation"')
+        #mesbox.showinfo("Select file",'Choose file containing the topography points. Columns can be "Easting, Northing, Elevation" or "Profile, Elevation"')
         topofile = fd.askopenfilename()
         #delimiter = sd.askstring("Input","Value delimiter? Example: ',' (comma) or '\t' (tab) ")
         commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
