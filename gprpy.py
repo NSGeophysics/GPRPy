@@ -25,6 +25,18 @@ class gprpy2d:
             self.importdata(filename)                 
         
     def importdata(self,filename):
+        '''
+        Loads .gpr (native GPRPy), .DT1 (Sensors and Software), or
+        .DZT (GSSI) data files and populates all the gprpy2d fields.
+
+        INPUT: 
+
+        filename    name of the .gpr, DT1, or .DZT file you want to
+                    import
+
+        Last modified by plattner-at-alumni.ethz.ch, 5/22/2018
+        '''
+        
         file_name, file_ext = os.path.splitext(filename)
         
         if file_ext==".DT1":

@@ -29,7 +29,6 @@ class GPRPyApp:
         self.window = master
 
         master.title("GPRPy")
-
         
         # Initialize the gprpy
         proj = gp.gprpy2d()
@@ -191,20 +190,19 @@ class GPRPyApp:
         topoCorrectButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
 
 
-        # Put new functionality here
-
-        # show hyperbola, remove hyperbola:
-        # Buttons next to each other
+        # show hyperbola
         hypOnButton = tk.Button(
             text="show hyperb", fg="black",
             command=lambda : [self.showHyp(proj,a), canvas.draw()])
         hypOnButton.config(height = 1, width = 5)
         hypOnButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
 
+        # Put new functionality here
         
         # Pick points
         # Button to start picking:
         # With each click I add a point
+        
         
         
         # Save data
