@@ -18,6 +18,7 @@ import gprpy as gp
 from scipy import signal
 import numpy as np
 import toolbox.splash as splash
+import os
 
 
 colsp=2
@@ -38,7 +39,8 @@ class GPRPyApp:
         # Show splash screen
         fig=Figure(figsize=(8,5))
         a=fig.add_subplot(111)
-        splash.showSplash(a)
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        splash.showSplash(a,dir_path)
         # splash=signal.ricker(50,4)
         # a.plot(splash)
         

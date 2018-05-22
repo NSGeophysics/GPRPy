@@ -295,7 +295,10 @@ class gprpy2d:
                                                               topoVal=topoVal, twtt=self.twtt)
 
         # Put in history
-        histstr = "mygpr.topoCorrect('%s')" %(topofile)
+        if delimiter is ',':
+             histstr = "mygpr.topoCorrect('%s')" %(topofile)
+        else:
+            histstr = "mygpr.topoCorrect('%s',delimiter='\\t')" %(topofile)
         self.history.append(histstr)
         
         

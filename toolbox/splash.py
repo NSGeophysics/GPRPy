@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
+import os
 
-def showSplash(a):
-    filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
+def showSplash(a,dir_path):
+    filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
     snakeGPR = gp.gprpy2d(filename)
     maxpoint=100;
     x=snakeGPR.twtt[0:maxpoint]
