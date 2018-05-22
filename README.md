@@ -23,6 +23,7 @@ or
 
 `conda install numpy`
 
+If pip or conda can't find a specific package (for example pickle), then it may already be installed.
 
 #### To run the GUI:
 
