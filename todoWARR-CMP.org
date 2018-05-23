@@ -1,0 +1,5 @@
+GPRPy WARR/CMP GUI
+* TODO Write basic GUI to load WARR/CMP data
+* TODO Implement hyperbola and linear semblance figures. Show both side-by-side with plot 
+* TODO Allow adding hyperbolae/lines at select semblance points
+

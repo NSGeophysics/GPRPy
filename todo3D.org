@@ -1,0 +1,10 @@
+GPRPy 3D interpolation
+* TODO Write basic GUI: Explain: Rerun history for selection of profiles
+* TODO Implement Collection of several processed profiles -> interpolation
+* TODO Export of interpolated profiles into VTK
+* TODO Give data from field work in Cyprus: Two directions
+
+
+
+
+
