@@ -35,7 +35,6 @@ def timeZeroAdjust(data):
 
 
 
-
 def dewow(data,window):
     newdata = np.asmatrix(np.zeros(data.shape))
     
@@ -71,8 +70,14 @@ def remMeanTrace(data,ntraces):
     newdata = np.asmatrix(np.zeros(data.shape))
     tottraces = data.shape[1]
 
+    # Need to improve: Instead of calculating an average
+    # trace for each trace, only calculate the UNIQUE
+    # average traces. For example if your width is 50% of
+    # the number of traces, then you only need ??? means
+    # (is it 2? need to think again)
+    
     # For each trace
-    for tr in tqdm(range(0,data.shape[1])):
+    for tr in tqdm(range(0,data.shape[1])):   
         winstart = int(tr - np.floor(ntraces/2.0))
         winend = int(tr + np.floor(ntraces/2.0))
         if (winstart < 0):
@@ -81,13 +86,14 @@ def remMeanTrace(data,ntraces):
         elif (winend > tottraces):
             winstart = max(tottraces - ntraces,0)
             winend = tottraces
-           
-        avgtr = np.zeros(data[:,tr].shape)
-        for i in range(winstart,winend):
-            avgtr = avgtr + data[:,i]
-            
-        avgtr = avgtr/float(winend-winstart)
-            
+
+        # This was a bad way of doing it    
+        #avgtr = np.zeros(data[:,tr].shape)
+        #for i in range(winstart,winend):
+        #    avgtr = avgtr + data[:,i]            
+        #avgtr = avgtr/float(winend-winstart)
+        avgtr=np.matrix.mean(data[:,winstart:winend],1)        
+        
         newdata[:,tr] = data[:,tr] - avgtr
             
     return newdata
@@ -99,7 +105,6 @@ def tpowGain(data,twtt,power):
     factmat = matlib.repmat(factor,1,data.shape[1])
     
     return np.multiply(data,factmat)
-
 
 
 def agcGain(data,window):
