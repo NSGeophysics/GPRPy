@@ -222,3 +222,8 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
     
 
     
+def prepVTK(profilePos,topofile,delimiter):
+    topotable = np.loadtxt(topofile,delimiter=delimiter)
+    topomat = np.asmatrix(topotable)
+
+    xpos = np.interp(self.profilePos,)

@@ -6,20 +6,14 @@ import toolbox.gprIO_DT1 as gprIO_DT1
 import toolbox.gprIO_DZT as gprIO_DZT
 import toolbox.gprpyTools as tools
 import copy
+import scipy.interpolate as interp
 
 class gprpy2d:
     def __init__(self,filename=None,desciption=None): #,profilerange=None):
         self.history = ["mygpr = gprpy.gprpy2d()"]
 
         # Initialize previous for undo
-        self.previous = {
-            "data" : None,
-            "twtt" : None,
-            "info" : None,
-            "profilePos" : None,
-            "history" : None,
-            "velocity" : None,
-            "maxTopo": None}
+        self.previous = {}
         
         if filename is not None:
             self.importdata(filename)                 
@@ -334,6 +328,35 @@ class gprpy2d:
             histstr = "mygpr.topoCorrect('%s',delimiter='\\t')" %(topofile)
         self.history.append(histstr)
         
+
+
+    def exportVTK(self,outfile,topofile,thickness=0.1,delimiter=','):
+        xpos, ypos, zpos = tools.prepVTK(self.profilePos,topofile,delimiter)
+
+
+        
+
+
+        
+
+#  mesh = pg.Mesh(’dcinv.result.vtk’)
+#  tn = [n.pos()[0] for n in mesh.nodes()]
+#  zn = [n.pos()[1] for n in mesh.nodes()]
+#  tt, xx, yy = np.loadtxt(’pos.map’, unpack=True)
+#  xn = np.interp(tn, tt,xx)
+#  yn = np.interp(tn, tt,yy)
+
+        
+        x=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
+        y=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
+        z=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
+        
+        data = np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))      
+        data[:,0,:] = self.data
+        data[:,1,:] = self.data
+
+        x=np.tile(self.profilePos,(1,2,len(self.twtt)))
+        y=
         
 
     def storePrevious(self):        
