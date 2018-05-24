@@ -54,10 +54,12 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            # Initialize previous
+            self.initPrevious()
+            
             # Put what you did in history
             histstr = "mygpr.importdata('%s')" %(filename)
-            self.history.append(histstr)
-                    
+            self.history.append(histstr)                                
             
         elif file_ext==".DZT":
 
@@ -72,6 +74,9 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            # Initialize previous
+            self.initPrevious()
+            
             # Put what you did in history
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
@@ -89,6 +94,9 @@ class gprpy2d:
             self.velocity = velocity
             self.depth = depth
             self.maxTopo = maxTopo
+
+            # Initialize previous
+            self.initPrevious()
             
         else:
             print("Can only read dt1 or dzt files")
@@ -117,6 +125,19 @@ class gprpy2d:
         del histsav[-1]
         self.history = histsav
         print("undo")
+
+        
+    def initPrevious(self):
+        self.previous["data"] = self.data
+        self.previous["twtt"] = self.twtt 
+        self.previous["info"] = self.info
+        self.previous["profilePos"] = self.profilePos
+        self.previous["velocity"] = self.velocity
+        self.previous["depth"] = self.depth
+        self.previous["maxTopo"] = self.maxTopo 
+        histsav = copy.copy(self.history)
+        self.previous["history"] = histsav
+
         
 
     def save(self,filename):

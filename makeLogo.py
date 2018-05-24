@@ -4,6 +4,7 @@ import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import numpy as np
+import matplotlib.image as im
 
 filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
 
@@ -54,9 +55,9 @@ line2 = mlines.Line2D(x, y, lw=2, color='black')
 plt.gca().add_line(line1)
 plt.gca().add_line(line2)
 
-plt.gca().set_xlim([-40,100])
+plt.gca().set_xlim([-25,90])
 #plt.gca().set_xlim([100,-40])
-plt.gca().set_ylim([-20000,20000])
+plt.gca().set_ylim([-28000,12000])
 
 
 font = {'family': 'Verdana',
@@ -67,8 +68,24 @@ font = {'family': 'Verdana',
         }
 plt.gca().text(35,-10000,'GPRPy',fontdict=font)
 
-#plt.gca().axis('off')
-plt.gca().get_xaxis().set_visible(False)
-plt.gca().get_yaxis().set_visible(False)
+plt.gca().axis('off')
+#plt.gca().get_xaxis().set_visible(False)
+#plt.gca().get_yaxis().set_visible(False)
 
-plt.savefig('GPRPy_Logo.pdf',format='pdf')
+# add nsf logo
+nsf =im.imread('toolbox/splashdat/NSF_4-Color_bitmap_Logo.png')
+yanchor = -25000
+yheight = 10000
+xanchor = -20
+#ratio = plt.gca().get_xlim/plt.gca().get_ylim
+ratio = plt.gca().get_data_ratio()*1.36
+xwidth = yheight/ratio
+plt.gca().imshow(nsf, aspect='auto', extent=(xanchor, xanchor+xwidth, yanchor, yanchor+yheight))
+font2 = {'family': 'Verdana',
+        'color':  'black',
+        'size': 9.5
+        }
+plt.gca().text(-20,-27000,'EAR-1550732',fontdict=font2)
+
+plt.savefig('GPRPy_Logo.pdf',format='pdf',dpi=600)
+#plt.savefig('NSF_Logo.pdf',format='pdf')

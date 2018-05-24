@@ -30,6 +30,7 @@ class GPRPyApp:
         self.window = master
 
         master.title("GPRPy")
+        master.resizable()
 
         self.balloon = Pmw.Balloon()
         
@@ -42,8 +43,6 @@ class GPRPyApp:
         a=fig.add_subplot(111)
         dir_path = os.path.dirname(os.path.realpath(__file__))
         splash.showSplash(a,dir_path)
-        # splash=signal.ricker(50,4)
-        # a.plot(splash)
         
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
@@ -303,8 +302,8 @@ class GPRPyApp:
         # Undo Button
         undoButton = tk.Button(
             text="undo",
-            command=lambda : [proj.undo(),
-                              self.resetYrng(),
+            command=lambda : [self.resetYrng(proj),
+                              proj.undo(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
                                                    yrng=self.yrng,
                                                    xrng=self.xrng,
@@ -413,8 +412,11 @@ class GPRPyApp:
         self.yrng=[ylow,yhigh]
         
 
-    def resetYrng(self):
-        self.yrng=self.prevyrng
+    def resetYrng(self,proj):
+        # Only needed in undo, and only if what you want to
+        # undo changed the y axis
+        if ("setVelocity" in proj.history[-1]) or ("topoCorrect" in proj.history[-1]): 
+            self.yrng=self.prevyrng
 
 
     def setAspect(self):

@@ -5,6 +5,7 @@ import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import os
+import matplotlib.image as im
 
 def showSplash(a,dir_path):
     filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
@@ -20,7 +21,7 @@ def showSplash(a,dir_path):
     xshift=0
     path_data = [
         (Path.MOVETO, [xshift,2500]),
-        (Path.CURVE3, [-30+xshift,0]),
+        (Path.CURVE3, [-25+xshift,0]),
         (Path.LINETO, [xshift,-2500]),
         (Path.CURVE3, [10+xshift,0]),
         (Path.LINETO, [xshift,2500]),
@@ -45,9 +46,9 @@ def showSplash(a,dir_path):
     a.add_line(line1)
     a.add_line(line2)
     # Axis setup
-    a.set_xlim([-40,100])
-    a.set_ylim([-20000,20000])
-    #a.axis('off')
+    a.set_xlim([-25,90])
+    a.set_ylim([-28000,12000])
+    a.axis('off')
     # Text
     font = {'family': 'Verdana',
         'color':  'black',
@@ -56,3 +57,22 @@ def showSplash(a,dir_path):
         'size': 35,
         }
     a.text(35,-10000,'GPRPy',fontdict=font)
+
+    # Add NSF logo
+    filename2=os.path.join(dir_path,'toolbox','splashdat',
+                           'NSF_4-Color_bitmap_Logo.png')
+    nsf = im.imread(filename2)
+    yanchor = -25000
+    yheight = 10000
+    xanchor = -20
+    figsize = a.figure.get_size_inches()
+    figratio = figsize[0]/figsize[1]
+    ratio = a.get_data_ratio()*figratio
+    xwidth = yheight/ratio
+    a.imshow(nsf, aspect='auto', extent=(xanchor, xanchor+xwidth,
+                                         yanchor, yanchor+yheight),
+             interpolation='spline36')
+    font2 = {'family': 'Verdana',
+             'color':  'black',
+             'size': 9.5}
+    a.text(-20,-27000,'EAR-1550732',fontdict=font2)

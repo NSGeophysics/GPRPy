@@ -36,66 +36,59 @@ def timeZeroAdjust(data):
 
 
 def dewow(data,window):
-    newdata = np.asmatrix(np.zeros(data.shape))
-    
+    totsamps = data.shape[0]
     # If the window is larger or equal to the number of samples,
     # then we can do a much faster dewow
-    if (window >= data.shape[0]):
-        for tr in tqdm(range(0,data.shape[1])):
-            newdata[:,tr]=data[:,tr]-np.mean(data[:,tr])*np.ones((data.shape[0],1))
+    if (window >= totsamps):
+        newdata = data-np.matrix.mean(data,0)            
     else:
-        # For each trace
-        for tr in tqdm(range(0,data.shape[1])):
-            trace = data[:,tr]
-            averages = np.zeros(trace.shape)
-            # Calculate and subtract running mean
-            for i in range(0,data.shape[0]):
-                winstart = int(i - np.floor(window/2.0))
-                winend = int(i + np.floor(window/2.0))
-                # If running mean window goes outside of range,
-                # set range to "beginning until length"
-                if winstart < 0:
-                    winstart = 0
-                    winend = window
-                # Or to "end-length to end"
-                if winend > len(trace):
-                    winstart = len(trace) - window
-                    winend = len(trace)     
-                newdata[i,tr] = trace[i] - np.mean(trace[winstart:winend])
+        newdata = np.asmatrix(np.zeros(data.shape))
+        halfwid = int(np.ceil(window/2.0))
+        
+        # For the first few samples, it will always be the same
+        avgsmp=np.matrix.mean(data[0:halfwid+1,:],0)
+        newdata[0:halfwid+1,:] = data[0:halfwid+1,:]-avgsmp
+
+        # for each sample in the middle
+        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+            winstart = int(smp - halfwid)
+            winend = int(smp + halfwid)
+            avgsmp = np.matrix.mean(data[winstart:winend+1,:],0)
+            newdata[smp,:] = data[smp,:]-avgsmp
+
+        # For the last few samples, it will always be the same
+        avgsmp = np.matrix.mean(data[totsamps-halfwid:totsamps+1,:],0)
+        newdata[totsamps-halfwid:totsamps+1,:] = data[totsamps-halfwid:totsamps+1,:]-avgsmp
+        
     print('done with dewow')
     return newdata
 
 
 def remMeanTrace(data,ntraces):
-    newdata = np.asmatrix(np.zeros(data.shape))
     tottraces = data.shape[1]
-
-    # Need to improve: Instead of calculating an average
-    # trace for each trace, only calculate the UNIQUE
-    # average traces. For example if your width is 50% of
-    # the number of traces, then you only need ??? means
-    # (is it 2? need to think again)
-    
-    # For each trace
-    for tr in tqdm(range(0,data.shape[1])):   
-        winstart = int(tr - np.floor(ntraces/2.0))
-        winend = int(tr + np.floor(ntraces/2.0))
-        if (winstart < 0):
-            winstart = 0
-            winend = min(ntraces,tottraces)
-        elif (winend > tottraces):
-            winstart = max(tottraces - ntraces,0)
-            winend = tottraces
-
-        # This was a bad way of doing it    
-        #avgtr = np.zeros(data[:,tr].shape)
-        #for i in range(winstart,winend):
-        #    avgtr = avgtr + data[:,i]            
-        #avgtr = avgtr/float(winend-winstart)
-        avgtr=np.matrix.mean(data[:,winstart:winend],1)        
+    # For ridiculous ntraces values, just remove the entire average
+    if ntraces >= tottraces:
+        newdata=data-np.matrix.mean(data,1) 
+    else: 
+        newdata = np.asmatrix(np.zeros(data.shape))    
+        halfwid = int(np.ceil(ntraces/2.0))
         
-        newdata[:,tr] = data[:,tr] - avgtr
-            
+        # First few traces, that all have the same average
+        avgtr=np.matrix.mean(data[:,0:halfwid+1],1)
+        newdata[:,0:halfwid+1] = data[:,0:halfwid+1]-avgtr
+        
+        # For each trace in the middle
+        for tr in tqdm(range(halfwid,tottraces-halfwid+1)):   
+            winstart = int(tr - halfwid)
+            winend = int(tr + halfwid)
+            avgtr=np.matrix.mean(data[:,winstart:winend+1],1)                
+            newdata[:,tr] = data[:,tr] - avgtr
+
+        # Last few traces again have the same average    
+        avgtr=np.matrix.mean(data[:,tottraces-halfwid:tottraces+1],1)
+        newdata[:,tottraces-halfwid:tottraces+1] = data[:,tottraces-halfwid:tottraces+1]-avgtr
+
+    print('done with removing mean trace')
     return newdata
 
 
@@ -107,30 +100,37 @@ def tpowGain(data,twtt,power):
     return np.multiply(data,factmat)
 
 
+
 def agcGain(data,window):
     eps=1e-8
-    newdata = np.asmatrix(np.zeros(data.shape))
-    # For each trace
-    for tr in tqdm(range(0,data.shape[1])):
-        trace = data[:,tr]
-        energy = np.zeros(trace.shape)
-        for i in range(0,len(trace)):
-            winstart = int(i - np.floor(window/2.0))
-            winend = int(i + np.floor(window/2.0))
-            # If running mean window goes outside of range,
-            # set range to "beginning until length"
-            if winstart < 0:
-                winstart = 0
-                winend = window
-            # Or to "end-length to end"
-            if winend > len(trace):
-                winstart = len(trace) - window
-                winend = len(trace)     
-            energy[i] = np.max([np.linalg.norm(trace[winstart:winend]) ,eps])
-        newdata[:,tr] = np.divide(data[:,tr],energy)
+    totsamps = data.shape[0]
+    # If window is a ridiculous value
+    if (window>totsamps):
+        # np.maximum is exactly the right thing (not np.amax or np.max)
+        energy = np.maximum(np.linalg.norm(data,axis=0),eps)
+        # np.divide automatically divides each row of "data"
+        # by the elements in "energy"
+        newdata = np.divide(data,energy)
+    else:
+        # Need to go through the samples
+        newdata = np.asmatrix(np.zeros(data.shape))
+        halfwid = int(np.ceil(window/2.0))
+        # For the first few samples, it will always be the same
+        energy = np.maximum(np.linalg.norm(data[0:halfwid+1,:],axis=0),eps)
+        newdata[0:halfwid+1,:] = np.divide(data[0:halfwid+1,:],energy)
+        
+        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+            winstart = int(smp - halfwid)
+            winend = int(smp + halfwid)
+            energy = np.maximum(np.linalg.norm(data[winstart:winend+1,:],axis=0),eps)
+            newdata[smp,:] = np.divide(data[smp,:],energy)
+
+        # For the first few samples, it will always be the same
+        energy = np.maximum(np.linalg.norm(data[totsamps-halfwid:totsamps+1,:],axis=0),eps)
+        newdata[totsamps-halfwid:totsamps+1,:] = np.divide(data[totsamps-halfwid:totsamps+1,:],energy)
+                        
     return newdata
-
-
+        
 
 def prepTopo(topofile,delimiter=','):
     # Read topofile, see if it is two columns or three columns.
