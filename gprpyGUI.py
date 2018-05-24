@@ -30,13 +30,11 @@ class GPRPyApp:
         self.window = master
 
         master.title("GPRPy")
-        master.resizable()
-
+        
         self.balloon = Pmw.Balloon()
         
         # Initialize the gprpy
         proj = gp.gprpy2d()
-
 
         # Show splash screen
         fig=Figure(figsize=(8,5))
