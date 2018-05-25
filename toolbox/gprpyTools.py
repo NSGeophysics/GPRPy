@@ -1,24 +1,21 @@
 import numpy as np
 import numpy.matlib as matlib
 import scipy.interpolate as interp
+import scipy.signal as signal
 # For progress bar
 import time
 from tqdm import tqdm
 
 
-def timeZeroAdjust(data):
-        
+def timeZeroAdjust(data):        
     maxlen = data.shape[0]
-    newdata = np.asmatrix(np.zeros(data.shape))
-    
+    newdata = np.asmatrix(np.zeros(data.shape))    
     # Go through all traces to find maximum spike
     maxind = np.zeros(data.shape[1], dtype=int)
     for tr in range(0,data.shape[1]):
         maxind[tr] = int(np.argmax(np.abs(data[:,tr])))
-
     # Find the mean spike point
     meanind = int(np.round(np.mean(maxind)))
-
     # Shift all traces. If max index is smaller than
     # mean index, then prepend zeros, otherwise append
     for tr in range(0,data.shape[1]):
@@ -30,7 +27,6 @@ def timeZeroAdjust(data):
             newdata[:,tr] = np.vstack([data[differ:maxlen,tr], np.zeros((differ,1))])
         else:
             newdata[:,tr] = data[:,tr]
-
     return newdata
 
 
@@ -95,8 +91,7 @@ def remMeanTrace(data,ntraces):
 
 def tpowGain(data,twtt,power):
     factor = np.reshape(twtt**(float(power)),(len(twtt),1))
-    factmat = matlib.repmat(factor,1,data.shape[1])
-    
+    factmat = matlib.repmat(factor,1,data.shape[1])  
     return np.multiply(data,factmat)
 
 
@@ -127,8 +122,7 @@ def agcGain(data,window):
 
         # For the first few samples, it will always be the same
         energy = np.maximum(np.linalg.norm(data[totsamps-halfwid:totsamps+1,:],axis=0),eps)
-        newdata[totsamps-halfwid:totsamps+1,:] = np.divide(data[totsamps-halfwid:totsamps+1,:],energy)
-                        
+        newdata[totsamps-halfwid:totsamps+1,:] = np.divide(data[totsamps-halfwid:totsamps+1,:],energy)          
     return newdata
         
 
@@ -136,7 +130,6 @@ def prepTopo(topofile,delimiter=','):
     # Read topofile, see if it is two columns or three columns.
     # Here I'm using numpy's loadtxt. There are more advanced readers around
     # but this one should do for this simple situation
-    #delimiter = ','
     topotable = np.loadtxt(topofile,delimiter=delimiter)
     topomat = np.asmatrix(topotable)
     # Depending if the table has two or three columns,
@@ -148,82 +141,101 @@ def prepTopo(topofile,delimiter=','):
         npos = topomat.shape[0]
         steplen = np.sqrt(
             np.power( topomat[1:npos,0]-topomat[0:npos-1,0] ,2.0) + 
-            np.power( topomat[1:npos,1]-topomat[0:npos-1,1] ,2.0)
+            np.power( topomat[1:npos,1]-topomat[0:npos-1,1] ,2.0) +
+            np.power( topomat[1:npos,2]-topomat[0:npos-1,2] ,2.0)
         )
         alongdist = np.cumsum(steplen)
         topoPos = np.append(0,alongdist)
     elif topomat.shape[1] is 2:
         topoPos = topomat[:,0]
         topoVal = topomat[:,1]
-        topoPos = np.squeeze(np.asarray(topoPos))
-        
+        topoPos = np.squeeze(np.asarray(topoPos))       
     return topoPos, topoVal
 
 
 
 
 def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
-    # The variable "topoPos" provides the along-profile coordinates
-    # for which the topography is given. 
-    # We allow several possibilities to provide topoPos:
-    # If None is given, then we assume that they are regularly
-    # spaced along the profile
-    if topoPos is None:
-        topoPos = np.linspace(np.min(profilePos),np.max(profilePos),
-                              np.size(topoVal))
-    # If it's an integer or a float, then it gives the evenly spaced
-    # intervals
-    elif type(topoPos) is int:
-        topoPos = np.arange(np.min(profilePos),np.max(profilePos),
-                            float(topoPos))
-    elif type(topoPos) is float:
-        topoPos = np.arange(np.min(profilePos),np.max(profilePos),
-                            topoPos)
-    # Or it could be a file giving the actual along-profile positions    
-    elif type(topoPos) is str:
-        delimiter = ','
-        topopostable = np.loadtxt(topoPos,delimiter=delimiter)
-
-    # Next we need to interpolate the topography
+    # We assume that the profilePos are the correct along-profile
+    # points of the measurements (they can be correted with adj profile)
+    # For some along-profile points, we have the elevation from prepTopo
+    # So we can just interpolate
     elev = interp.pchip_interpolate(topoPos,topoVal,profilePos)
-
     elevdiff = elev-np.min(elev)
     # Turn each elevation point into a two way travel-time shift.
     # It's two-way travel time
     etime = 2*elevdiff/velocity
-
     timeStep=twtt[1]-twtt[0]
-    
     # Calculate the time shift for each trace
     tshift = (np.round(etime/timeStep)).astype(int)
-
     maxup = np.max(tshift)
-
     # We want the highest elevation to be zero time.
     # Need to shift by the greatest amount, where  we are the lowest
     tshift = np.max(tshift) - tshift
-
     # Make new datamatrix
     newdata = np.empty((data.shape[0]+maxup,data.shape[1]))
     newdata[:] = np.nan
-
     # Set new twtt
     newtwtt = np.arange(0, twtt[-1] + maxup*timeStep, timeStep)
-
     nsamples = len(twtt)
     # Enter every trace at the right place into newdata
     for pos in range(0,len(profilePos)):
         #print(type(tshift[pos][0]))
         newdata[tshift[pos][0]:tshift[pos][0]+nsamples ,pos] = np.squeeze(data[:,pos])
-
     return newdata, newtwtt, np.max(elev)
 
     
     
 
     
-def prepVTK(profilePos,topofile,delimiter):
-    topotable = np.loadtxt(topofile,delimiter=delimiter)
-    topomat = np.asmatrix(topotable)
-
-    xpos = np.interp(self.profilePos,)
+def prepVTK(profilePos,gpsfile=None,delimiter=',',smooth=True,win_length=51,porder=3):
+    if gpsfile is None:
+        x = profilePos
+        y = np.zeros(x.size)
+        z = np.zeros(x.size)
+    else:
+        gpstable = np.loadtxt(gpsfile,delimiter=delimiter)
+        gpsmat = np.asmatrix(gpstable)   
+        # Turn the three-dimensional positions into along-profile
+        # distances
+        if gpsmat.shape[1] is 3:
+            npos = gpsmat.shape[0]
+            steplen = np.sqrt(
+                np.power( gpsmat[1:npos,0]-gpsmat[0:npos-1,0] ,2.0) + 
+                np.power( gpsmat[1:npos,1]-gpsmat[0:npos-1,1] ,2.0) +
+                np.power( gpsmat[1:npos,2]-gpsmat[0:npos-1,2] ,2.0)
+            )
+            alongdist = np.cumsum(steplen)
+            gpsPos = np.append(0,alongdist)
+            # We assume that the profilePos are the correct along-profile
+            # points of the measurements (they can be correted with adj profile)
+            # For some along-profile points, we have the elevation from prepTopo
+            # So we can just interpolate
+            xval = gpsmat[:,0]
+            yval = gpsmat[:,1]
+            zval = gpsmat[:,2]                        
+            x = interp.pchip_interpolate(gpsPos,xval,profilePos)
+            y = interp.pchip_interpolate(gpsPos,yval,profilePos)
+            z = interp.pchip_interpolate(gpsPos,zval,profilePos)
+        else:
+            npos = gpsmat.shape[0]
+            steplen = np.sqrt(
+                np.power( gpsmat[1:npos,0]-gpsmat[0:npos-1,0] ,2.0) + 
+                np.power( gpsmat[1:npos,1]-gpsmat[0:npos-1,1] ,2.0)  
+            )
+            alongdist = np.cumsum(steplen)
+            gpsPos = np.append(0,alongdist)
+            xval = gpsmat[:,0]
+            zval = gpsmat[:,1]
+            x = interp.pchip_interpolate(gpsPos,xval,profilePos)
+            z = interp.pchip_interpolate(gpsPos,zval,profilePos)
+            y = np.zeros(len(x))
+            
+        # Do some smoothing
+        if smooth:
+            win_length = min(int(len(x)/2),win_length)
+            porder = min(int(np.sqrt(len(x))),porder)
+            x = signal.savgol_filter(x.squeeze(), window_length=win_length, polyorder=porder)
+            y = signal.savgol_filter(y.squeeze(), window_length=win_length, polyorder=porder)
+            z = signal.savgol_filter(z.squeeze(), window_length=win_length, polyorder=porder) 
+    return x,y,z

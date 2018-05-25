@@ -2,7 +2,7 @@ GPRPy main GUI
 
 * TODO [#A] Make picking of coordinates possible
 * TODO [#B] add filtering: high cut
-* TODO [#A] Allow export of vtk files (choose thickness)
+* DONE [#A] Allow export of vtk files (choose thickness)
 * DONE [#B] Improve performance through optimal use of numpy instead of for loops
 * DONE [#A] Add AGC. Button and gprpytool are already there
 * DONE [#A] Make Button to set depth/elevation plots 1:1 aspect ratio

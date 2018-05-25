@@ -7,6 +7,7 @@ import toolbox.gprIO_DZT as gprIO_DZT
 import toolbox.gprpyTools as tools
 import copy
 import scipy.interpolate as interp
+from pyevtk.hl import gridToVTK
 
 class gprpy2d:
     def __init__(self,filename=None,desciption=None): #,profilerange=None):
@@ -308,14 +309,37 @@ class gprpy2d:
         # Put in history
         histstr = "mygpr.setVelocity(%g)" %(velocity)
         self.history.append(histstr)
-            
 
+
+    def truncateY(self,maxY):
+        # Store previous state for undo
+        self.storePrevious()
+        
+        if self.velocity is None:
+            maxtwtt = maxY
+            maxind = np.argmin( np.abs(self.twtt-maxY) )
+            self.twtt = self.twtt[0:maxind]
+            self.data = self.data[0:maxind,:]
+        else:
+            maxtwtt = maxY*2.0/self.velocity
+            maxind = np.argmin( np.abs(self.twtt-maxtwtt) )
+            self.twtt = self.twtt[0:maxind]
+            self.data = self.data[0:maxind,:]
+            self.depth = self.depth[0:maxind]
+        
+        # Put in history
+        histstr = "mygpr.truncateY(%g)" %(maxY)
+        self.history.append(histstr)
+
+
+        
     def topoCorrect(self,topofile,delimiter=','):
         if self.velocity is None:
             print("First need to set velocity!")
             return
         # Store previous state for undo
         self.storePrevious()
+        self.data_pretopo = self.data
         topoPos,topoVal = tools.prepTopo(topofile,delimiter)
         self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
                                                               profilePos=self.profilePos, topoPos=topoPos,
@@ -330,35 +354,88 @@ class gprpy2d:
         
 
 
-    def exportVTK(self,outfile,topofile,thickness=0.1,delimiter=','):
-        xpos, ypos, zpos = tools.prepVTK(self.profilePos,topofile,delimiter)
+    def exportVTK(self,outfile,gpsfile=None,thickness=0.1,delimiter=',',aspect=1.0,smooth=True, win_length=51, porder=3):
+        # First get the x,y,z positions of our data points
+        x,y,z = tools.prepVTK(self.profilePos,gpsfile,delimiter,smooth,win_length,porder)        
+        z = z*aspect     
+        if self.velocity is None:
+            downward = self.twtt*aspect
+        else:
+            downward = self.depth*aspect                        
+        if self.maxTopo is None:
+            topY = 0
+        else:
+            topY=self.maxTopo
+            
+        Z = topY - np.reshape(downward,(1,len(downward))) + np.reshape(z,(len(z),1))
+        ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (3,1,1))
+        
+        # This is if we want everything on the x axis.
+        #X = np.tile(np.reshape(self.profilePos,(len(self.profilePos),1)),(1,len(downward)))
+        #XX = np.tile(np.reshape(X, (X.shape[0],1,X.shape[1])), (1,2,1))
+        #YY = np.tile(np.reshape([-thickness/2,thickness/2],(1,2,1)), (len(x),1,len(downward)))
 
+        # To create a 3D grid with a width, calculate the perpendicular direction,
+        # normalize it, and add it to xvals and yvals as below.
+        # To figure this out, just drar the profile point-by-point, and at each point,
+        # draw the perpendicular to the segment and place a grid point in each perpendicular
+        # direction
+        #
+        #          x[0]-px[0], x[1]-px[1], x[2]-px[2], ..... 
+        # xvals =     x[0]   ,    x[1]   ,     x[2]  , .....   
+        #          x[0]+px[0], x[1]+px[1], x[2]+px[2], .....
+        #  
+        #          y[0]+py[0], y[1]+py[1], y[2]+py[2], .....
+        # yvals =     y[0]   ,    y[1]   ,    y[2]   , .....
+        #          y[0]-py[0], y[1]-py[1], y[2]-py[2], .....
+        #
+        # Here, the [px[i],py[i]] vector needs to be normalized by the thickness 
+        pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[1:]-x[0:-1]).squeeze()])
+        pvec = np.divide(pvec, np.linalg.norm(pvec,axis=0)) * thickness/2.0
+        # We can't calculate the perpendicular direction at the last point
+        # let's just set it to the same as for the second-to-last point
+        pvec = np.append(pvec, np.expand_dims(pvec[:,-1],axis=1) ,axis=1)
+        
+        X = np.asarray([(x.squeeze()-pvec[0,:]).squeeze(), x.squeeze(), (x.squeeze()+pvec[0,:]).squeeze()])
+        Y = np.asarray([(y.squeeze()+pvec[1,:]).squeeze(), y.squeeze(), (y.squeeze()-pvec[1,:]).squeeze()])
+        # Copy-paste the same X and Y positions for each depth
+        XX = np.tile(np.reshape(X, (X.shape[0],X.shape[1],1)), (1,1,ZZ.shape[2]))
+        YY = np.tile(np.reshape(Y, (Y.shape[0],Y.shape[1],1)), (1,1,ZZ.shape[2]))
+        
+        if self.maxTopo is None:
+            data=self.data.transpose()
+        else:
+            data=self.data_pretopo.transpose()       
+
+        data = np.asarray(data)
+        data = np.reshape(data,(1,data.shape[0],data.shape[1]))        
+        data = np.tile(data, (3,1,1))
+        
+        # Remove the last row and column to turn it into a cell
+        # instead of point values 
+        data = data[0:-1,0:-1,0:-1]
+
+        nx=3-1
+        ny=len(x)-1
+        nz=len(downward)-1
+        datarray = np.zeros(nx*ny*nz).reshape(nx,ny,nz)
+        datarray[:,:,:] = data
+        
+        gridToVTK(outfile,XX,YY,ZZ, cellData ={'gpr': datarray})
+ 
+        # Put in history
+        if gpsfile is None:
+            histstr = "mygpr.exportVTK('%s',aspect=%g)" %(outfile,aspect)
+        else:
+            if delimiter is ',':
+                histstr = "mygpr.exportVTK('%s',gpsfile='%s',thickness=%g,delimiter=',',aspect=%g,smooth=%r, win_length=%d, porder=%d)" %(outfile,gpsfile,thickness,aspect,smooth,win_length,porder)
+            else:
+                 histstr = "mygpr.exportVTK('%s',gpsfile='%s',thickness=%g,delimiter='\\t',aspect=%g,smooth=%r, win_length=%d, porder=%d)" %(outfile,gpsfile,thickness,aspect,smooth,win_length,porder)
+        self.history.append(histstr)
 
         
 
-
         
-
-#  mesh = pg.Mesh(’dcinv.result.vtk’)
-#  tn = [n.pos()[0] for n in mesh.nodes()]
-#  zn = [n.pos()[1] for n in mesh.nodes()]
-#  tt, xx, yy = np.loadtxt(’pos.map’, unpack=True)
-#  xn = np.interp(tn, tt,xx)
-#  yn = np.interp(tn, tt,yy)
-
-        
-        x=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
-        y=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
-        z=np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))
-        
-        data = np.asarray(np.zeros(len(self.profilePos),2,len(self.twtt)))      
-        data[:,0,:] = self.data
-        data[:,1,:] = self.data
-
-        x=np.tile(self.profilePos,(1,2,len(self.twtt)))
-        y=
-        
-
     def storePrevious(self):        
         self.previous["data"] = self.data
         self.previous["twtt"] = self.twtt

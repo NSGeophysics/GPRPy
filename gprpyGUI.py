@@ -95,6 +95,25 @@ class GPRPyApp:
                           "Set the two-way travel time that \n" 
                           "that corresponds to the surface.")
                 
+
+        # truncate Y
+        truncYButton = tk.Button(
+            text="truncate Y", fg="black",
+            command=lambda : [self.truncateY(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas,
+                                                   yrng=self.yrng,
+                                                   xrng=self.xrng,
+                                                   asp=self.asp,
+                                                   contrast=float(contr.get()),
+                                                   color=colvar.get())])
+        truncYButton.config(height = 1, width = 10)         
+        truncYButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(truncYButton,
+                          "Remove data points at arrival times\n"
+                          "later than the chosen value. If velocity\n"
+                          "is given: remove data points at depths greater\n"
+                          "than the chosen value")   
+            
         
         # Dewow
         DewowButton = tk.Button(
@@ -107,7 +126,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         DewowButton.config(height = 1, width = 10)         
-        DewowButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        DewowButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(DewowButton,
                           "Trace-wise low-cut filter. Removes\n" 
                           "from each trace a running mean of\n"
@@ -125,7 +144,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         TZAButton.config(height = 1, width = 10)         
-        TZAButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
+        TZAButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(TZAButton,
                          'Automatically shifts each trace up or down\n'
                          'such that the maximum aplitudes of the individual\n'
@@ -146,7 +165,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         remMeanTraceButton.config(height = 1, width = 10)         
-        remMeanTraceButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
+        remMeanTraceButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(remMeanTraceButton,
                           "Removes from each traces the average\n" 
                           "of its surrounding traces. This can be\n"
@@ -165,7 +184,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         tpowButton.config(height=1, width=1)
-        tpowButton.grid(row=7, column=rightcol, sticky='nsew')
+        tpowButton.grid(row=8, column=rightcol, sticky='nsew')
         self.balloon.bind(tpowButton,
                           "t-power gain. Increases the power of the\n"
                           "signal by a factor of (two-way travel time)^p,\n"
@@ -183,7 +202,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         agcButton.config(height=1, width=1)
-        agcButton.grid(row=7, column=rightcol+1, sticky='nsew')
+        agcButton.grid(row=8, column=rightcol+1, sticky='nsew')
         self.balloon.bind(agcButton,
                           "Automatic gain controll. Normalizes the power\n"
                           "of the signal per given sample window along\n" 
@@ -194,7 +213,7 @@ class GPRPyApp:
             text="show hyperb", fg="black",
             command=lambda : [self.showHyp(proj,a), canvas.draw()])
         hypButton.config(height = 1, width = 5)
-        hypButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        hypButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(hypButton,
                           "Draws a hyperbola depending on profile position,\n"
                           "two-way travel time, and estimated velocity. This\n" 
@@ -216,7 +235,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         setVelButton.config(height = 1, width = 10)         
-        setVelButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(setVelButton,
                           "Set the known subsurface radar velocity. This will\n" 
                           "turn the y-axis from two-way travel time to depth.\n"
@@ -233,7 +252,7 @@ class GPRPyApp:
                                                    contrast=float(contr.get()),
                                                    color=colvar.get())])
         topoCorrectButton.config(height = 1, width = 10)
-        topoCorrectButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(topoCorrectButton,
                           "Reads a comma- or tab-separated file containing\n" 
                           "either 3 columns (easting, northing, elevation)\n" 
@@ -254,7 +273,7 @@ class GPRPyApp:
             text="save data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 10)         
-        SaveButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(SaveButton,
                           'saves the processed data including its history in a\n'
                           '.gpr file. The resulting file will contain absolute\n'
@@ -269,13 +288,27 @@ class GPRPyApp:
             text="print figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig,yrng=self.yrng,xrng=self.xrng,asp=self.asp,contrast=contr.get(),color=colvar.get()))
         PrintButton.config(height = 1, width = 10)         
-        PrintButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(PrintButton,
                           "Saves the current visible figure in a pdf with \n"
                           "chosen resolution. If there is a hyperbola on\n" 
                           "the current figure, then the hyperbola will also\n"
                           "appear on the printed figure.")
+
+
+        # Export to VTK
+        VTKButton = tk.Button(
+            text="export to VTK", fg="black",
+            command = lambda : self.exportVTK(proj))
+        VTKButton.config(height = 1, width = 10)
+        VTKButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(VTKButton,
+                          "Exports the processed figure to a\n"
+                          "VTK format, that can be read by\n" 
+                          "Paraview or similar 3D programs")
         
+
+
         
         # Write history
         HistButton = tk.Button(
@@ -456,7 +489,12 @@ class GPRPyApp:
     def agcGain(self,proj):
         window = sd.askinteger("Input","Window length for AGC?")
         proj.agcGain(window=window)
-    
+
+    def truncateY(self,proj):
+        maxY = sd.askfloat("Input","Truncate at what y value\n" 
+                           "(two-way travel time or depth)")
+        proj.truncateY(maxY)
+        
         
     def setVelocity(self,proj):
         velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
@@ -468,9 +506,7 @@ class GPRPyApp:
         if proj.velocity is None:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
-        #mesbox.showinfo("Select file",'Choose file containing the topography points. Columns can be "Easting, Northing, Elevation" or "Profile, Elevation"')
         topofile = fd.askopenfilename()
-        #delimiter = sd.askstring("Input","Value delimiter? Example: ',' (comma) or '\t' (tab) ")
         commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
         if commasep:
             delimiter = ','
@@ -506,8 +542,33 @@ class GPRPyApp:
     def saveData(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".gpr")
         proj.save(filename)
-       
+
+
+    def exportVTK(self,proj):                    
+        outfile = fd.asksaveasfilename()
+        gpyes = mesbox.askyesno("Question",
+                                "Do you have an x,y,z coordinate file for this profile?")
+        delimiter=','
+        if gpyes:
+            gpsfile = fd.askopenfilename()
+            commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
+            if commasep:
+                delimiter = ','
+            else:
+                delimiter = '\t' 
+        else: 
+            gpsfile = None
         
+        thickness = sd.askfloat("Input","Profile thickness [m]")
+        
+        if self.asp is None:
+            aspect = 1.0
+        else:
+            aspect = self.asp
+            
+        proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=delimiter,aspect=aspect)
+        print('... done with exporting to VTK.')
+                
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
         proj.writeHistory(filename)
@@ -584,6 +645,8 @@ class GPRPyApp:
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
 
 
+
+        
 
     # Show hyperbola
     def showHyp(self,proj,a):

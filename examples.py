@@ -4,8 +4,11 @@ import numpy as np
 
 filename = 'exampledata/SnS/ComOffs/XLINE00.DT1'
 topofile = 'exampledata/SnS/ComOffs/GPS.xyz'
+#filename = 'exampledata/GSSI/FILE____032.DZT'
 #filename = 'dewowed.gpr'
 proj = gp.gprpy2d(filename)
+
+proj.truncateY(500)
 
 proj.dewow(100000000000000)
 
@@ -19,9 +22,15 @@ proj.setVelocity(0.1)
 
 proj.topoCorrect(topofile)
 
+proj.exportVTK('testvtk',gpsfile=topofile,thickness=1,aspect=5,smooth=True)
+
+
 proj.showProfile(color="bwr")
 
 plt.show()
+
+
+
 
 #proj.printProfile('test1.pdf')
 
