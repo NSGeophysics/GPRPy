@@ -1,6 +1,7 @@
 GPRPy main GUI
 
-* TODO [#A] Make picking of coordinates possible
+* DONE [#A] Make picking of coordinates possible
+* TODO [#A] Write bubble help text for picking (including the undo thing)
 * TODO [#B] add filtering: high cut
 * DONE [#A] Allow export of vtk files (choose thickness)
 * DONE [#B] Improve performance through optimal use of numpy instead of for loops
