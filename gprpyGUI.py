@@ -60,7 +60,7 @@ class GPRPyApp:
         undoButton = tk.Button(
             text="undo",
             command=lambda : [self.resetYrng(proj),
-                              proj.undo(),
+                              self.undo(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         undoButton.config(height = 1, width = 2*halfwid)
         undoButton.grid(row=0, column=0, sticky='nsew',rowspan=2)
@@ -374,6 +374,13 @@ class GPRPyApp:
                           'command was used.')
 
 
+
+
+    def undo(self,proj):
+        if self.picking:
+            self.picked=self.picked[0:-1,:]
+        else:
+            proj.undo()                        
         
       
     def setYrng(self):
