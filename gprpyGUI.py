@@ -19,12 +19,14 @@ import numpy as np
 import toolbox.splash as splash
 import os
 import Pmw
+import scipy.interpolate as interp
 
 
 colsp=2
 rightcol=7
 halfwid=6
 
+              
 
 class GPRPyApp:
 
@@ -36,6 +38,7 @@ class GPRPyApp:
         # Variables specific to GUI
         self.balloon = Pmw.Balloon()
         self.picking = False
+        self.delimiter = None
         
         # Initialize the gprpy
         proj = gp.gprpy2d()
@@ -308,7 +311,7 @@ class GPRPyApp:
 
         stopPickButton = tk.Button(
             text="stop pick", fg="black",
-            command=lambda : [self.stopPicking(),
+            command=lambda : [self.stopPicking(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         
         stopPickButton.config(height = 1, width = halfwid)
@@ -454,12 +457,8 @@ class GPRPyApp:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
         topofile = fd.askopenfilename()
-        commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
-        if commasep:
-            delimiter = ','
-        else:
-            delimiter = '\t'            
-        proj.topoCorrect(topofile,delimiter)
+        out = self.getDelimiter()    
+        proj.topoCorrect(topofile,self.delimiter)
         self.prevyrng=self.yrng
         self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo]
 
@@ -481,13 +480,33 @@ class GPRPyApp:
 
             
 
-    def stopPicking(self):
+    def stopPicking(self,proj):
         self.picking = False
         print("Picking mode off")
-        filename = fd.asksaveasfilename(defaultextension=".txt")
-        np.savetxt(filename,self.picked,delimiter='\t')
-        print('saved picked file as "%s"' %(filename))
-        
+        filename = fd.asksaveasfilename()
+        np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
+        print('saved picked file as "%s"' %(filename+'_profile.txt'))
+        # If we have 3D info, also plot it as 3D points
+        if proj.threeD is not None:
+            # First calculate along-track points
+            topoVal = proj.threeD[:,2]
+            npos = proj.threeD.shape[0]
+            steplen = np.sqrt(
+                np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
+                np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
+                np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
+            )
+            alongdist = np.cumsum(steplen)
+            topoPos = np.append(0,alongdist)
+            pick3D = np.zeros((self.picked.shape[0],3))
+            for i in range(0,3):    
+                pick3D[:,i] = interp.pchip_interpolate(topoPos,
+                                                       proj.threeD[:,i],
+                                                       self.picked[:,0]).squeeze()
+
+                np.savetxt(filename+'_3D.txt',pick3D,delimiter='\t')
+                print('saved picked file as "%s"' %(filename+'_3D.txt'))
+
         
     def loadData(self,proj):
         filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
@@ -520,14 +539,9 @@ class GPRPyApp:
         outfile = fd.asksaveasfilename()
         gpyes = mesbox.askyesno("Question",
                                 "Do you have an x,y,z coordinate file for this profile?")
-        delimiter=','
         if gpyes:
             gpsfile = fd.askopenfilename()
-            commasep = mesbox.askyesno("Question","Is this a comma-separated file (Yes)\nor tab-separated (No)")
-            if commasep:
-                delimiter = ','
-            else:
-                delimiter = '\t' 
+            self.getDelimiter()           
         else: 
             gpsfile = None
         
@@ -538,7 +552,7 @@ class GPRPyApp:
         else:
             aspect = self.asp
             
-        proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=delimiter,aspect=aspect)
+        proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
         print('... done with exporting to VTK.')
                 
     def writeHistory(self,proj):        
@@ -594,7 +608,7 @@ class GPRPyApp:
         # In case you are picking
         if self.picking:
             a.plot(self.picked[:,0],self.picked[:,1],'-x',color='yellow',linewidth=3) 
-            a.plot(self.picked[:,0],self.picked[:,1],'-x',color=[0.3,0.5,0.8],linewidth=1)                               
+            a.plot(self.picked[:,0],self.picked[:,1],'-x',color='black',linewidth=2)                               
 
         # Allow for cursor coordinates being displayed        
         def moved(event):
@@ -631,7 +645,32 @@ class GPRPyApp:
         histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],self.asp,dpi)
         proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
-    
+
+
+
+    def getDelimiter(self):                
+        commaQuery = tk.Toplevel(self.window)
+        commaQuery.title("Comma or tab separated?")     
+        text = tk.Label(commaQuery,text="Is this a comma- or tab-separated file?",fg='red')
+        text.pack(padx=10,pady=10)
+        commaButton = tk.Button(commaQuery,text="comma",width=10,
+                                command = lambda: [self.setComma(),
+                                                   commaQuery.destroy()])
+        commaButton.pack(side="left")
+        tabButton = tk.Button(commaQuery,text="tab",width=10,
+                              command = lambda: [self.setTab(),
+                                                 commaQuery.destroy()])
+        tabButton.pack(side="right")
+        #self.window.frame().tansient(self.window)
+        #self.window.frame().grab_set()
+        self.window.wait_window(commaQuery)        
+    def setComma(self):
+        self.delimiter = ','
+        print("Delimiter set to comma")
+    def setTab(self):
+        self.delimiter = '\t'
+        print("Delimiter set to tab")
+
 
         
 root = tk.Tk()

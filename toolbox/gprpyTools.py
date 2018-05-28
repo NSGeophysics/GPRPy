@@ -135,6 +135,8 @@ def prepTopo(topofile,delimiter=','):
     # Depending if the table has two or three columns,
     # need to treat it differently
     if topomat.shape[1] is 3:
+        # Save the three columns
+        threeD = topomat
         # Turn the three-dimensional positions into along-profile
         # distances
         topoVal = topomat[:,2]
@@ -147,10 +149,16 @@ def prepTopo(topofile,delimiter=','):
         alongdist = np.cumsum(steplen)
         topoPos = np.append(0,alongdist)
     elif topomat.shape[1] is 2:
+        threeD = None
         topoPos = topomat[:,0]
         topoVal = topomat[:,1]
-        topoPos = np.squeeze(np.asarray(topoPos))       
-    return topoPos, topoVal
+        topoPos = np.squeeze(np.asarray(topoPos))
+    else:
+        print("Something is wrong with the topogrphy file")
+        topoPos = None
+        topoVal = None
+        threeD = None
+    return topoPos, topoVal, threeD
 
 
 

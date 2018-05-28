@@ -49,6 +49,7 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            self.threeD = None
             # Initialize previous
             self.initPrevious()
             
@@ -69,6 +70,7 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            self.threeD = None
             # Initialize previous
             self.initPrevious()
             
@@ -80,7 +82,7 @@ class gprpy2d:
         elif file_ext==".gpr":
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history, velocity, depth, maxTopo = pickle.load(f)
+                data, info, profilePos, twtt, history, velocity, depth, maxTopo, threeD = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
@@ -89,7 +91,8 @@ class gprpy2d:
             self.velocity = velocity
             self.depth = depth
             self.maxTopo = maxTopo
-
+            self.threeD = threeD
+            
             # Initialize previous
             self.initPrevious()
             
@@ -114,6 +117,7 @@ class gprpy2d:
         self.velocity = self.previous["velocity"]
         self.depth = self.previous["depth"]
         self.maxTopo = self.previous["maxTopo"]
+        self.threeD = self.previous["threeD"]
         # Make sure to not keep deleting history
         # when applying undo several times. 
         histsav = copy.copy(self.previous["history"])
@@ -129,7 +133,8 @@ class gprpy2d:
         self.previous["profilePos"] = self.profilePos
         self.previous["velocity"] = self.velocity
         self.previous["depth"] = self.depth
-        self.previous["maxTopo"] = self.maxTopo 
+        self.previous["maxTopo"] = self.maxTopo
+        self.previous["threeD"] = self.threeD
         histsav = copy.copy(self.history)
         self.previous["history"] = histsav
 
@@ -142,7 +147,7 @@ class gprpy2d:
         if not(file_ext=='.gpr'):
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
-            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.maxTopo], f)
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.maxTopo,self.threeD], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -246,6 +251,7 @@ class gprpy2d:
         # Put what you did in history
         histstr = "mygpr.adjProfile(%g,%g)" %(minPos,maxPos)
         self.history.append(histstr)   
+
         
     def setZeroTime(self,newZeroTime):
         # Store previous state for undo
@@ -258,13 +264,12 @@ class gprpy2d:
         # Put what you did in history
         histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
         self.history.append(histstr)  
+
         
     def dewow(self,window):
         # Store previous state for undo
         self.storePrevious()
-
         self.data = tools.dewow(self.data,window)
-
         # Put in history
         histstr = "mygpr.dewow(%d)" %(window)
         self.history.append(histstr)
@@ -314,7 +319,6 @@ class gprpy2d:
     def truncateY(self,maxY):
         # Store previous state for undo
         self.storePrevious()
-        
         if self.velocity is None:
             maxtwtt = maxY
             maxind = np.argmin( np.abs(self.twtt-maxY) )
@@ -326,7 +330,6 @@ class gprpy2d:
             self.twtt = self.twtt[0:maxind]
             self.data = self.data[0:maxind,:]
             self.depth = self.depth[0:maxind]
-        
         # Put in history
         histstr = "mygpr.truncateY(%g)" %(maxY)
         self.history.append(histstr)
@@ -340,7 +343,7 @@ class gprpy2d:
         # Store previous state for undo
         self.storePrevious()
         self.data_pretopo = self.data
-        topoPos,topoVal = tools.prepTopo(topofile,delimiter)
+        topoPos, topoVal, self.threeD = tools.prepTopo(topofile,delimiter)
         self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
                                                               profilePos=self.profilePos, topoPos=topoPos,
                                                               topoVal=topoVal, twtt=self.twtt)
@@ -445,3 +448,4 @@ class gprpy2d:
         self.previous["velocity"] = self.velocity
         self.previous["depth"] = self.depth
         self.previous["maxTopo"] = self.maxTopo
+        self.previous["threeD"] = self.threeD
