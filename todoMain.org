@@ -2,7 +2,8 @@ GPRPy main GUI
 
 * DONE [#A] Make picking of coordinates possible
 * TODO [#A] Write bubble help text for picking (including the undo thing)
-* TODO [#B] add filtering: high cut
+* TODO [#A] Make, when a cancel is pressed on input, that the call is not executed
+* TODO [#B] add output to obspy
 * DONE [#A] Allow export of vtk files (choose thickness)
 * DONE [#B] Improve performance through optimal use of numpy instead of for loops
 * DONE [#A] Add AGC. Button and gprpytool are already there

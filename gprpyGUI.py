@@ -388,9 +388,11 @@ class GPRPyApp:
       
     def setYrng(self):
         ylow = sd.askfloat("Input","Min Y value")
-        yhigh = sd.askfloat("Input","Max Y value")
-        self.prevyrng=self.yrng
-        self.yrng=[ylow,yhigh]
+        if ylow is not None:            
+            yhigh = sd.askfloat("Input","Max Y value")
+            if yhigh is not None:
+                self.prevyrng=self.yrng
+                self.yrng=[ylow,yhigh]
         
 
     def resetYrng(self,proj):
@@ -403,65 +405,77 @@ class GPRPyApp:
     def setAspect(self):
         self.asp = sd.askfloat("Input","Plotting aspect ratio")
         
+        
 
     def setXrng(self):
         xlow = sd.askfloat("Input","Min X value")
-        xhigh = sd.askfloat("Input","Max X value")
-        self.xrng=[xlow,xhigh]
+        if xlow is not None:
+            xhigh = sd.askfloat("Input","Max X value")
+            if xhigh is not None:
+                self.xrng=[xlow,xhigh]
         
 
     def adjProfile(self,proj):
         minPos = sd.askfloat("Input","Start x coordinate")
-        maxPos = sd.askfloat("Input","End x coordinate")
-        proj.adjProfile(minPos=minPos,maxPos=maxPos)
-        self.xrng=[minPos,maxPos]
+        if minPos is not None:
+            maxPos = sd.askfloat("Input","End x coordinate")
+            if maxPos is not None:
+                proj.adjProfile(minPos=minPos,maxPos=maxPos)
+                self.xrng=[minPos,maxPos]
 
     def setZeroTime(self,proj):
         newZeroTime = sd.askfloat("Input","New zero time")
-        proj.setZeroTime(newZeroTime=newZeroTime)
+        if newZeroTime is not None:
+            proj.setZeroTime(newZeroTime=newZeroTime)
         
         
     def dewow(self,proj):
         window = sd.askinteger("Input","Dewow window width (number of samples)")
-        proj.dewow(window=window)
+        if window is not None:
+            proj.dewow(window=window)
         
 
     def remMeanTrace(self,proj):
         ntraces = sd.askinteger("Input","Remove mean over how many traces?")
-        proj.remMeanTrace(ntraces=ntraces)
+        if ntraces is not None:
+            proj.remMeanTrace(ntraces=ntraces)
 
 
     def tpowGain(self,proj):
         power = sd.askfloat("Input","Power for tpow gain?")
-        proj.tpowGain(power=power)
+        if power is not None:
+            proj.tpowGain(power=power)
         
 
     def agcGain(self,proj):
         window = sd.askinteger("Input","Window length for AGC?")
-        proj.agcGain(window=window)
+        if window is not None:
+            proj.agcGain(window=window)
 
     def truncateY(self,proj):
         maxY = sd.askfloat("Input","Truncate at what y value\n" 
                            "(two-way travel time or depth)")
-        proj.truncateY(maxY)
+        if maxY is not None:
+            proj.truncateY(maxY)
         
         
     def setVelocity(self,proj):
         velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
-        proj.setVelocity(velocity)
-        self.prevyrng=self.yrng
-        self.yrng=[0,np.max(proj.depth)]
+        if velocity is not None:
+            proj.setVelocity(velocity)
+            self.prevyrng=self.yrng
+            self.yrng=[0,np.max(proj.depth)]
 
     def topoCorrect(self,proj):
         if proj.velocity is None:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
         topofile = fd.askopenfilename()
-        out = self.getDelimiter()    
-        proj.topoCorrect(topofile,self.delimiter)
-        self.prevyrng=self.yrng
-        self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo]
-
+        if topofile is not None:
+            out = self.getDelimiter()    
+            proj.topoCorrect(topofile,self.delimiter)
+            self.prevyrng=self.yrng
+            self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo]
 
 
    
@@ -476,33 +490,32 @@ class GPRPyApp:
             print('freshly picked')
         canvas.mpl_connect('button_press_event', addPoint)
 
-
-
             
 
     def stopPicking(self,proj):
-        self.picking = False
-        print("Picking mode off")
         filename = fd.asksaveasfilename()
-        np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
-        print('saved picked file as "%s"' %(filename+'_profile.txt'))
-        # If we have 3D info, also plot it as 3D points
-        if proj.threeD is not None:
-            # First calculate along-track points
-            topoVal = proj.threeD[:,2]
-            npos = proj.threeD.shape[0]
-            steplen = np.sqrt(
-                np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
-                np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
-                np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
-            )
-            alongdist = np.cumsum(steplen)
-            topoPos = np.append(0,alongdist)
-            pick3D = np.zeros((self.picked.shape[0],3))
-            for i in range(0,3):    
-                pick3D[:,i] = interp.pchip_interpolate(topoPos,
-                                                       proj.threeD[:,i],
-                                                       self.picked[:,0]).squeeze()
+        if filename is not '':
+            self.picking = False
+            print("Picking mode off")
+            np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
+            print('saved picked file as "%s"' %(filename+'_profile.txt'))
+            # If we have 3D info, also plot it as 3D points
+            if proj.threeD is not None:
+                # First calculate along-track points
+                topoVal = proj.threeD[:,2]
+                npos = proj.threeD.shape[0]
+                steplen = np.sqrt(
+                    np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
+                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
+                    np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
+                )
+                alongdist = np.cumsum(steplen)
+                topoPos = np.append(0,alongdist)
+                pick3D = np.zeros((self.picked.shape[0],3))
+                for i in range(0,3):    
+                    pick3D[:,i] = interp.pchip_interpolate(topoPos,
+                                                           proj.threeD[:,i],
+                                                           self.picked[:,0]).squeeze()
 
                 np.savetxt(filename+'_3D.txt',pick3D,delimiter='\t')
                 print('saved picked file as "%s"' %(filename+'_3D.txt'))
@@ -512,53 +525,53 @@ class GPRPyApp:
         filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT")))
-        proj.importdata(filename=filename)
-        self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
-        
-        if proj.depth is None:
-            self.yrng = [0,np.max(proj.twtt)]
-        else:
-            if proj.maxTopo is None:
-                self.yrng = [0,np.max(proj.depth)]
+        if filename is not None:
+            proj.importdata(filename=filename)
+            self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
+            if proj.depth is None:
+                self.yrng = [0,np.max(proj.twtt)]
             else:
-                self.yrng = [proj.maxTopo-np.max(proj.depth), proj.maxTopo]
-
-        self.asp=None
-
-        # Just in case someone presses undo before changing yrange        
-        self.prevyrng=self.yrng    
-        print("Loaded " + filename)
+                if proj.maxTopo is None:
+                    self.yrng = [0,np.max(proj.depth)]
+                else:
+                    self.yrng = [proj.maxTopo-np.max(proj.depth), proj.maxTopo]
+            self.asp=None
+            # Just in case someone presses undo before changing yrange        
+            self.prevyrng=self.yrng    
+            print("Loaded " + filename)
 
         
     def saveData(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".gpr")
-        proj.save(filename)
+        if filename is not None:
+            proj.save(filename)
 
 
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
-        gpyes = mesbox.askyesno("Question",
-                                "Do you have an x,y,z coordinate file for this profile?")
-        if gpyes:
-            gpsfile = fd.askopenfilename()
-            self.getDelimiter()           
-        else: 
-            gpsfile = None
-        
-        thickness = sd.askfloat("Input","Profile thickness [m]")
-        
-        if self.asp is None:
-            aspect = 1.0
-        else:
-            aspect = self.asp
+        if filename is not None:
+            gpyes = mesbox.askyesno("Question",
+                                    "Do you have an x,y,z coordinate file"
+                                    "for this profile?")
+            if gpyes:
+                gpsfile = fd.askopenfilename()
+                self.getDelimiter()           
+            else: 
+                gpsfile = None        
+            thickness = sd.askfloat("Input","Profile thickness [m]")        
+            if self.asp is None:
+                aspect = 1.0
+            else:
+                aspect = self.asp
             
-        proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
-        print('... done with exporting to VTK.')
+            proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
+            print('... done with exporting to VTK.')
                 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
-        proj.writeHistory(filename)
-        print("Wrote history to " + filename)
+        if filename is not None:
+            proj.writeHistory(filename)
+            print("Wrote history to " + filename)
 
 
     def plotProfileData(self,proj,fig,a,canvas):
@@ -627,23 +640,27 @@ class GPRPyApp:
     # Show hyperbola
     def showHyp(self,proj,a):
         x0 = sd.askfloat("Input","Hyperbola center on profile [m]")
-        t0 = sd.askfloat("Input","Hyperbola apex location (two-way travel time [ns])")
-        v  = sd.askfloat("Input","Estimated velocity [m/ns]")
-        # t0 is two-way travel time
-        y=proj.profilePos-x0
-        d=v*t0/2.0
-        k=np.sqrt(d**2 + np.power(y,2))
-        t2=2*k/v
-        a.plot(proj.profilePos,t2,'--c',linewidth=3)
+        if x0 is not None:
+            t0 = sd.askfloat("Input","Hyperbola apex location (two-way travel time [ns])")
+            if t0 is not None:
+                v  = sd.askfloat("Input","Estimated velocity [m/ns]")
+                if v is not None:
+                    y=proj.profilePos-x0
+                    d=v*t0/2.0
+                    k=np.sqrt(d**2 + np.power(y,2))
+                    t2=2*k/v
+                    a.plot(proj.profilePos,t2,'--c',linewidth=3)
         
 
     def printProfileFig(self,proj,fig):
         figname = fd.asksaveasfilename(defaultextension=".pdf")
-        dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
-        fig.savefig(figname, format='pdf', dpi=dpi)        
-        # Put what you did in history        
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],self.asp,dpi)
-        proj.history.append(histstr)
+        if figname is not None:
+            dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
+            if dpi is not None:
+                fig.savefig(figname, format='pdf', dpi=dpi)        
+                # Put what you did in history        
+                histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],self.asp,dpi)
+                proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
 
 
