@@ -10,7 +10,7 @@ import scipy.interpolate as interp
 from pyevtk.hl import gridToVTK
 
 class gprpy2d:
-    def __init__(self,filename=None,desciption=None): #,profilerange=None):
+    def __init__(self,filename=None):
         self.history = ["mygpr = gprpy.gprpy2d()"]
 
         # Initialize previous for undo
@@ -432,8 +432,6 @@ class gprpy2d:
         self.history.append(histstr)
 
         
-
-        
     def storePrevious(self):        
         self.previous["data"] = self.data
         self.previous["twtt"] = self.twtt
@@ -444,3 +442,50 @@ class gprpy2d:
         self.previous["depth"] = self.depth
         self.previous["maxTopo"] = self.maxTopo
         self.previous["threeD"] = self.threeD
+
+
+
+
+        
+class gprpyCW(gprpy2d):
+    def __init__(self,filename=None,dtype=None):
+        '''
+        dtype needs to be either "CMP" or "WARR"
+        '''
+        # Inheriting the initializer from the gprpy2d class
+        super().__init__(None)
+        self.history = ["mygpr = gprpy.gprpyCW()"]
+        # Initialize previous for undo
+        self.previous = {}
+        self.dtype = dtype
+        
+        if (filename is not None) and (dtype is not None):
+            self.importdata(filename,dtype)
+
+
+    def importdata(self,filename,dtype):
+        print(filename)
+        super().importdata(filename)
+        self.dtype = dtype
+        # Remove the history string from the super-class importing
+        del self.history[-1]
+        # Put what you did in history
+        histstr = "mygpr.importdata('%s',dtype='%s')" %(filename,dtype)
+        self.history.append(histstr)  
+
+
+    
+    def normalize(self):
+        # Store previous state for undo
+        self.storePrevious()
+        # Calculate norm of each trace and divide each trace by it
+        self.data = np.divide(self.data,np.maximum(np.linalg.norm(self.data,axis=0),1e-8))
+        print("Normalized data set")
+        # Put what you did in history
+        histstr = "mygpr.normalize()"
+        self.history.append(histstr) 
+        
+
+                      
+        
+            
