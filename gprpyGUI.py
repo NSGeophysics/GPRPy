@@ -53,6 +53,7 @@ class GPRPyApp:
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7,rowspan=15,sticky='nsew')
+
         canvas.draw() 
 
 
@@ -690,6 +691,9 @@ class GPRPyApp:
 
         
 root = tk.Tk()
+
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
 
 app = GPRPyApp(root)
 
