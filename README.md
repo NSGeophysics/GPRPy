@@ -29,8 +29,7 @@ if you downloaded GPRPy directly onto your desktop
 This should open the graphical user interface
 
 
-
-
+## General comments
 
 #### Requires:
 
