@@ -167,7 +167,6 @@ class gprpy2d:
                                                     min(self.twtt)],
                        aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
             plt.gca().set_ylabel("two-way travel time [ns]")
-            #plt.gca().set_ylim([0,min(maxyval,max(self.twtt))])
             plt.gca().invert_yaxis()
             
         elif self.maxTopo is None:
@@ -177,7 +176,6 @@ class gprpy2d:
                                                     min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
              plt.gca().set_ylabel("depth [m]")
-             #plt.gca().set_ylim([0,min(maxyval,max(self.depth))])
              plt.gca().invert_yaxis()
         else:
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
@@ -186,9 +184,7 @@ class gprpy2d:
                                                     self.maxTopo-min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
             plt.gca().set_ylabel("elevation [m]")
-            #if maxyval > self.maxTopo:
-            #    maxyval = 0    
-            #plt.gca().set_ylim([max(maxyval,self.maxTopo-max(self.depth)) ,self.maxTopo])
+            
             
         if yrng is not None:
             plt.ylim(yrng)
@@ -347,10 +343,9 @@ class gprpy2d:
         self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
                                                               profilePos=self.profilePos, topoPos=topoPos,
                                                               topoVal=topoVal, twtt=self.twtt)
-
         # Put in history
         if delimiter is ',':
-             histstr = "mygpr.topoCorrect('%s')" %(topofile)
+            histstr = "mygpr.topoCorrect('%s')" %(topofile)
         else:
             histstr = "mygpr.topoCorrect('%s',delimiter='\\t')" %(topofile)
         self.history.append(histstr)

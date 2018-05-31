@@ -471,7 +471,7 @@ class GPRPyApp:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
         topofile = fd.askopenfilename()
-        if topofile is not None:
+        if topofile is not '':
             out = self.getDelimiter()    
             proj.topoCorrect(topofile,self.delimiter)
             self.prevyrng=self.yrng
@@ -487,7 +487,6 @@ class GPRPyApp:
         def addPoint(event):
             self.picked = np.append(self.picked,np.asmatrix([event.xdata,event.ydata]),axis=0)
             self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)
-            print('freshly picked')
         canvas.mpl_connect('button_press_event', addPoint)
 
             
@@ -525,7 +524,7 @@ class GPRPyApp:
         filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT")))
-        if filename is not None:
+        if filename is not '':
             proj.importdata(filename=filename)
             self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
             if proj.depth is None:
@@ -543,13 +542,13 @@ class GPRPyApp:
         
     def saveData(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".gpr")
-        if filename is not None:
+        if filename is not '':
             proj.save(filename)
 
 
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
-        if filename is not None:
+        if filename is not '':
             gpyes = mesbox.askyesno("Question",
                                     "Do you have an x,y,z coordinate file"
                                     "for this profile?")
@@ -569,7 +568,7 @@ class GPRPyApp:
                 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
-        if filename is not None:
+        if filename is not '':
             proj.writeHistory(filename)
             print("Wrote history to " + filename)
 
@@ -654,7 +653,7 @@ class GPRPyApp:
 
     def printProfileFig(self,proj,fig):
         figname = fd.asksaveasfilename(defaultextension=".pdf")
-        if figname is not None:
+        if figname is not '':
             dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
             if dpi is not None:
                 fig.savefig(figname, format='pdf', dpi=dpi)        

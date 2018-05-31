@@ -167,30 +167,33 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
     # We assume that the profilePos are the correct along-profile
     # points of the measurements (they can be correted with adj profile)
     # For some along-profile points, we have the elevation from prepTopo
-    # So we can just interpolate
-    elev = interp.pchip_interpolate(topoPos,topoVal,profilePos)
-    elevdiff = elev-np.min(elev)
-    # Turn each elevation point into a two way travel-time shift.
-    # It's two-way travel time
-    etime = 2*elevdiff/velocity
-    timeStep=twtt[1]-twtt[0]
-    # Calculate the time shift for each trace
-    tshift = (np.round(etime/timeStep)).astype(int)
-    maxup = np.max(tshift)
-    # We want the highest elevation to be zero time.
-    # Need to shift by the greatest amount, where  we are the lowest
-    tshift = np.max(tshift) - tshift
-    # Make new datamatrix
-    newdata = np.empty((data.shape[0]+maxup,data.shape[1]))
-    newdata[:] = np.nan
-    # Set new twtt
-    newtwtt = np.arange(0, twtt[-1] + maxup*timeStep, timeStep)
-    nsamples = len(twtt)
-    # Enter every trace at the right place into newdata
-    for pos in range(0,len(profilePos)):
-        #print(type(tshift[pos][0]))
-        newdata[tshift[pos][0]:tshift[pos][0]+nsamples ,pos] = np.squeeze(data[:,pos])
-    return newdata, newtwtt, np.max(elev)
+    # So we can just interpolate    
+    if not ((all(np.diff(topoPos)>0)) or  (all(np.diff(topoPos)<0))):
+        raise ValueError('\x1b[1;31;47m' + 'The profile vs topo file does not have purely increasing or decreasing along-profile positions' + '\x1b[0m')        
+    else:
+        elev = interp.pchip_interpolate(topoPos,topoVal,profilePos)
+        elevdiff = elev-np.min(elev)
+        # Turn each elevation point into a two way travel-time shift.
+        # It's two-way travel time
+        etime = 2*elevdiff/velocity
+        timeStep=twtt[1]-twtt[0]
+        # Calculate the time shift for each trace
+        tshift = (np.round(etime/timeStep)).astype(int)
+        maxup = np.max(tshift)
+        # We want the highest elevation to be zero time.
+        # Need to shift by the greatest amount, where  we are the lowest
+        tshift = np.max(tshift) - tshift
+        # Make new datamatrix
+        newdata = np.empty((data.shape[0]+maxup,data.shape[1]))
+        newdata[:] = np.nan
+        # Set new twtt
+        newtwtt = np.arange(0, twtt[-1] + maxup*timeStep, timeStep)
+        nsamples = len(twtt)
+        # Enter every trace at the right place into newdata
+        for pos in range(0,len(profilePos)):
+            #print(type(tshift[pos][0]))
+            newdata[tshift[pos][0]:tshift[pos][0]+nsamples ,pos] = np.squeeze(data[:,pos])
+        return newdata, newtwtt, np.max(elev)
 
     
     
