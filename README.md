@@ -9,7 +9,7 @@ Ground Penetrating Radar processing and visualization software for python 3.
 button and then "Download ZIP". Save the file somewhere on your computer and extract the 
 zip folder (typically by double-clicking on it).
 
-2) Install anaconda python (the python 3.6 version) from https://www.anaconda.com/download/#macos
+2) Install anaconda python (the python 3.6 version) from https://www.anaconda.com/download/
 
 3) Once the installation finished, open Anaconda Prompt (on Windows: click on Start, 
 then enter "Anaconda Prompt", without the quotation marks into the 
