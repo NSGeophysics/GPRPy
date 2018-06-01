@@ -458,6 +458,8 @@ class gprpyCW(gprpy2d):
         # Initialize previous for undo
         self.previous = {}
         self.dtype = dtype
+        self.linSemb = None
+        self.hypSemb = None
         
         if (filename is not None) and (dtype is not None):
             self.importdata(filename,dtype)
@@ -480,10 +482,24 @@ class gprpyCW(gprpy2d):
         self.storePrevious()
         # Calculate norm of each trace and divide each trace by it
         self.data = np.divide(self.data,np.maximum(np.linalg.norm(self.data,axis=0),1e-8))
-        print("Normalized data set")
+        print("normalized data set")
         # Put what you did in history
         histstr = "mygpr.normalize()"
         self.history.append(histstr) 
+
+
+    def linSemblance(self,vmin,vmax,vint):
+        vVals = np.arange(vmin,vmax+vint,vint)
+        #tVals = np.arange(tmin,tmax+tint,tint)
+        if self.dtype is "WARR":
+            typefact = 1
+        elif self.dtype is "CMP":
+            typefact = 2
+        self.linSemb = tools.linSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
+        print("calculated linear semblance")
+        # Put what you did in history
+        histstr = "mygpr.linSemblance(vmin=%g,vmax=%g,vint=%g)"
+        self.history.append(histstr)
         
 
                       

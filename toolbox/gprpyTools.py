@@ -250,3 +250,31 @@ def prepVTK(profilePos,gpsfile=None,delimiter=',',smooth=True,win_length=51,pord
             y = signal.savgol_filter(y.squeeze(), window_length=win_length, polyorder=porder)
             z = signal.savgol_filter(z.squeeze(), window_length=win_length, polyorder=porder) 
     return x,y,z
+
+
+
+
+# def linSemblance(data,profilePos,twtt,vVals,tVals,typefact):
+#     linSemb=np.zeros((len(vVals),len(tVals)))
+#     f = interp.interp2d(profilePos, twtt, data)        
+#     for vi in  tqdm(range(0,len(vVals))):
+#         for ti in range(0,len(tVals)):
+#             t = tVals[ti] + typefact*profilePos/vVals[vi]            
+#             vals = np.diagonal(np.asmatrix(f(profilePos, t)))
+#             linSemb[vi,ti] = sum(vals)/len(vals)
+#     return linSemb
+
+
+def linSemblance(data,profilePos,twtt,vVals,tVals,typefact):
+    linSemb=np.zeros((len(vVals),len(tVals)))
+    for vi in tqdm(range(0,len(vVals))):       
+        for ti in range(0,len(tVals)):
+            t = tVals[ti] + typefact*profilePos/vVals[vi]
+            tindices = (np.floor((t-twtt[0])*(twtt[1]-twtt[0]))).astype(int)
+            # The tindices will be sorted, can use searchsorted because
+            # the wave doesn't turn around
+            maxi = np.searchsorted(tindices,len(twtt))
+            pixels = data[(tindices[0:maxi],np.arange(0,maxi))]
+            linSemb[vi,ti]=np.sum(pixels)/pixels.shape[1]          
+    return linSemb
+    
