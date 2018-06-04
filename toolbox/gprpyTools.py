@@ -254,27 +254,59 @@ def prepVTK(profilePos,gpsfile=None,delimiter=',',smooth=True,win_length=51,pord
 
 
 
-# def linSemblance(data,profilePos,twtt,vVals,tVals,typefact):
-#     linSemb=np.zeros((len(vVals),len(tVals)))
-#     f = interp.interp2d(profilePos, twtt, data)        
-#     for vi in  tqdm(range(0,len(vVals))):
-#         for ti in range(0,len(tVals)):
-#             t = tVals[ti] + typefact*profilePos/vVals[vi]            
-#             vals = np.diagonal(np.asmatrix(f(profilePos, t)))
-#             linSemb[vi,ti] = sum(vals)/len(vals)
-#     return linSemb
+def linSemblance_alt1(data,profilePos,twtt,vVals,tVals,typefact):
+    linSemb=np.zeros((len(tVals),len(vVals)))
+    f = interp.interp2d(profilePos, twtt, data)        
+    for vi in  tqdm(range(0,len(vVals))):
+        for ti in range(0,len(tVals)):
+            t = tVals[ti] + typefact*profilePos/vVals[vi]            
+            vals = np.diagonal(np.asmatrix(f(profilePos, t)))
+            linSemb[ti,vi] = np.abs(sum(vals)/len(vals))
+    return linSemb
 
 
 def linSemblance(data,profilePos,twtt,vVals,tVals,typefact):
-    linSemb=np.zeros((len(vVals),len(tVals)))
+    linSemb=np.zeros((len(tVals),len(vVals)))
     for vi in tqdm(range(0,len(vVals))):       
         for ti in range(0,len(tVals)):
             t = tVals[ti] + typefact*profilePos/vVals[vi]
-            tindices = (np.floor((t-twtt[0])*(twtt[1]-twtt[0]))).astype(int)
+            tindices = (np.round((t-twtt[0])/(twtt[1]-twtt[0]))).astype(int)
             # The tindices will be sorted, can use searchsorted because
             # the wave doesn't turn around
             maxi = np.searchsorted(tindices,len(twtt))
             pixels = data[(tindices[0:maxi],np.arange(0,maxi))]
-            linSemb[vi,ti]=np.sum(pixels)/pixels.shape[1]          
+            linSemb[ti,vi]=np.abs(np.sum(pixels)/pixels.shape[1])
     return linSemb
+
+
+def linSemblance_alt2(data,profilePos,twtt,vVals,tVals,typefact):
+    linSemb=np.zeros((len(tVals),len(vVals)))
     
+    tVals = np.asmatrix(tVals).transpose()   
+    for vi in tqdm(range(0,len(vVals))):
+        t = tVals + typefact*profilePos/vVals[vi]
+        tindices = (np.round((t-twtt[0])/(twtt[1]-twtt[0]))).astype(int)
+        for ti in range(0,len(tVals)):
+            # The tindices will be sorted, can use searchsorted because
+            # the wave doesn't turn around           
+            maxi = np.searchsorted(np.ravel(tindices[ti,:]),len(twtt))
+            pixels = data[(tindices[ti,0:maxi],np.arange(0,maxi))]
+            linSemb[ti,vi]=np.abs(np.sum(pixels)/pixels.shape[1])
+    return linSemb
+
+
+
+def hypSemblance(data,profilePos,twtt,vVals,tVals,typefact):
+    hypSemb=np.zeros((len(tVals),len(vVals)))
+    x2 = np.power(typefact*profilePos,2.0)
+    for vi in tqdm(range(0,len(vVals))):       
+        for ti in range(0,len(tVals)):
+            t = np.sqrt(x2 + 4*np.power(tVals[ti]/2.0 * vVals[vi],2.0))/vVals[vi]
+            tindices = (np.round((t-twtt[0])/(twtt[1]-twtt[0]))).astype(int)
+            # The tindices will be sorted, can use searchsorted because
+            # the wave doesn't turn around
+            maxi = np.searchsorted(tindices,len(twtt))
+            pixels = data[(tindices[0:maxi],np.arange(0,maxi))]
+            hypSemb[ti,vi]=np.abs(np.sum(pixels)/pixels.shape[1])
+    return hypSemb
+
