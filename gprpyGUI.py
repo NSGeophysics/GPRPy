@@ -549,7 +549,7 @@ class GPRPyApp:
 
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
-        if filename is not '':
+        if outfile is not '':
             gpyes = mesbox.askyesno("Question",
                                     "Do you have an x,y,z coordinate file"
                                     "for this profile?")

@@ -16,7 +16,7 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=7
+rightcol=8
 halfwid=4
 
 class GPRPyCWApp:
@@ -38,6 +38,10 @@ class GPRPyCWApp:
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7,rowspan=15,sticky='nsew')
         canvas.draw()
 
+        self.vmin = 0.01
+        self.vmax = 0.33
+        self.vint = 0.01
+        
         proj = gp.gprpyCW()
 
 
@@ -115,7 +119,21 @@ class GPRPyCWApp:
                           "they all have equal energy") 
 
 
+        # Lin Semblance
+        LinSembButton = tk.Button(
+            text="lin semb", fg="black",
+            command = lambda : [self.linSemb(proj),
+                                self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb)])
+        LinSembButton.config(height = 1, width = 2*halfwid)
+        LinSembButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
 
+        # Hyp Semblance
+        HypSembButton = tk.Button(
+            text="hyp semb", fg="black",
+            command = lambda : [self.hypSemb(proj),
+                                self.plotHypeSemb(proj,a=ahyp,canvas=canvas)])
+        HypSembButton.config(height = 1, width = 2*halfwid)
+        HypSembButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
                 
         # Write history
         HistButton = tk.Button(
@@ -174,17 +192,26 @@ class GPRPyCWApp:
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
 
+        # Set velocity range
+        VelrngButton = tk.Button(
+            text="set vel range", fg="black",
+            command=lambda : [self.setVelRng()])
+        VelrngButton.config(height = 1, width = 2*halfwid)         
+        VelrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
+        self.balloon.bind(VelrngButton,"Set the velocity range\n"
+                                       "used in the semblance\n"
+                                       "analysis.")
+        
         
         # Contrast
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
         contrlabel.grid(row=0, column=4, sticky='nsew')
-        self.balloon.bind(contrlabel,"Set color saturation")
+        self.balloon.bind(contrlabel,"Data color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
         contrbox.grid(row=1, column=4, sticky='nsew')
-        #contr.set("1.0")
         self.contrast.set("1.0")
 
         
@@ -199,12 +226,27 @@ class GPRPyCWApp:
                           "data representation.")
 
 
+
+        # Saturation
+        sattext = tk.StringVar()
+        sattext.set("contrast")
+        satlabel = tk.Label(master, textvariable=sattext,height = 1,width = 2*halfwid)
+        satlabel.grid(row=0, column=6, sticky='nsew')
+        self.balloon.bind(contrlabel,"Semblance color saturation")
+        self.saturation = tk.DoubleVar()
+        satbox = tk.Entry(master, textvariable=self.saturation, width=2*halfwid)
+        satbox.grid(row=1, column=6, sticky='nsew')
+        self.saturation.set("1.0")
+
+
+
+        
         # Refreshing plot
         plotButton = tk.Button(
             text="refresh plot",
             command=lambda : self.plotCWData(proj,a=adata,canvas=canvas))
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -281,8 +323,29 @@ class GPRPyCWApp:
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
         canvas.draw()
 
+        
+    def plotSemb(self,proj,a,canvas,semb):
+        a.clear()
+        stdcont = np.nanmax(np.abs(semb)[:])
+        a.imshow(semb, cmap='inferno', extent=[self.vmin, self.vmax,
+                                            min(proj.twtt),max(proj.twtt)],
+                 aspect='auto',
+                 vmin=0, vmax=stdcont/self.saturation.get())
+        
+        a.set_ylim(self.yrng)
+        a.set_xlabel("velocity")
+        def moved(event):
+            if event.xdata is not None and event.ydata is not None:
+                canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
+                
+        canvas.mpl_connect('button_press_event', moved)
+        tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
+
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
+        canvas.draw()
 
 
+        
     def setYrng(self):
         ylow = sd.askfloat("Input","Min Y value")
         if ylow is not None:            
@@ -298,7 +361,18 @@ class GPRPyCWApp:
             xhigh = sd.askfloat("Input","Max X value")
             if xhigh is not None:
                 self.xrng=[xlow,xhigh]
-        
+
+    def setVelRng(self):
+        vmin = sd.askfloat("Input","Minimum velocity")
+        if vmin is not None:
+            self.vmin = vmin
+        vmax = sd.askfloat("Input","Maximum velocity")
+        if vmax is not None:
+            self.vmax = vmax
+        vint = sd.askfloat("Input","Velocity step size (interval)")
+        if vint is not None:
+            self.vint = vint    
+            
 
     def adjProfile(self,proj):
         minPos = sd.askfloat("Input","Start x coordinate")
@@ -308,12 +382,23 @@ class GPRPyCWApp:
                 proj.adjProfile(minPos=minPos,maxPos=maxPos)
                 self.xrng=[minPos,maxPos]
 
+                
     def setZeroTime(self,proj):
         newZeroTime = sd.askfloat("Input","New zero time")
         if newZeroTime is not None:
             proj.setZeroTime(newZeroTime=newZeroTime)
-                
 
+
+    def dewow(self,proj):
+        window = sd.askinteger("Input","Dewow window width (number of samples)")
+        if window is not None:
+            proj.dewow(window=window)
+
+    def linSemb(self,proj):
+        proj.linSemblance(self.vmin,self.vmax,self.vint)
+
+    def hypSemb(self,proj):
+        proj.hypSemblance(self.vmin,self.vmax,self.vint)
 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")

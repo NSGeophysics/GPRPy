@@ -490,7 +490,6 @@ class gprpyCW(gprpy2d):
 
     def linSemblance(self,vmin,vmax,vint):
         vVals = np.arange(vmin,vmax+vint,vint)
-        #tVals = np.arange(tmin,tmax+tint,tint)
         if self.dtype is "WARR":
             typefact = 1
         elif self.dtype is "CMP":
@@ -502,6 +501,16 @@ class gprpyCW(gprpy2d):
         self.history.append(histstr)
         
 
-                      
+    def hypSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
+        vVals = np.arange(vmin,vmax+vint,vint)
+        if self.dtype is "WARR":
+            typefact = 1
+        elif self.dtype is "CMP":
+            typefact = 2
+        self.hypSemb = tools.hypSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
+        print("calculated hyperbola semblance")
+        # Put what you did in history
+        histstr = "mygpr.hypSemblance(vmin=%g,vmax=%g,vint=%g)"
+        self.history.append(histstr)                  
         
             
