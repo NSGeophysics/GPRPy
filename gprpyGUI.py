@@ -550,21 +550,20 @@ class GPRPyApp:
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
         if outfile is not '':
-            gpyes = mesbox.askyesno("Question",
-                                    "Do you have an x,y,z coordinate file"
-                                    "for this profile?")
-            if gpyes:
-                gpsfile = fd.askopenfilename()
-                self.getDelimiter()           
-            else: 
-                gpsfile = None        
-            thickness = sd.askfloat("Input","Profile thickness [m]")        
+            thickness = sd.askfloat("Input","Profile thickness [m]")    
             if self.asp is None:
                 aspect = 1.0
             else:
                 aspect = self.asp
             
-            proj.exportVTK(outfile,gpsfile=gpsfile,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
+            if proj.threeD is None:
+                gpyes = mesbox.askyesno("Question","Do you have topography data for this profile?")
+                if gpyes:
+                    filename = fd.askopenfilename()
+                    self.getDelimiter()
+                    proj.exportVTK(outfile,gpsinfo=filename,thickness=thickness,delimiter=self.delimiter,aspect=aspect)        
+            else:
+                proj.exportVTK(outfile,gpsinfo=proj.threeD,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
             print('... done with exporting to VTK.')
                 
     def writeHistory(self,proj):        

@@ -199,14 +199,14 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
     
 
     
-def prepVTK(profilePos,gpsfile=None,delimiter=',',smooth=True,win_length=51,porder=3):
-    if gpsfile is None:
+def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porder=3):
+    if gpsmat is None:
         x = profilePos
         y = np.zeros(x.size)
         z = np.zeros(x.size)
     else:
-        gpstable = np.loadtxt(gpsfile,delimiter=delimiter)
-        gpsmat = np.asmatrix(gpstable)   
+        #gpstable = np.loadtxt(gpsfile,delimiter=delimiter)
+        #gpsmat = np.asmatrix(gpstable)   
         # Turn the three-dimensional positions into along-profile
         # distances
         if gpsmat.shape[1] is 3:
