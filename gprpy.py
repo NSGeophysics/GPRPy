@@ -489,6 +489,22 @@ class gprpyCW(gprpy2d):
         self.history.append(histstr)  
 
 
+    def setZeroTimeCW(self,newZeroTime):
+        # Store previous state for undo
+        self.storePrevious()
+        # Find index of value that is nearest to newZeroTime
+        #print(self.twtt)
+        #print(newZeroTime)
+        #print(np.abs(self.twtt - newZeroTime))
+        zeroind = np.abs(self.twtt - newZeroTime).argmin()
+        #print(zeroind)
+        # Cut out everything before
+        self.twtt = self.twtt[zeroind:] - newZeroTime
+        #self.data = self.data[zeroind:,:]
+        # Put what you did in history
+        histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
+        self.history.append(histstr)  
+        
     
     def normalize(self):
         # Store previous state for undo

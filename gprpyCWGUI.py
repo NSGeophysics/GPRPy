@@ -16,7 +16,7 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=8
+rightcol=9
 halfwid=4
 
 class GPRPyCWApp:
@@ -28,14 +28,24 @@ class GPRPyCWApp:
 
         self.balloon = Pmw.Balloon()
         fig = Figure(figsize=(9,5))
-        ahyp = fig.add_axes([0.04,0.1,0.29,0.88])
-        adata = fig.add_axes([0.365,0.1,0.29,0.88])
-        alin = fig.add_axes([0.69,0.1,0.29,0.88])
-        adata.get_yaxis().set_visible(False)
+        ahyp = fig.add_axes([0.065,0.1,0.27,0.83])
+        alin = fig.add_axes([0.365,0.1,0.27,0.83])
+        adata= fig.add_axes([0.665,0.1,0.27,0.83])
+        #adata.get_yaxis().set_visible(False)
         alin.get_yaxis().set_visible(False)
 
+        adata.set_title('data')
+        adata.get_yaxis().tick_right()
+        adata.get_yaxis().set_label_position('right')
+        adata.set_ylabel('two-way travel time [ns]')
+        
+        alin.set_title('linear semblance')
+        ahyp.set_title('hyperbolic semblance')
+        ahyp.set_ylabel('two-way travel time [ns]')
+        
+
         canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7,rowspan=15,sticky='nsew')
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=15,sticky='nsew')
         canvas.draw()
 
         self.vmin = 0.01
@@ -123,7 +133,7 @@ class GPRPyCWApp:
         LinSembButton = tk.Button(
             text="lin semb", fg="black",
             command = lambda : [self.linSemb(proj),
-                                self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb)])
+                                self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance')])
         LinSembButton.config(height = 1, width = 2*halfwid)
         LinSembButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
 
@@ -131,7 +141,7 @@ class GPRPyCWApp:
         HypSembButton = tk.Button(
             text="hyp semb", fg="black",
             command = lambda : [self.hypSemb(proj),
-                                self.plotHypeSemb(proj,a=ahyp,canvas=canvas)])
+                                self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
         HypSembButton.config(height = 1, width = 2*halfwid)
         HypSembButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
                 
@@ -172,27 +182,30 @@ class GPRPyCWApp:
                           'visualization settings such as "set x-range"\n'
                           'etc.')
 
-        # X range
-        XrngButton = tk.Button(
-            text="set x-range", fg="black",
-            command=lambda : [self.setXrng(),
-                              self.plotCWData(proj,a=adata,canvas=canvas)])
-        XrngButton.config(height = 1, width = 2*halfwid)         
-        XrngButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
-        self.balloon.bind(XrngButton,"Set the x-axis display limits.")
-        
-        
-        # Y range
-        YrngButton = tk.Button(
-            text="set y-range", fg="black",
-            command=lambda : [self.setYrng(),
-                              self.plotCWData(proj,a=adata,canvas=canvas)])
-        YrngButton.config(height = 1, width = 2*halfwid)         
-        YrngButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
-        self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
+        # Saturation
+        sattext = tk.StringVar()
+        sattext.set("semblance saturation")
+        satlabel = tk.Label(master, textvariable=sattext,height = 1,width = 4*halfwid)
+        satlabel.grid(row=0, column=1, sticky='nsew')
+        self.balloon.bind(satlabel,"Semblance color saturation")
+        self.saturation = tk.DoubleVar()
+        satbox = tk.Entry(master, textvariable=self.saturation, width=4*halfwid)
+        satbox.grid(row=1, column=1, sticky='nsew')
+        self.saturation.set("1.0")
 
-        # Set velocity range
+        # Lin or log mode switch for semblance representation
+        self.sembrep=tk.StringVar()
+        self.sembrep.set("lin")
+        repswitch = tk.OptionMenu(master,self.sembrep,"lin","log","exp")
+        repswitch.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        self.balloon.bind(repswitch,
+                          "Choose between linear\n"
+                          "and logarithmic scale\n" 
+                          "for semblance colors.")
+
+        
+         # Set velocity range
         VelrngButton = tk.Button(
             text="set vel range", fg="black",
             command=lambda : [self.setVelRng()])
@@ -202,16 +215,36 @@ class GPRPyCWApp:
                                        "used in the semblance\n"
                                        "analysis.")
         
+        # X range
+        XrngButton = tk.Button(
+            text="set x-range", fg="black",
+            command=lambda : [self.setXrng(),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        XrngButton.config(height = 1, width = 2*halfwid)         
+        XrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
+        self.balloon.bind(XrngButton,"Set the x-axis display limits.")
+        
+        
+        # Y range
+        YrngButton = tk.Button(
+            text="set y-range", fg="black",
+            command=lambda : [self.setYrng(),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        YrngButton.config(height = 1, width = 2*halfwid)         
+        YrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        self.balloon.bind(YrngButton,"Set the y-axis display limits.")
+
+        
         
         # Contrast
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
-        contrlabel.grid(row=0, column=4, sticky='nsew')
+        contrlabel.grid(row=0, column=6, sticky='nsew')
         self.balloon.bind(contrlabel,"Data color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
-        contrbox.grid(row=1, column=4, sticky='nsew')
+        contrbox.grid(row=1, column=6, sticky='nsew')
         self.contrast.set("1.0")
 
         
@@ -219,34 +252,22 @@ class GPRPyCWApp:
         self.color=tk.StringVar()
         self.color.set("gray")
         colswitch = tk.OptionMenu(master,self.color,"gray","bwr")
-        colswitch.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
                           "and red-white-blue (rwb)\n" 
                           "data representation.")
 
 
-
-        # Saturation
-        sattext = tk.StringVar()
-        sattext.set("contrast")
-        satlabel = tk.Label(master, textvariable=sattext,height = 1,width = 2*halfwid)
-        satlabel.grid(row=0, column=6, sticky='nsew')
-        self.balloon.bind(contrlabel,"Semblance color saturation")
-        self.saturation = tk.DoubleVar()
-        satbox = tk.Entry(master, textvariable=self.saturation, width=2*halfwid)
-        satbox.grid(row=1, column=6, sticky='nsew')
-        self.saturation.set("1.0")
-
-
-
         
         # Refreshing plot
         plotButton = tk.Button(
             text="refresh plot",
-            command=lambda : self.plotCWData(proj,a=adata,canvas=canvas))
+            command=lambda : [self.plotCWData(proj,a=adata,canvas=canvas),
+                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
+                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=7, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=8, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -295,6 +316,7 @@ class GPRPyCWApp:
         self.dtype = 'WARR'
         print("Data type is WARR")
 
+        
 
     def plotCWData(self,proj,a,canvas):
         a.clear()
@@ -312,37 +334,70 @@ class GPRPyCWApp:
             a.set_xlabel("antenna separation [m]")
         elif self.dtype is "CMP":
             a.set_xlabel("distance from midpoint [m]")
+        a.set_title('data')
+        a.set_ylabel('two-way travel time [ns]')
+        a.get_xaxis().set_ticks_position('both')
+        a.get_yaxis().set_ticks_position('both')
+
         # Allow for cursor coordinates being displayed        
-        def moved(event):
+        def pressed(event):
             if event.xdata is not None and event.ydata is not None:
                 canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
                 
-        canvas.mpl_connect('button_press_event', moved)
-        tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
+        canvas.mpl_connect('button_press_event', pressed)        
 
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
+        #tag = canvas.get_tk_widget().create_text(620, -2, text="", anchor="nw")
+        tag = canvas.get_tk_widget().create_text(2, -3, text="", anchor="nw")
+        
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
         canvas.draw()
 
         
-    def plotSemb(self,proj,a,canvas,semb):
-        a.clear()
-        stdcont = np.nanmax(np.abs(semb)[:])
-        a.imshow(semb, cmap='inferno', extent=[self.vmin, self.vmax,
-                                            min(proj.twtt),max(proj.twtt)],
-                 aspect='auto',
-                 vmin=0, vmax=stdcont/self.saturation.get())
-        
-        a.set_ylim(self.yrng)
-        a.set_xlabel("velocity")
-        def moved(event):
-            if event.xdata is not None and event.ydata is not None:
-                canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
+    def plotSemb(self,proj,a,canvas,semb,title,ylabel=None):
+        if semb is not None:
+            a.clear()
+            if self.sembrep.get() == "lin":
+                print("Linear semblance representation")
+                stdcont = np.nanmax(np.abs(semb)[:])
+                a.imshow(np.flipud(np.abs(semb)), cmap='inferno', extent=[self.vmin, self.vmax,
+                                                                          min(proj.twtt),max(proj.twtt)],
+                         aspect='auto',
+                         vmin=0, vmax=stdcont/self.saturation.get())
+            elif self.sembrep.get() == "log":
+                print("Logarithmic semblance representation")
+                stdcont = np.nanmax(np.log(np.abs(semb))[:])
+                a.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
+                                                                                  min(proj.twtt),max(proj.twtt)],
+                         aspect='auto',
+                         vmin=0, vmax=stdcont/self.saturation.get())
+            elif self.sembrep.get() == "exp":
+                print("Exponential semblance representation")
+                stdcont = np.nanmax(np.exp(np.abs(semb))[:])
+                a.imshow(np.flipud(np.exp(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
+                                                                                  min(proj.twtt),max(proj.twtt)],
+                         aspect='auto',
+                         vmin=0, vmax=stdcont/self.saturation.get())
+
                 
-        canvas.mpl_connect('button_press_event', moved)
-        tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
-
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
-        canvas.draw()
+            a.set_ylim(self.yrng)
+            a.set_xlabel("velocity [m/ns]")
+            a.invert_yaxis()
+            a.set_title(title)
+            a.get_xaxis().set_ticks_position('both')
+            a.get_yaxis().set_ticks_position('both')
+            if ylabel is not None:
+                a.set_ylabel(ylabel)            
+        
+            def pressed(event):
+                if event.xdata is not None and event.ydata is not None:
+                    canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
+                
+            canvas.mpl_connect('button_press_event', pressed)
+            tag = canvas.get_tk_widget().create_text(2, -3, text="", anchor="nw")
+        
+        
+            canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
+            canvas.draw()
 
 
         
@@ -386,8 +441,13 @@ class GPRPyCWApp:
     def setZeroTime(self,proj):
         newZeroTime = sd.askfloat("Input","New zero time")
         if newZeroTime is not None:
-            proj.setZeroTime(newZeroTime=newZeroTime)
+            proj.setZeroTimeCW(newZeroTime=newZeroTime)
 
+
+    def truncateY(self,proj):
+        maxY = sd.askfloat("Input","Maximum two-way travel time?")
+        if maxY is not None:
+            proj.truncateY(maxY)
 
     def dewow(self,proj):
         window = sd.askinteger("Input","Dewow window width (number of samples)")

@@ -1,4 +1,8 @@
 GPRPy WARR/CMP GUI
-* TODO Write basic GUI to load WARR/CMP data
-* TODO Implement hyperbola and linear semblance figures. Show both side-by-side with plot 
-* TODO Allow adding hyperbolae/lines at select semblance points
+* DONE [#A] Write basic GUI to load WARR/CMP data
+* DONE [#A] Implement hyperbola and linear semblance figures. Show both side-by-side with plot 
+* TODO [#A] Allow adding hyperbolae/lines at select semblance points
+* TODO [#A] Add velocity lines (vertical lines) in Semblance plot
+* TODO [#B] Implement calculation of max velocity sum given a velocity range
+* TODO [#A] Implement plotting
+* TODO [#A] Implement saving processed data

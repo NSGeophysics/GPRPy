@@ -281,6 +281,9 @@ def hypSemblance(data,profilePos,twtt,vVals,tVals,typefact):
     return hypSemb
 
 
+
+
+
 ##### Testing / trying to improve performance:
 def linSemblance_alt1(data,profilePos,twtt,vVals,tVals,typefact):
     linSemb=np.zeros((len(tVals),len(vVals)))
