@@ -471,13 +471,32 @@ class gprpyCW(gprpy2d):
         # Initialize previous for undo
         self.previous = {}
         self.dtype = dtype
+        # Semblance plots
         self.linSemb = None
         self.hypSemb = None
+        # Picked lines and hyperbolae
+        self.lins = list()
+        self.hyps = list()
         
         if (filename is not None) and (dtype is not None):
             self.importdata(filename,dtype)
 
 
+    def storePrevious(self):        
+        self.previous["data"] = self.data
+        self.previous["twtt"] = self.twtt
+        self.previous["info"] = self.info
+        self.previous["profilePos"] = self.profilePos
+        self.previous["history"] = self.history
+        self.previous["dtype"] = self.dtype
+        self.previous["hypSemb"] = self.hypSemb
+        self.previous["linSemb"] = self.linSemb
+        self.previous["lins"] = self.lins
+        self.previous["hyps"] = self.hyps
+
+
+
+            
     def importdata(self,filename,dtype):
         print(filename)
         super().importdata(filename)
@@ -518,6 +537,8 @@ class gprpyCW(gprpy2d):
 
 
     def linSemblance(self,vmin,vmax,vint):
+        # Store previous state for undo
+        self.storePrevious()
         vVals = np.arange(vmin,vmax+vint,vint)
         if self.dtype is "WARR":
             typefact = 1
@@ -526,11 +547,13 @@ class gprpyCW(gprpy2d):
         self.linSemb = tools.linSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
         print("calculated linear semblance")
         # Put what you did in history
-        histstr = "mygpr.linSemblance(vmin=%g,vmax=%g,vint=%g)"
+        histstr = "mygpr.linSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
         self.history.append(histstr)
         
 
     def hypSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
+        # Store previous state for undo
+        self.storePrevious()
         vVals = np.arange(vmin,vmax+vint,vint)
         if self.dtype is "WARR":
             typefact = 1
@@ -539,7 +562,39 @@ class gprpyCW(gprpy2d):
         self.hypSemb = tools.hypSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
         print("calculated hyperbola semblance")
         # Put what you did in history
-        histstr = "mygpr.hypSemblance(vmin=%g,vmax=%g,vint=%g)"
+        histstr = "mygpr.hypSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
         self.history.append(histstr)                  
-        
+
+
+    def addLin(self,zerotwtt,vel):
+        # Store previous state for undo
+        self.storePrevious()
+        self.lins.append([zerotwtt,vel])
+        # Put what you did in history
+        histstr = "mygpr.addLin(zerotwtt=%g,vel=%g)" %(zerotwtt,vel)
+        self.history.append(histstr)  
             
+
+    def addHyp(self,zerotwtt,vel):
+        # Store previous state for undo
+        self.storePrevious()
+        self.hyps.append([zerotwtt,vel])
+        # Put what you did in history
+        histstr = "mygpr.addHyp(zerotwtt=%g,vel=%g)" %(zerotwtt,vel)
+        self.history.append(histstr)  
+
+    def remLin(self):
+        # Store previous state for undo
+        self.storePrevious()
+        del self.lins[-1]
+        # Put what you did in history
+        histstr = "mygpr.remLin()" 
+        self.history.append(histstr) 
+
+    def remHyp(self):
+        # Store previous state for undo
+        self.storePrevious()
+        del self.hyps[-1]
+        # Put what you did in history
+        histstr = "mygpr.remHyp()" 
+        self.history.append(histstr) 

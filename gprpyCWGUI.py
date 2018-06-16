@@ -51,6 +51,8 @@ class GPRPyCWApp:
         self.vmin = 0.01
         self.vmax = 0.33
         self.vint = 0.01
+
+        self.showlnhp = False
         
         proj = gp.gprpyCW()
 
@@ -144,7 +146,51 @@ class GPRPyCWApp:
                                 self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
         HypSembButton.config(height = 1, width = 2*halfwid)
         HypSembButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
-                
+
+        # Add line on top of data
+        AddLinButton = tk.Button(
+            text="add ln", fg="black",
+            command = lambda : [self.addLin(proj),
+                                self.plotCWData(proj,a=adata,canvas=canvas)])
+        AddLinButton.config(height = 1, width = halfwid)
+        AddLinButton.grid(row=9,column=rightcol, sticky='nsew')
+        
+        # Draw hyperbola on top of data
+        AddHypButton = tk.Button(
+            text="add hp", fg="black",
+            command = lambda : [self.addHyp(proj),
+                                self.plotCWData(proj,a=adata,canvas=canvas)])
+        AddHypButton.config(height = 1, width = halfwid)
+        AddHypButton.grid(row=9,column=rightcol+1, sticky='nsew')
+
+
+        # Remove most recent line
+        RemLinButton = tk.Button(
+            text="rem ln", fg="black",
+            command = lambda : [proj.remLin(),
+            self.plotCWData(proj,a=adata,canvas=canvas)])
+        RemLinButton.config(height = 1, width = halfwid)
+        RemLinButton.grid(row=10,column=rightcol, sticky='nsew')
+
+        # Remove most recent hyperbola
+        RemHypButton = tk.Button(
+            text="rem hp", fg="black",
+            command = lambda : [proj.remHyp(),
+            self.plotCWData(proj,a=adata,canvas=canvas)])
+        RemHypButton.config(height = 1, width = halfwid)
+        RemHypButton.grid(row=10,column=rightcol+1, sticky='nsew')
+
+                          
+        
+        # Show ln hp toggle
+        ShowLnHpButton = tk.Button(
+            text="show ln/hp", fg="black",
+            command = lambda : [self.toggleLnHp(),
+                                self.plotCWData(proj,a=adata,canvas=canvas)])
+        ShowLnHpButton.config(height = 1, width = 2*halfwid)
+        ShowLnHpButton.grid(row=11,column=rightcol, sticky='nsew',columnspan=colsp)
+        
+        
         # Write history
         HistButton = tk.Button(
             text="write history", fg="black",
@@ -338,6 +384,24 @@ class GPRPyCWApp:
         a.set_ylabel('two-way travel time [ns]')
         a.get_xaxis().set_ticks_position('both')
         a.get_yaxis().set_ticks_position('both')
+        # If we have any hyperbolae or lines, we need to plot them too:
+        if proj.dtype is "WARR":
+            typefact = 1
+        elif proj.dtype is "CMP":
+            typefact = 2
+        if self.showlnhp:            
+            if proj.lins:
+                for lin in proj.lins:
+                    time = lin[0] + typefact*proj.profilePos/lin[1]
+                    a.plot(proj.profilePos,time,linewidth=2,color='yellow')
+                    a.plot(proj.profilePos,time,linewidth=1,color='black')
+            if proj.hyps:
+                x2 = np.power(typefact*proj.profilePos,2.0)
+                for hyp in proj.hyps:
+                    time = np.sqrt(x2 + 4*np.power(hyp[0]/2.0 * hyp[1],2.0))/hyp[1]
+                    a.plot(proj.profilePos,time,linewidth=2,color='yellow')
+                    a.plot(proj.profilePos,time,linewidth=1,color='black')
+                
 
         # Allow for cursor coordinates being displayed        
         def pressed(event):
@@ -459,7 +523,30 @@ class GPRPyCWApp:
 
     def hypSemb(self,proj):
         proj.hypSemblance(self.vmin,self.vmax,self.vint)
+        
 
+    def addLin(self,proj):
+        self.showlnhp = True
+        vel = sd.askfloat("Input","Velocity?")
+        if vel is not None:
+            zerotwtt = sd.askfloat("Input","Zero two-way travel time?")
+            if zerotwtt is not None:           
+                proj.addLin(zerotwtt=zerotwtt,vel=vel)
+
+
+    def addHyp(self,proj):
+        self.showlnhp = True
+        vel = sd.askfloat("Input","Velocity?")
+        if vel is not None:            
+            zerotwtt = sd.askfloat("Input","Zero two-way travel time?")
+            if zerotwtt is not None:
+                proj.addHyp(zerotwtt=zerotwtt,vel=vel)                                
+
+                
+    def toggleLnHp(self):
+        self.showlnhp = not self.showlnhp
+        
+                
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
         if filename is not '':
