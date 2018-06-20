@@ -395,6 +395,8 @@ class gprpy2d:
         #
         # Here, the [px[i],py[i]] vector needs to be normalized by the thickness 
         pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[1:]-x[0:-1]).squeeze()])
+        # I think here we may need to calc the difference depending on the situation
+        #pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[0:-1]-x[1:]).squeeze()])
         pvec = np.divide(pvec, np.linalg.norm(pvec,axis=0)) * thickness/2.0
         # We can't calculate the perpendicular direction at the last point
         # let's just set it to the same as for the second-to-last point
