@@ -352,7 +352,7 @@ class gprpy2d:
         
 
 
-    def exportVTK(self,outfile,gpsinfo,thickness=0.1,delimiter=',',aspect=1.0,smooth=True, win_length=51, porder=3):
+    def exportVTK(self,outfile,gpsinfo,thickness=0,delimiter=',',aspect=1.0,smooth=True, win_length=51, porder=3):
         # If gpsmat is a filename, we first need to load the file:
         if type(gpsinfo) is str:
             gpsmat = np.loadtxt(gpsinfo,delimiter=delimiter)
@@ -372,7 +372,11 @@ class gprpy2d:
             topY=self.maxTopo
             
         Z = topY - np.reshape(downward,(1,len(downward))) + np.reshape(z,(len(z),1))
-        ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (3,1,1))
+        # ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (3,1,1))
+        if thickness:
+            ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (2,1,1))
+        else:
+            ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (1,1,1))
         
         # This is if we want everything on the x axis.
         #X = np.tile(np.reshape(self.profilePos,(len(self.profilePos),1)),(1,len(downward)))
@@ -393,17 +397,19 @@ class gprpy2d:
         # yvals =     y[0]   ,    y[1]   ,    y[2]   , .....
         #          y[0]-py[0], y[1]-py[1], y[2]-py[2], .....
         #
-        # Here, the [px[i],py[i]] vector needs to be normalized by the thickness 
-        pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[1:]-x[0:-1]).squeeze()])
-        # I think here we may need to calc the difference depending on the situation
-        #pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[0:-1]-x[1:]).squeeze()])
-        pvec = np.divide(pvec, np.linalg.norm(pvec,axis=0)) * thickness/2.0
-        # We can't calculate the perpendicular direction at the last point
-        # let's just set it to the same as for the second-to-last point
-        pvec = np.append(pvec, np.expand_dims(pvec[:,-1],axis=1) ,axis=1)
+        # Here, the [px[i],py[i]] vector needs to be normalized by the thickness
+        if thickness:
+            pvec = np.asarray([(y[0:-1]-y[1:]).squeeze(), (x[1:]-x[0:-1]).squeeze()])
+            pvec = np.divide(pvec, np.linalg.norm(pvec,axis=0)) * thickness/2.0
+            # We can't calculate the perpendicular direction at the last point
+            # let's just set it to the same as for the second-to-last point
+            pvec = np.append(pvec, np.expand_dims(pvec[:,-1],axis=1) ,axis=1)
+            X = np.asarray([(x.squeeze()-pvec[0,:]).squeeze(), (x.squeeze()+pvec[0,:]).squeeze()])
+            Y = np.asarray([(y.squeeze()+pvec[1,:]).squeeze(), (y.squeeze()-pvec[1,:]).squeeze()])
+        else:
+            X = np.asarray([x.squeeze()])
+            Y = np.asarray([y.squeeze()])
         
-        X = np.asarray([(x.squeeze()-pvec[0,:]).squeeze(), x.squeeze(), (x.squeeze()+pvec[0,:]).squeeze()])
-        Y = np.asarray([(y.squeeze()+pvec[1,:]).squeeze(), y.squeeze(), (y.squeeze()-pvec[1,:]).squeeze()])
         # Copy-paste the same X and Y positions for each depth
         XX = np.tile(np.reshape(X, (X.shape[0],X.shape[1],1)), (1,1,ZZ.shape[2]))
         YY = np.tile(np.reshape(Y, (Y.shape[0],Y.shape[1],1)), (1,1,ZZ.shape[2]))

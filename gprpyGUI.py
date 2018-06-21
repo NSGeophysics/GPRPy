@@ -550,7 +550,8 @@ class GPRPyApp:
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
         if outfile is not '':
-            thickness = sd.askfloat("Input","Profile thickness [m]")    
+            #thickness = sd.askfloat("Input","Profile thickness [m]")
+            thickness = 0
             if self.asp is None:
                 aspect = 1.0
             else:
