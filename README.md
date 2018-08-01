@@ -19,8 +19,8 @@ then enter "Anaconda Prompt", without the quotation marks into the
 `pip install numpy scipy matplotlib tqdm Pmw pyevtk`
 This will install the dependencies, if they are not already installed
 
-5) In the Anaconda Prompt, Change into the directory where you downloaded the GPRPy files.
-Th is is usually through a command like for example
+5) In the Anaconda Prompt, change into the directory where you downloaded the GPRPy files.
+This is usually through a command like for example
 `cd Desktop\GPRPy`
 if you downloaded GPRPy directly onto your desktop
 
