@@ -23,9 +23,11 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=7
+rightcol=8
 halfwid=6
 
+figrowsp=16
+figcolsp=8
 
 class GPRPyApp:
 
@@ -37,10 +39,8 @@ class GPRPyApp:
         normscrhigt=768
         scrwidt=master.winfo_screenwidth()
         scrhigt=master.winfo_screenheight()
-        widfac=scrwidt/normscrwidt
-        highfac=scrhigt/normscrhigt
-        #fontfac=0.5*(widfac+highfac)
-        
+        self.widfac=scrwidt/normscrwidt
+        self.highfac=scrhigt/normscrhigt
         
         master.title("GPRPy")
         
@@ -48,21 +48,23 @@ class GPRPyApp:
         self.balloon = Pmw.Balloon()
         self.picking = False
         self.delimiter = None
-        
+
         # Initialize the gprpy
         proj = gp.gprpy2d()
 
         # Show splash screen
-        #fig=Figure(figsize=(8,5))
-        fig=Figure(figsize=(8*widfac,5*highfac))
+        fig=Figure(figsize=(8*self.widfac,5*self.highfac))
         a=fig.add_subplot(111)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        splash.showSplash(a,dir_path,widfac,highfac)
+        splash.showSplash(a,dir_path,self.widfac,self.highfac)
+
+        # Set font size for screen res
+        mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*self.widfac})
         
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7,rowspan=15,sticky='nsew')
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=figcolsp,rowspan=figrowsp,sticky='nsew')
 
         canvas.draw() 
 
@@ -85,6 +87,15 @@ class GPRPyApp:
                           'step from the history. Does not revert\n' 
                           'visualization settings such as "set x-range"\n'
                           'etc.')
+
+        # Full view
+        FullButton = tk.Button(
+            text="full view", fg="black",
+            command=lambda : [self.setFullView(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        FullButton.config(height = 1, width = 2*halfwid)         
+        FullButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
+        self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
         
 
         # X range
@@ -93,7 +104,7 @@ class GPRPyApp:
             command=lambda : [self.setXrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         XrngButton.config(height = 1, width = 2*halfwid)         
-        XrngButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
+        XrngButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
         self.balloon.bind(XrngButton,"Set the x-axis display limits.")
         
 
@@ -103,16 +114,17 @@ class GPRPyApp:
             command=lambda : [self.setYrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         YrngButton.config(height = 1, width = 2*halfwid)         
-        YrngButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        YrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
+        
         # Aspect
         AspButton = tk.Button(
             text="aspect ratio", fg="black",
             command=lambda : [self.setAspect(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])                              
         AspButton.config(height = 1, width = 2*halfwid)         
-        AspButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
+        AspButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
         self.balloon.bind(AspButton, "Set the aspect ratio between x- and y-axis.")
         
 
@@ -120,19 +132,20 @@ class GPRPyApp:
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
-        contrlabel.grid(row=0, column=4, sticky='nsew')
+        contrlabel.grid(row=0, column=5, sticky='nsew')
         self.balloon.bind(contrlabel,"Set color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
-        contrbox.grid(row=1, column=4, sticky='nsew')
+        contrbox.grid(row=1, column=5, sticky='nsew')
         #contr.set("1.0")
         self.contrast.set("1.0")
 
+        
         # Mode switch for figure color
         self.color=tk.StringVar()
         self.color.set("gray")
         colswitch = tk.OptionMenu(master,self.color,"gray","bwr")
-        colswitch.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        colswitch.grid(row=0, column=6, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
                           "and red-white-blue (rwb)\n" 
@@ -144,7 +157,7 @@ class GPRPyApp:
             text="refresh plot",
             command=lambda : self.plotProfileData(proj,fig=fig,a=a,canvas=canvas))
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -155,7 +168,6 @@ class GPRPyApp:
 
         ## Methods buttons
         
-        
         # Load data
         LoadButton = tk.Button(
             text="import data", fg="black",
@@ -165,6 +177,7 @@ class GPRPyApp:
         LoadButton.grid(row=0, column=rightcol, sticky='nsew',columnspan=colsp,rowspan=2)
         self.balloon.bind(LoadButton,"Load .gpr, .DT1, or .DZT data.")
 
+        
         # Adjust profile length; if trigger wheel is not good
         AdjProfileButton = tk.Button(
             text="adj profile", fg="black",
@@ -176,6 +189,7 @@ class GPRPyApp:
                           "Adjust the profile length to \n"
                           "known start and end positions.")
 
+        
         # Set new zero time
         SetZeroTimeButton = tk.Button(
             text="set zero time", fg="black",
@@ -245,7 +259,7 @@ class GPRPyApp:
                           "horizontal features.")
 
 
-        # Gain: row 7
+        # Gain
         tpowButton = tk.Button(
             text="tpow", fg="black",
             command=lambda : [self.tpowGain(proj),
@@ -286,7 +300,7 @@ class GPRPyApp:
 
         
 
-        # Set Velocity: row 8
+        # Set Velocity
         setVelButton = tk.Button(
             text="set velocity", fg="black",
             command=lambda : [self.setVelocity(proj),
@@ -298,7 +312,7 @@ class GPRPyApp:
                           "turn the y-axis from two-way travel time to depth.\n"
                           "This step is necessary for topographic correction.")
 
-        # Topo Correct row 9
+        # Topo Correct
         topoCorrectButton = tk.Button(
             text="topo correct", fg="black",
             command=lambda : [self.topoCorrect(proj),
@@ -371,21 +385,23 @@ class GPRPyApp:
 
 
         
-        # Write history
+        # Write script
         HistButton = tk.Button(
-            text="write history", fg="black",
+            text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
         HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
-                          'Saves the history of the current status as a\n'
-                          'python script which can be run directly from\n'
-                          'the command prompt. If the current data is\n'  
-                          'from a .gpr file, then the python script will\n'
-                          'contain all steps going back to the raw data.\n'
-                          'The script will not contain visualization settings\n'
-                          'such as x-range settings, unless the "print figure"\n'
-                          'command was used.')
+                          'Writes a python script to reproduce of \n'
+                          'the current status.\n'
+                          '\n'
+                          'If the current data is from a .gpr file, \n'  
+                          'then the python script will contain all \n'
+                          'steps going back to the raw data. \n'
+                          '\n'
+                          'The script will not contain visualization \n'
+                          'settings such as x-range settings, unless \n'
+                          'the "print figure" command was used. ')
 
 
 
@@ -416,8 +432,17 @@ class GPRPyApp:
     def setAspect(self):
         self.asp = sd.askfloat("Input","Plotting aspect ratio")
         
-        
 
+    def setFullView(self,proj):    
+        self.xrng=[np.min(proj.profilePos),np.max(proj.profilePos)]
+        if proj.velocity is None:
+            self.yrng=[np.min(proj.twtt),np.max(proj.twtt)]
+        elif proj.maxTopo is None:
+            self.yrng=[np.min(proj.depth),np.max(proj.depth)]
+        else:
+            self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo-np.min(proj.depth)]
+
+            
     def setXrng(self):
         xlow = sd.askfloat("Input","Min X value")
         if xlow is not None:
@@ -532,7 +557,8 @@ class GPRPyApp:
 
         
     def loadData(self,proj):
-        filename = fd.askopenfilename( filetypes= (("GPRPy (.gpr)", "*.gpr"),
+        filename = fd.askopenfilename( filetypes= (("All", "*.*"),
+                                                   ("GPRPy (.gpr)", "*.gpr"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT")))
         if filename is not '':
@@ -581,7 +607,7 @@ class GPRPyApp:
         filename = fd.asksaveasfilename(defaultextension=".py")
         if filename is not '':
             proj.writeHistory(filename)
-            print("Wrote history to " + filename)
+            print("Wrote script to " + filename)
 
 
     def plotProfileData(self,proj,fig,a,canvas):
@@ -596,7 +622,7 @@ class GPRPyApp:
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
             a.set_ylim(self.yrng)
             a.set_xlim(self.xrng)
-            a.set_ylabel("two-way travel time [ns]")
+            a.set_ylabel("two-way travel time [ns]", fontsize=mpl.rcParams['font.size'])
             a.invert_yaxis()
         elif proj.maxTopo is None:
             a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
@@ -605,7 +631,7 @@ class GPRPyApp:
                                                   min(proj.depth)],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
-            a.set_ylabel("depth [m]")
+            a.set_ylabel("depth [m]", fontsize=mpl.rcParams['font.size'])
             a.set_ylim(self.yrng)
             a.set_xlim(self.xrng)
             a.invert_yaxis()
@@ -616,13 +642,13 @@ class GPRPyApp:
                                                   proj.maxTopo-min(proj.depth)],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
-            a.set_ylabel("elevation [m]")
+            a.set_ylabel("elevation [m]", fontsize=mpl.rcParams['font.size'])
             a.set_ylim(self.yrng)
             a.set_xlim(self.xrng)
 
         a.get_xaxis().set_visible(True)
         a.get_yaxis().set_visible(True)                    
-        a.set_xlabel("profile position [m]")
+        a.set_xlabel("profile position [m]", fontsize=mpl.rcParams['font.size'])
         a.xaxis.tick_top()
         a.xaxis.set_label_position('top')
         if self.asp is not None:
@@ -630,8 +656,8 @@ class GPRPyApp:
 
         # In case you are picking
         if self.picking:
-            a.plot(self.picked[:,0],self.picked[:,1],'-x',color='yellow',linewidth=3) 
-            a.plot(self.picked[:,0],self.picked[:,1],'-x',color='black',linewidth=2)                               
+            a.plot(self.picked[:,0],self.picked[:,1],'-x',color='yellow',linewidth=3*self.highfac) 
+            a.plot(self.picked[:,0],self.picked[:,1],'-x',color='black',linewidth=2*self.highfac)                               
 
         # Allow for cursor coordinates being displayed        
         def moved(event):
@@ -641,7 +667,7 @@ class GPRPyApp:
         canvas.mpl_connect('button_press_event', moved)
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
 
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=7, rowspan=15, sticky='nsew')
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=figcolsp, rowspan=figrowsp, sticky='nsew')
         canvas.draw()
 
 
@@ -702,8 +728,10 @@ class GPRPyApp:
         
 root = tk.Tk()
 
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+for col in range(rightcol):
+    root.columnconfigure(col, weight=1)
+for row in range(17):    
+    root.rowconfigure(row, weight=1)
 
 app = GPRPyApp(root)
 
