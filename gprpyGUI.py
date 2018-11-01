@@ -26,13 +26,22 @@ colsp=2
 rightcol=7
 halfwid=6
 
-              
 
 class GPRPyApp:
 
     def __init__(self,master):
         self.window = master
 
+        # Set up for high-resolution screens
+        normscrwidt=1024
+        normscrhigt=768
+        scrwidt=master.winfo_screenwidth()
+        scrhigt=master.winfo_screenheight()
+        widfac=scrwidt/normscrwidt
+        highfac=scrhigt/normscrhigt
+        #fontfac=0.5*(widfac+highfac)
+        
+        
         master.title("GPRPy")
         
         # Variables specific to GUI
@@ -44,10 +53,11 @@ class GPRPyApp:
         proj = gp.gprpy2d()
 
         # Show splash screen
-        fig=Figure(figsize=(8,5))
+        #fig=Figure(figsize=(8,5))
+        fig=Figure(figsize=(8*widfac,5*highfac))
         a=fig.add_subplot(111)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        splash.showSplash(a,dir_path)
+        splash.showSplash(a,dir_path,widfac,highfac)
         
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)

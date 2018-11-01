@@ -60,7 +60,7 @@ plt.gca().set_xlim([-25,90])
 plt.gca().set_ylim([-28000,12000])
 
 
-font = {'family': 'Verdana',
+font = {'family': 'DejaVu Sans',
         'color':  'black',
         'weight': 'bold',
         'style': 'italic',
@@ -81,7 +81,7 @@ xanchor = -20
 ratio = plt.gca().get_data_ratio()*1.36
 xwidth = yheight/ratio
 plt.gca().imshow(nsf, aspect='auto', extent=(xanchor, xanchor+xwidth, yanchor, yanchor+yheight))
-font2 = {'family': 'Verdana',
+font2 = {'family': 'DejaVu Sans',
         'color':  'black',
         'size': 9.5
         }
