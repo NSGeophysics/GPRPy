@@ -25,7 +25,7 @@ This is usually through a command like for example
 if you downloaded GPRPy directly onto your desktop
 
 6) To install migration, type and press Enter afterward:
-`python installMigration.py'
+`python installMigration.py`
 
 7) In Anaconda Prompt, type and press Enter afterward:
 `python gprpyGUI.py`
