@@ -1,3 +1,7 @@
 __pycache__/
 toolbox/__pycache__
 .DS_Store
+notused/
+testing/
+external/
+

@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sp
 import numpy.matlib as matlib
 import scipy.interpolate as interp
 import scipy.signal as signal
@@ -246,9 +247,12 @@ def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porde
         if smooth:
             win_length = min(int(len(x)/2),win_length)
             porder = min(int(np.sqrt(len(x))),porder)
-            x = signal.savgol_filter(x.squeeze(), window_length=win_length, polyorder=porder)
-            y = signal.savgol_filter(y.squeeze(), window_length=win_length, polyorder=porder)
-            z = signal.savgol_filter(z.squeeze(), window_length=win_length, polyorder=porder) 
+            x = signal.savgol_filter(x.squeeze(), window_length=win_length,
+                                     polyorder=porder)
+            y = signal.savgol_filter(y.squeeze(), window_length=win_length,
+                                     polyorder=porder)
+            z = signal.savgol_filter(z.squeeze(), window_length=win_length,
+                                     polyorder=porder) 
     return x,y,z
 
 
@@ -284,6 +288,31 @@ def hypSemblance(data,profilePos,twtt,vVals,tVals,typefact):
 
 
 
+##### Some helper functions
+def nextpow2(i):
+    n = 1
+    while n < i: n *= 2
+    return n
+
+
+def padMat(mat,nrow,ncol):
+    padheight=nrow-mat.shape[0]
+    padwidth=ncol-mat.shape[1]
+    if padheight>0: 
+        mat = np.concatenate((mat,np.zeros((padheight,mat.shape[1]))))
+    if padwidth>0:    
+        pad = np.zeros((nrow,padwidth))
+        mat = np.concatenate((mat,pad),axis=1)
+    return mat
+
+
+def padVec(vec,totlen):
+    padwidth=totlen-len(vec)
+    if padwidth>0:
+        vec = np.append(vec,np.zeros(padwidth))
+    return vec
+
+
 ##### Testing / trying to improve performance:
 def linSemblance_alt1(data,profilePos,twtt,vVals,tVals,typefact):
     linSemb=np.zeros((len(tVals),len(vVals)))
@@ -294,6 +323,7 @@ def linSemblance_alt1(data,profilePos,twtt,vVals,tVals,typefact):
             vals = np.diagonal(np.asmatrix(f(profilePos, t)))
             linSemb[ti,vi] = np.abs(sum(vals)/len(vals))
     return linSemb
+
 
 def linSemblance_alt2(data,profilePos,twtt,vVals,tVals,typefact):
     linSemb=np.zeros((len(tVals),len(vVals)))

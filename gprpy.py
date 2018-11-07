@@ -5,6 +5,10 @@ import pickle
 import toolbox.gprIO_DT1 as gprIO_DT1
 import toolbox.gprIO_DZT as gprIO_DZT
 import toolbox.gprpyTools as tools
+try:
+    import external.mig_fk as mig_fk
+except:
+    print("No fk migration in public version")
 import copy
 import scipy.interpolate as interp
 from pyevtk.hl import gridToVTK
@@ -312,6 +316,18 @@ class gprpy2d:
         self.history.append(histstr)
 
 
+    def fkMigration(self, **kwargs):
+        # Store previous state for undo
+        self.storePrevious()
+        # apply migration
+        dt=self.twtt[1]-self.twtt[0]
+        dx=self.profilePos[1]-self.profilePos[0]
+        self.data,self.twtt,self.profilePos=mig_fk.fkmig(self.data,dt,dx,self.velocity)
+        # Put in history
+        histstr = "mygpr.fkMigration()"
+        self.history.append(histstr)
+        
+        
     def truncateY(self,maxY):
         # Store previous state for undo
         self.storePrevious()

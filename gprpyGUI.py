@@ -26,7 +26,7 @@ colsp=2
 rightcol=8
 halfwid=6
 
-figrowsp=16
+figrowsp=17
 figcolsp=8
 
 class GPRPyApp:
@@ -60,6 +60,7 @@ class GPRPyApp:
 
         # Set font size for screen res
         mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*self.widfac})
+        a.tick_params(direction='out',length=6*self.widfac,width=self.highfac)
         
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
@@ -312,13 +313,33 @@ class GPRPyApp:
                           "turn the y-axis from two-way travel time to depth.\n"
                           "This step is necessary for topographic correction.")
 
+
+        # Migration Button
+        migButton = tk.Button(
+            text="fk migration", fg="black",
+            command=lambda : [self.fkMigration(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        migButton.config(height = 1, width = 2*halfwid)         
+        migButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(migButton,
+                          "Stolt fk migration using a code originally written\n"
+                          "in Matlab for the CREWES software package.\n" 
+                          "Translated into Python 2 by Nat Wilson.\n"
+                          "\n"
+                          "Not included in the public version because of License\n"
+                          "uncertainty. Contact alainplattner@gmail.com\n"
+                          "if you would like to use it.")
+                         
+                         
+        
+        
         # Topo Correct
         topoCorrectButton = tk.Button(
             text="topo correct", fg="black",
             command=lambda : [self.topoCorrect(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         topoCorrectButton.config(height = 1, width = 2*halfwid)
-        topoCorrectButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(topoCorrectButton,
                           "Reads a comma- or tab-separated file containing\n" 
                           "either 3 columns (easting, northing, elevation)\n" 
@@ -331,7 +352,7 @@ class GPRPyApp:
             text="start pick", fg="black",
             command=lambda : self.startPicking(proj,fig=fig,a=a,canvas=canvas))        
         startPickButton.config(height = 1, width = halfwid)
-        startPickButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=1)
+        startPickButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=1)
 
 
         stopPickButton = tk.Button(
@@ -340,7 +361,7 @@ class GPRPyApp:
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         
         stopPickButton.config(height = 1, width = halfwid)
-        stopPickButton.grid(row=12, column=rightcol+1, sticky='nsew',columnspan=1)
+        stopPickButton.grid(row=13, column=rightcol+1, sticky='nsew',columnspan=1)
         
         
         # Save data
@@ -348,7 +369,7 @@ class GPRPyApp:
             text="save data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 2*halfwid)         
-        SaveButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(SaveButton,
                           'saves the processed data including its history in a\n'
                           '.gpr file. The resulting file will contain absolute\n'
@@ -363,7 +384,7 @@ class GPRPyApp:
             text="print figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig))
         PrintButton.config(height = 1, width = 2*halfwid)         
-        PrintButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(PrintButton,
                           "Saves the current visible figure in a pdf with \n"
                           "chosen resolution. If there is a hyperbola on\n" 
@@ -376,7 +397,7 @@ class GPRPyApp:
             text="export to VTK", fg="black",
             command = lambda : self.exportVTK(proj))
         VTKButton.config(height = 1, width = 2*halfwid)
-        VTKButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        VTKButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(VTKButton,
                           "Exports the processed figure to a\n"
                           "VTK format, that can be read by\n" 
@@ -390,7 +411,7 @@ class GPRPyApp:
             text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=17, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce of \n'
                           'the current status.\n'
@@ -502,6 +523,13 @@ class GPRPyApp:
             self.prevyrng=self.yrng
             self.yrng=[0,np.max(proj.depth)]
 
+
+    def fkMigration(self,proj):
+        if proj.velocity is None:
+            mesbox.showinfo("Migration Error","You have to set the velocity first")
+        proj.fkMigration()
+            
+            
     def topoCorrect(self,proj):
         if proj.velocity is None:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
