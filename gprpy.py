@@ -6,7 +6,7 @@ import toolbox.gprIO_DT1 as gprIO_DT1
 import toolbox.gprIO_DZT as gprIO_DZT
 import toolbox.gprpyTools as tools
 try:
-    import external.mig_fk as mig_fk
+    import irlib.external.mig_fk as mig_fk
 except:
     print("No fk migration in public version")
 import copy
