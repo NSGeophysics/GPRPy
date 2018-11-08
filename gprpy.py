@@ -284,6 +284,15 @@ class gprpy2d:
         self.history.append(histstr)
 
 
+    def smooth(self,window):
+        # Store previous state for undo
+        self.storePrevious()
+        self.data = tools.smooth(self.data,window)
+        # Put in history
+        histstr = "mygpr.smooth(%d)" %(window)
+        self.history.append(histstr)
+
+
     def remMeanTrace(self,ntraces):
         # Store previous state for undo
         self.storePrevious()

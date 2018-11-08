@@ -61,6 +61,38 @@ def dewow(data,window):
     return newdata
 
 
+
+def smooth(data,window):
+    totsamps = data.shape[0]
+    # If the window is larger or equal to the number of samples,
+    # then we can do a much faster dewow
+    if (window >= totsamps):
+        newdata = np.matrix.mean(data,0)
+    elif window == 1:
+        newdata = data
+    elif window == 0:
+        newdata = data
+    else:
+        newdata = np.asmatrix(np.zeros(data.shape))
+        halfwid = int(np.ceil(window/2.0))
+        
+        # For the first few samples, it will always be the same
+        newdata[0:halfwid+1,:] = np.matrix.mean(data[0:halfwid+1,:],0)
+
+        # for each sample in the middle
+        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+            winstart = int(smp - halfwid)
+            winend = int(smp + halfwid)
+            newdata[smp,:] = np.matrix.mean(data[winstart:winend+1,:],0)
+
+        # For the last few samples, it will always be the same
+        newdata[totsamps-halfwid:totsamps+1,:] = np.matrix.mean(data[totsamps-halfwid:totsamps+1,:],0)
+        
+    print('done with smoothing')
+    return newdata
+
+
+
 def remMeanTrace(data,ntraces):
     tottraces = data.shape[1]
     # For ridiculous ntraces values, just remove the entire average
