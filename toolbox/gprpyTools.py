@@ -194,7 +194,7 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
         for pos in range(0,len(profilePos)):
             #print(type(tshift[pos][0]))
             newdata[tshift[pos][0]:tshift[pos][0]+nsamples ,pos] = np.squeeze(data[:,pos])
-        return newdata, newtwtt, np.max(elev)
+        return newdata, newtwtt, np.max(elev), np.min(elev)
 
     
     

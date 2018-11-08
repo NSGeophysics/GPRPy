@@ -461,7 +461,7 @@ class GPRPyApp:
         elif proj.maxTopo is None:
             self.yrng=[np.min(proj.depth),np.max(proj.depth)]
         else:
-            self.yrng=[proj.maxTopo-np.max(proj.depth),proj.maxTopo-np.min(proj.depth)]
+            self.yrng=[proj.minTopo-np.max(proj.depth),proj.maxTopo-np.min(proj.depth)]
 
             
     def setXrng(self):
@@ -666,7 +666,7 @@ class GPRPyApp:
         else:
             a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
                                                   max(proj.profilePos),
-                                                  proj.maxTopo-max(proj.depth),
+                                                  proj.minTopo-max(proj.depth),
                                                   proj.maxTopo-min(proj.depth)],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())

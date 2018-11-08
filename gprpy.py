@@ -53,6 +53,7 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            self.minTopo = None
             self.threeD = None
             # Initialize previous
             self.initPrevious()
@@ -86,7 +87,7 @@ class gprpy2d:
         elif file_ext==".gpr":
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history, velocity, depth, maxTopo, threeD = pickle.load(f)
+                data, info, profilePos, twtt, history, velocity, depth, maxTopo, minTopo, threeD = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
@@ -95,6 +96,7 @@ class gprpy2d:
             self.velocity = velocity
             self.depth = depth
             self.maxTopo = maxTopo
+            self.minTopo = minTopo
             self.threeD = threeD
             
             # Initialize previous
@@ -121,6 +123,7 @@ class gprpy2d:
         self.velocity = self.previous["velocity"]
         self.depth = self.previous["depth"]
         self.maxTopo = self.previous["maxTopo"]
+        self.minTopo = self.previous["minTopo"]
         self.threeD = self.previous["threeD"]
         # Make sure to not keep deleting history
         # when applying undo several times. 
@@ -138,6 +141,7 @@ class gprpy2d:
         self.previous["velocity"] = self.velocity
         self.previous["depth"] = self.depth
         self.previous["maxTopo"] = self.maxTopo
+        self.previous["minTopo"] = self.minTopo
         self.previous["threeD"] = self.threeD
         histsav = copy.copy(self.history)
         self.previous["history"] = histsav
@@ -151,7 +155,9 @@ class gprpy2d:
         if not(file_ext=='.gpr'):
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
-            pickle.dump([self.data, self.info, self.profilePos, self.twtt, self.history,self.velocity,self.depth,self.maxTopo,self.threeD], f)
+            pickle.dump([self.data, self.info, self.profilePos, self.twtt,
+                         self.history, self.velocity, self.depth, self.maxTopo,
+                         self.minTopo, self.threeD], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -184,7 +190,7 @@ class gprpy2d:
         else:
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
                                                     max(self.profilePos),
-                                                    self.maxTopo-max(self.depth),
+                                                    self.minTopo-max(self.depth),
                                                     self.maxTopo-min(self.depth)],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
             plt.gca().set_ylabel("elevation [m]")
@@ -356,9 +362,12 @@ class gprpy2d:
         self.storePrevious()
         self.data_pretopo = self.data
         topoPos, topoVal, self.threeD = tools.prepTopo(topofile,delimiter)
-        self.data, self.twtt, self.maxTopo = tools.correctTopo(self.data, velocity=self.velocity,
-                                                              profilePos=self.profilePos, topoPos=topoPos,
-                                                              topoVal=topoVal, twtt=self.twtt)
+        self.data, self.twtt, self.maxTopo, self.minTopo = tools.correctTopo(self.data,
+                                                                             velocity=self.velocity,
+                                                                             profilePos=self.profilePos,
+                                                                             topoPos=topoPos,
+                                                                             topoVal=topoVal,
+                                                                             twtt=self.twtt)
         # Put in history
         if delimiter is ',':
             histstr = "mygpr.topoCorrect('%s')" %(topofile)
@@ -382,12 +391,16 @@ class gprpy2d:
             downward = self.twtt*aspect
         else:
             downward = self.depth*aspect                        
-        if self.maxTopo is None:
-            topY = 0
-        else:
-            topY=self.maxTopo
-            
-        Z = topY - np.reshape(downward,(1,len(downward))) + np.reshape(z,(len(z),1))
+        # if self.maxTopo is None:
+        #     topY = 0
+        # else:
+        #     topY=self.maxTopo            
+        # Z = topY - np.reshape(downward,(1,len(downward))) + np.reshape(z,(len(z),1))
+        Z = np.reshape(z,(len(z),1)) - np.reshape(downward,(1,len(downward)))
+
+               
+        #print(self.depth)
+        
         # ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (3,1,1))
         if thickness:
             ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (2,1,1))
