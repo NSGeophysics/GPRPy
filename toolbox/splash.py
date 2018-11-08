@@ -59,16 +59,31 @@ def showSplash(a,dir_path,widfac,highfac):
         }
     a.text(35,-10000,'GPRPy',fontdict=font)
 
+    # add UA logo
+    ua = im.imread('toolbox/splashdat/A_Square_Logo_4c.png')
+    #yanchor = -24500
+    #yheight = 10000*0.9
+    yanchor = -24000
+    yheight = 10000*0.8
+    xanchor = -20
+    figsize = a.figure.get_size_inches()
+    figratio = figsize[0]/figsize[1]
+    ratio = a.get_data_ratio()*figratio
+    xwidth = yheight/ratio
+    a.imshow(ua, aspect='auto', extent=(xanchor, xanchor+xwidth,
+                                         yanchor, yanchor+yheight),
+             interpolation='spline36')
+
+    
     # Add NSF logo
     filename2=os.path.join(dir_path,'toolbox','splashdat',
                            'NSF_4-Color_bitmap_Logo.png')
     nsf = im.imread(filename2)
     yanchor = -25000
     yheight = 10000
-    xanchor = -20
+    xanchor = -5
     figsize = a.figure.get_size_inches()
     figratio = figsize[0]/figsize[1]
-    #ratio = a.get_data_ratio()*figratio*1.1
     ratio = a.get_data_ratio()*figratio
     xwidth = yheight/ratio
     a.imshow(nsf, aspect='auto', extent=(xanchor, xanchor+xwidth,
@@ -77,4 +92,4 @@ def showSplash(a,dir_path,widfac,highfac):
     font2 = {'family': 'DejaVu Sans',
              'color':  'black',
              'size': 7.5*widfac}
-    a.text(-20,-27000,'EAR-1550732',fontdict=font2)
+    a.text(-5,-27000,'EAR-1550732',fontdict=font2)
