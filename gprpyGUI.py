@@ -569,17 +569,20 @@ class GPRPyApp:
                 npos = proj.threeD.shape[0]
                 steplen = np.sqrt(
                     np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
-                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
-                    np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
+                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0)
+                    #np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
                 )
                 alongdist = np.cumsum(steplen)
                 topoPos = np.append(0,alongdist)
                 pick3D = np.zeros((self.picked.shape[0],3))
-                for i in range(0,3):    
+                #for i in range(0,3):
+                for i in range(0,2):
                     pick3D[:,i] = interp.pchip_interpolate(topoPos,
                                                            proj.threeD[:,i],
                                                            self.picked[:,0]).squeeze()
-
+            
+                pick3D[:,2] = self.picked[:,1].squeeze()
+                    
                 np.savetxt(filename+'_3D.txt',pick3D,delimiter='\t')
                 print('saved picked file as "%s"' %(filename+'_3D.txt'))
 
@@ -722,8 +725,11 @@ class GPRPyApp:
             dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
             if dpi is not None:
                 fig.savefig(figname, format='pdf', dpi=dpi)        
-                # Put what you did in history        
-                histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],self.asp,dpi)
+                # Put what you did in history
+                if self.asp is None:
+                    histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],dpi)
+                else:
+                    histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,self.color.get(),self.contrast.get(),self.yrng[0],self.yrng[1],self.xrng[0],self.xrng[1],self.asp,dpi)
                 proj.history.append(histstr)
         print("Saved figure as %s" %(figname+'.pdf'))
 

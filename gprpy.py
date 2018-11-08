@@ -207,7 +207,7 @@ class gprpy2d:
 
         plt.gca().get_xaxis().set_visible(True)
         plt.gca().get_yaxis().set_visible(True)                
-        plt.gca().set_xlabel("profile position")
+        plt.gca().set_xlabel("profile position [m]")
         plt.gca().xaxis.tick_top()
         plt.gca().xaxis.set_label_position('top')
         
@@ -219,12 +219,15 @@ class gprpy2d:
         plt.show(block=False)
 
 
-    def printProfile(self, figname, dpi=None, **kwargs):
+    def printProfile(self, figname, dpi=600, **kwargs):
         contrast, color, yrng, xrng, asp = self.prepProfileFig(**kwargs)
         plt.savefig(figname, format='pdf', dpi=dpi)
         plt.close('all')
         # Put what you did in history
-        histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
+        if asp is None:
+            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],dpi)
+        else:
+            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
         self.history.append(histstr)
         
 
