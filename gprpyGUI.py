@@ -23,11 +23,11 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=8
+rightcol=9
 halfwid=6
 
 figrowsp=18+1
-figcolsp=8
+figcolsp=9
 
 class GPRPyApp:
 
@@ -48,6 +48,7 @@ class GPRPyApp:
         self.balloon = Pmw.Balloon()
         self.picking = False
         self.delimiter = None
+        self.grid = False
 
         # Initialize the gprpy
         proj = gp.gprpy2d()
@@ -97,15 +98,25 @@ class GPRPyApp:
         FullButton.config(height = 1, width = 2*halfwid)         
         FullButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
         self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
-        
 
+        
+        # Grid button
+        GridButton = tk.Button(
+            text="grid", fg="black",
+            command=lambda : [self.toggleGrid(),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        GridButton.config(height = 1, width = 2*halfwid)         
+        GridButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        self.balloon.bind(GridButton,"Toggles grid on/off.")
+
+        
         # X range
         XrngButton = tk.Button(
             text="set x-range", fg="black",
             command=lambda : [self.setXrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         XrngButton.config(height = 1, width = 2*halfwid)         
-        XrngButton.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        XrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
         self.balloon.bind(XrngButton,"Set the x-axis display limits.")
         
 
@@ -115,7 +126,7 @@ class GPRPyApp:
             command=lambda : [self.setYrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         YrngButton.config(height = 1, width = 2*halfwid)         
-        YrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
+        YrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
         
@@ -125,7 +136,7 @@ class GPRPyApp:
             command=lambda : [self.setAspect(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])                              
         AspButton.config(height = 1, width = 2*halfwid)         
-        AspButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
+        AspButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
         self.balloon.bind(AspButton, "Set the aspect ratio between x- and y-axis.")
         
 
@@ -133,11 +144,11 @@ class GPRPyApp:
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
-        contrlabel.grid(row=0, column=5, sticky='nsew')
+        contrlabel.grid(row=0, column=6, sticky='nsew')
         self.balloon.bind(contrlabel,"Set color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
-        contrbox.grid(row=1, column=5, sticky='nsew')
+        contrbox.grid(row=1, column=6, sticky='nsew')
         #contr.set("1.0")
         self.contrast.set("1.0")
 
@@ -146,7 +157,7 @@ class GPRPyApp:
         self.color=tk.StringVar()
         self.color.set("gray")
         colswitch = tk.OptionMenu(master,self.color,"gray","bwr")
-        colswitch.grid(row=0, column=6, sticky='nsew',rowspan=2)
+        colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
                           "and red-white-blue (rwb)\n" 
@@ -158,7 +169,7 @@ class GPRPyApp:
             text="refresh plot",
             command=lambda : self.plotProfileData(proj,fig=fig,a=a,canvas=canvas))
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=7, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=8, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -476,6 +487,9 @@ class GPRPyApp:
         else:
             self.yrng=[proj.minTopo-np.max(proj.depth),proj.maxTopo-np.min(proj.depth)]
 
+    def toggleGrid(self):
+        self.grid = not self.grid
+            
             
     def setXrng(self):
         xlow = sd.askfloat("Input","Min X value")
@@ -704,6 +718,9 @@ class GPRPyApp:
         if self.asp is not None:
             a.set_aspect(self.asp)
 
+        # Set grid
+        a.grid(self.grid)
+            
         # In case you are picking
         if self.picking:
             a.plot(self.picked[:,0],self.picked[:,1],'-x',color='yellow',linewidth=3*self.highfac) 

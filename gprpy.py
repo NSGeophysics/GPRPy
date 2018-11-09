@@ -75,6 +75,7 @@ class gprpy2d:
             self.velocity = None
             self.depth = None
             self.maxTopo = None
+            self.minTopo = None
             self.threeD = None
             # Initialize previous
             self.initPrevious()
