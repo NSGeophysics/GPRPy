@@ -60,7 +60,9 @@ def showSplash(a,dir_path,widfac,highfac):
     a.text(35,-10000,'GPRPy',fontdict=font)
 
     # add UA logo
-    ua = im.imread('toolbox/splashdat/A_Square_Logo_4c.png')
+    filename1=os.path.join(dir_path,'toolbox','splashdat',
+                           'A_Square_Logo_4c.png')
+    ua = im.imread(filename1)
     #yanchor = -24500
     #yheight = 10000*0.9
     yanchor = -24000
