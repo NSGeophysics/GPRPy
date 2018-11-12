@@ -366,11 +366,13 @@ class GPRPyCWApp:
 
     def plotCWData(self,proj,a,canvas):
         a.clear()
+        dx=proj.profilePos[1]-proj.profilePos[0]
+        dt=proj.twtt[1]-proj.twtt[0]
         stdcont = np.nanmax(np.abs(proj.data)[:])
-        a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
-                                                         max(proj.profilePos),
-                                                         max(proj.twtt),
-                                                         min(proj.twtt)],
+        a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos)-dx/2.0,
+                                                         max(proj.profilePos)+dx/2.0,
+                                                         max(proj.twtt)+dt/2.0,
+                                                         min(proj.twtt)-dt/2.0],
                  aspect="auto",
                  vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
         a.set_ylim(self.yrng)
@@ -418,27 +420,28 @@ class GPRPyCWApp:
 
         
     def plotSemb(self,proj,a,canvas,semb,title,ylabel=None):
+        dt=proj.twtt[1]-proj.twtt[0]
         if semb is not None:
             a.clear()
             if self.sembrep.get() == "lin":
                 print("Linear semblance representation")
                 stdcont = np.nanmax(np.abs(semb)[:])
-                a.imshow(np.flipud(np.abs(semb)), cmap='inferno', extent=[self.vmin, self.vmax,
-                                                                          min(proj.twtt),max(proj.twtt)],
+                a.imshow(np.flipud(np.abs(semb)), cmap='inferno', extent=[self.vmin-self.vint/2.0, self.vmax+self.vint/2.0,
+                                                                          min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
             elif self.sembrep.get() == "log":
                 print("Logarithmic semblance representation")
                 stdcont = np.nanmax(np.log(np.abs(semb))[:])
                 a.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
-                                                                                  min(proj.twtt),max(proj.twtt)],
+                                                                                  min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
             elif self.sembrep.get() == "exp":
                 print("Exponential semblance representation")
                 stdcont = np.nanmax(np.exp(np.abs(semb))[:])
                 a.imshow(np.flipud(np.exp(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
-                                                                                  min(proj.twtt),max(proj.twtt)],
+                                                                                  min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
 

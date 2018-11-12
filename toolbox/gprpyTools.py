@@ -122,6 +122,41 @@ def remMeanTrace(data,ntraces):
 
 
 
+def profileSmooth(data,profilePos,ntraces=1,noversample=1):
+    # New profile positions
+    newProfilePos = np.linspace(profilePos[0],
+                                profilePos[-1],
+                                noversample*len(profilePos))
+    # First oversample the data
+    data = np.asmatrix(np.repeat(data,noversample,1))
+    tottraces = data.shape[1]
+    if ntraces == 1:
+        newdata = data
+    elif ntraces == 0:
+        newdata = data
+    elif ntraces >= tottraces:
+        newdata=np.matrix.mean(data,1) 
+    else:
+        newdata = np.asmatrix(np.zeros(data.shape))    
+        halfwid = int(np.ceil(ntraces/2.0))
+        
+        # First few traces, that all have the same average
+        newdata[:,0:halfwid+1] = np.matrix.mean(data[:,0:halfwid+1],1)
+        
+        # For each trace in the middle
+        for tr in tqdm(range(halfwid,tottraces-halfwid+1)):   
+            winstart = int(tr - halfwid)
+            winend = int(tr + halfwid)
+            newdata[:,tr] = np.matrix.mean(data[:,winstart:winend+1],1) 
+
+        # Last few traces again have the same average    
+        newdata[:,tottraces-halfwid:tottraces+1] = np.matrix.mean(data[:,tottraces-halfwid:tottraces+1],1)
+
+    print('done with profile smoothing')
+    return newdata, newProfilePos
+
+
+
 def tpowGain(data,twtt,power):
     factor = np.reshape(twtt**(float(power)),(len(twtt),1))
     factmat = matlib.repmat(factor,1,data.shape[1])  

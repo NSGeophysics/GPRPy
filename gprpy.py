@@ -169,30 +169,39 @@ class gprpy2d:
     
     # This is a helper function
     def prepProfileFig(self, color="gray", contrast=1.0, yrng=None, xrng=None, asp=None):
+        dx=self.profilePos[1]-self.profilePos[0]
+        dt=self.twtt[1]-self.twtt[0]
         stdcont = np.nanmax(np.abs(self.data)[:])       
         
         if self.velocity is None:
-            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
-                                                    max(self.profilePos),
-                                                    max(self.twtt),
-                                                    min(self.twtt)],
+            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
+                                                    max(self.profilePos)+dx/2.0,
+                                                    max(self.twtt)+dt/2.0,
+                                                    min(self.twtt)-dt/2.0],
                        aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
             plt.gca().set_ylabel("two-way travel time [ns]")
             plt.gca().invert_yaxis()
+            if yrng is not None:
+                yrng=[np.max(yrng),np.min(yrng)]
             
         elif self.maxTopo is None:
-             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
-                                                    max(self.profilePos),
-                                                    max(self.depth),
-                                                    min(self.depth)],
-                    aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
-             plt.gca().set_ylabel("depth [m]")
-             plt.gca().invert_yaxis()
+            dy=dt*self.velocity
+            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
+                                                    max(self.profilePos)+dx/2.0,
+                                                    max(self.depth)+dy/2.0,
+                                                    min(self.depth)-dy/2.0],
+                       aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
+            plt.gca().set_ylabel("depth [m]")
+            plt.gca().invert_yaxis()
+            if yrng is not None:
+                yrng=[np.max(yrng),np.min(yrng)]
+            
         else:
-            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos),
-                                                    max(self.profilePos),
-                                                    self.minTopo-max(self.depth),
-                                                    self.maxTopo-min(self.depth)],
+            dy=dt*self.velocity
+            plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
+                                                    max(self.profilePos)+dx/2.0,
+                                                    self.minTopo-max(self.depth)-dy/2.0,
+                                                    self.maxTopo-min(self.depth)+dy/2.0],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
             plt.gca().set_ylabel("elevation [m]")
             
@@ -293,7 +302,7 @@ class gprpy2d:
         histstr = "mygpr.smooth(%d)" %(window)
         self.history.append(histstr)
 
-
+        
     def remMeanTrace(self,ntraces):
         # Store previous state for undo
         self.storePrevious()
@@ -304,6 +313,16 @@ class gprpy2d:
         self.history.append(histstr)
 
 
+    def profileSmooth(self,ntraces,noversample):
+        # Store previous state for undo
+        self.storePrevious()
+        self.data,self.profilePos = tools.profileSmooth(self.data,self.profilePos,
+                                                        ntraces,noversample)
+        # Put in history
+        histstr = "mygpr.profileSmooth(%d,%d)" %(ntraces,noversample)
+        self.history.append(histstr)
+
+        
     def tpowGain(self,power=0.0):
         # Store previous state for undo
         self.storePrevious()

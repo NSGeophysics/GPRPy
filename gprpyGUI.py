@@ -26,7 +26,7 @@ colsp=2
 rightcol=9
 halfwid=6
 
-figrowsp=18+1
+figrowsp=19+1
 figcolsp=9
 
 class GPRPyApp:
@@ -354,7 +354,20 @@ class GPRPyApp:
                           "uncertainty. Contact alainplattner@gmail.com\n"
                           "if you would like to use it.")
                          
-                         
+
+
+        # profile Smoothing Button
+        profSmButton = tk.Button(
+            text="profile smoothing", fg="black",
+            command=lambda : [self.profileSmooth(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        profSmButton.config(height = 1, width = 2*halfwid)         
+        profSmButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(profSmButton,
+                          "First oversamples the profile (makes 'n' copies\n"
+                          "of each trace) and then replaces each trace by\n"
+                          "the mean of its neighboring 'm' traces."
+                          )
         
         
         # Topo Correct
@@ -363,7 +376,7 @@ class GPRPyApp:
             command=lambda : [self.topoCorrect(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         topoCorrectButton.config(height = 1, width = 2*halfwid)
-        topoCorrectButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(topoCorrectButton,
                           "Reads a comma- or tab-separated file containing\n" 
                           "either 3 columns (easting, northing, elevation)\n" 
@@ -376,7 +389,7 @@ class GPRPyApp:
             text="start pick", fg="black",
             command=lambda : self.startPicking(proj,fig=fig,a=a,canvas=canvas))        
         startPickButton.config(height = 1, width = halfwid)
-        startPickButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=1)
+        startPickButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=1)
 
 
         stopPickButton = tk.Button(
@@ -385,7 +398,7 @@ class GPRPyApp:
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         
         stopPickButton.config(height = 1, width = halfwid)
-        stopPickButton.grid(row=14, column=rightcol+1, sticky='nsew',columnspan=1)
+        stopPickButton.grid(row=15, column=rightcol+1, sticky='nsew',columnspan=1)
         
         
         # Save data
@@ -393,7 +406,7 @@ class GPRPyApp:
             text="save data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 2*halfwid)         
-        SaveButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(SaveButton,
                           'saves the processed data including its history in a\n'
                           '.gpr file. The resulting file will contain absolute\n'
@@ -408,7 +421,7 @@ class GPRPyApp:
             text="print figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig))
         PrintButton.config(height = 1, width = 2*halfwid)         
-        PrintButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintButton.grid(row=17, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(PrintButton,
                           "Saves the current visible figure in a pdf with \n"
                           "chosen resolution. If there is a hyperbola on\n" 
@@ -421,7 +434,7 @@ class GPRPyApp:
             text="export to VTK", fg="black",
             command = lambda : self.exportVTK(proj))
         VTKButton.config(height = 1, width = 2*halfwid)
-        VTKButton.grid(row=17, column=rightcol, sticky='nsew',columnspan=colsp)
+        VTKButton.grid(row=18, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(VTKButton,
                           "Exports the processed figure to a\n"
                           "VTK format, that can be read by\n" 
@@ -435,7 +448,7 @@ class GPRPyApp:
             text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=18, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=19, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce of \n'
                           'the current status.\n'
@@ -561,7 +574,15 @@ class GPRPyApp:
         if proj.velocity is None:
             mesbox.showinfo("Migration Error","You have to set the velocity first")
         proj.fkMigration()
-            
+
+
+    def profileSmooth(self,proj):
+        ntraces = sd.askinteger("Input","Smooth over how many traces (m)")
+        if ntraces is not None:
+            noversample = sd.askinteger("Input","Make how many copies of each trace (n).\nRecommended: Same as number of traces to be smoothed.")
+            if noversample is not None:
+                proj.profileSmooth(ntraces,noversample)
+        
             
     def topoCorrect(self,proj):
         if proj.velocity is None:
@@ -675,13 +696,15 @@ class GPRPyApp:
 
 
     def plotProfileData(self,proj,fig,a,canvas):
+        dx=proj.profilePos[1]-proj.profilePos[0]
+        dt=proj.twtt[1]-proj.twtt[0]
         a.clear()        
         stdcont = np.nanmax(np.abs(proj.data)[:])        
         if proj.velocity is None:
-            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
-                                                  max(proj.profilePos),
-                                                  max(proj.twtt),
-                                                  min(proj.twtt)],
+            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos)-dx/2.0,
+                                                             max(proj.profilePos)+dx/2.0,
+                                                             max(proj.twtt)+dt/2.0,
+                                                             min(proj.twtt)-dt/2.0],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
             a.set_ylim(self.yrng)
@@ -689,10 +712,11 @@ class GPRPyApp:
             a.set_ylabel("two-way travel time [ns]", fontsize=mpl.rcParams['font.size'])
             a.invert_yaxis()
         elif proj.maxTopo is None:
-            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
-                                                  max(proj.profilePos),
-                                                  max(proj.depth),
-                                                  min(proj.depth)],
+            dy=dt*proj.velocity
+            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos)-dx/2.0,
+                                                             max(proj.profilePos)+dx/2.0,
+                                                             max(proj.depth)+dy/2.0,
+                                                             min(proj.depth)-dy/2.0],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
             a.set_ylabel("depth [m]", fontsize=mpl.rcParams['font.size'])
@@ -700,10 +724,11 @@ class GPRPyApp:
             a.set_xlim(self.xrng)
             a.invert_yaxis()
         else:
-            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos),
-                                                  max(proj.profilePos),
-                                                  proj.minTopo-max(proj.depth),
-                                                  proj.maxTopo-min(proj.depth)],
+            dy=dt*proj.velocity
+            a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos)-dx/2.0,
+                                                             max(proj.profilePos)+dx/2.0,
+                                                             proj.minTopo-max(proj.depth)-dy/2.0,
+                                                             proj.maxTopo-min(proj.depth)+dy/2.0],
                      aspect="auto",
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
             a.set_ylabel("elevation [m]", fontsize=mpl.rcParams['font.size'])
