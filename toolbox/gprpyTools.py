@@ -94,6 +94,7 @@ def smooth(data,window):
 
 
 def remMeanTrace(data,ntraces):
+    data=np.asmatrix(data)
     tottraces = data.shape[1]
     # For ridiculous ntraces values, just remove the entire average
     if ntraces >= tottraces:
