@@ -183,6 +183,8 @@ class gprpy2d:
             plt.gca().invert_yaxis()
             if yrng is not None:
                 yrng=[np.max(yrng),np.min(yrng)]
+            else:
+                yrng=[np.max(self.twtt),np.min(self.twtt)]
             
         elif self.maxTopo is None:
             dy=dt*self.velocity
@@ -195,7 +197,9 @@ class gprpy2d:
             plt.gca().invert_yaxis()
             if yrng is not None:
                 yrng=[np.max(yrng),np.min(yrng)]
-            
+            else:
+                yrng=[np.max(self.depth),np.min(self.depth)]
+                
         else:
             dy=dt*self.velocity
             plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
@@ -204,8 +208,13 @@ class gprpy2d:
                                                     self.maxTopo-min(self.depth)+dy/2.0],
                     aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)            
             plt.gca().set_ylabel("elevation [m]")
+            if yrng is None:
+                yrng=[self.minTopo-np.max(self.depth),self.maxTopo-np.min(self.depth)]
             
-            
+
+        if xrng is None:
+            xrng=[min(self.profilePos),max(self.profilePos)]       
+                
         if yrng is not None:
             plt.ylim(yrng)
             
@@ -581,11 +590,7 @@ class gprpyCW(gprpy2d):
         # Store previous state for undo
         self.storePrevious()
         # Find index of value that is nearest to newZeroTime
-        #print(self.twtt)
-        #print(newZeroTime)
-        #print(np.abs(self.twtt - newZeroTime))
         zeroind = np.abs(self.twtt - newZeroTime).argmin()
-        #print(zeroind)
         # Cut out everything before
         self.twtt = self.twtt[zeroind:] - newZeroTime
         #self.data = self.data[zeroind:,:]
