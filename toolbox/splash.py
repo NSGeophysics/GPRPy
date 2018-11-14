@@ -14,7 +14,7 @@ def showSplash(a,dir_path,widfac,highfac):
     x=snakeGPR.twtt[0:maxpoint]
     y=snakeGPR.data[0:maxpoint,10]
     # Snake body
-    lw=5
+    lw=7#5
     a.plot(x,y,'k',linewidth=lw*widfac,solid_capstyle='round')
     # Snake head
     Path = mpath.Path
@@ -95,3 +95,11 @@ def showSplash(a,dir_path,widfac,highfac):
              'color':  'black',
              'size': 7.5*widfac}
     a.text(-5,-27000,'EAR-1550732',fontdict=font2)
+
+    
+    # Add name/email
+    font3 = {'family': 'DejaVu Sans',
+             'color':  'gray',
+             'size': 7.5*widfac}
+    a.text(70,-22000,'Alain Plattner',fontdict=font3)
+    a.text(59.5,-24000,'plattner@alumni.ethz.ch',fontdict=font3)

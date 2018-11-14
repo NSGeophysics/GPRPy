@@ -212,7 +212,24 @@ class GPRPyApp:
         self.balloon.bind(SetZeroTimeButton,
                           "Set the two-way travel time that \n" 
                           "that corresponds to the surface.")
-                
+
+
+
+        # TimeZero Adjust = align traces
+        TZAButton = tk.Button(
+            text="align traces", fg="black",
+            command=lambda : [proj.timeZeroAdjust(),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        TZAButton.config(height = 1, width = 2*halfwid)         
+        TZAButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(TZAButton,
+                         'Automatically shifts each trace up or down\n'
+                         'such that the maximum aplitudes of the individual\n'
+                         'traces align. Can lead to problems when the maxima\n' 
+                         'are not in the air waves. If the results are bad,\n' 
+                         'use the "undo" button.')
+
+        
 
         # truncate Y
         truncYButton = tk.Button(
@@ -220,7 +237,7 @@ class GPRPyApp:
             command=lambda : [self.truncateY(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         truncYButton.config(height = 1, width = 2*halfwid)         
-        truncYButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        truncYButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(truncYButton,
                           "Remove data points at arrival times\n"
                           "later than the chosen value. If velocity\n"
@@ -234,55 +251,58 @@ class GPRPyApp:
             command=lambda : [self.dewow(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         DewowButton.config(height = 1, width = 2*halfwid)         
-        DewowButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
+        DewowButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(DewowButton,
                           "Trace-wise low-cut filter. Removes\n" 
                           "from each trace a running mean of\n"
                           "chosen window width.")
 
-
-        # Smooth
-        SmoothButton = tk.Button(
-            text="smooth", fg="black",
-            command=lambda : [self.smooth(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        SmoothButton.config(height = 1, width = 2*halfwid)         
-        SmoothButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(SmoothButton,
-                          "Trace-wise high-cut filter. Replaces\n" 
-                          "each sample within a trace by a\n"
-                          "running mean of chosen window width.")
-
         
-        # TimeZero Adjust
-        TZAButton = tk.Button(
-            text="time zero adj", fg="black",
-            command=lambda : [proj.timeZeroAdjust(),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        TZAButton.config(height = 1, width = 2*halfwid)         
-        TZAButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(TZAButton,
-                         'Automatically shifts each trace up or down\n'
-                         'such that the maximum aplitudes of the individual\n'
-                         'traces align. Can lead to problems when the maxima\n' 
-                         'are not in the air waves. If the results are bad,\n' 
-                         'use the "undo" button.')
-        
-        
-
         # Rem mean trace
         remMeanTraceButton = tk.Button(
             text="rem mean tr", fg="black",
             command=lambda : [self.remMeanTrace(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         remMeanTraceButton.config(height = 1, width = 2*halfwid)         
-        remMeanTraceButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        remMeanTraceButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(remMeanTraceButton,
                           "Removes from each traces the average\n" 
                           "of its surrounding traces. This can be\n"
                           "useful to remove air waves, or\n" 
                           "horizontal features.")
+        
 
+        # Smooth 
+        SmoothButton = tk.Button(
+            text="smooth (temp)", fg="black",
+            command=lambda : [self.smooth(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        SmoothButton.config(height = 1, width = 2*halfwid)         
+        SmoothButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(SmoothButton,
+                          "Trace-wise high-cut filter. Replaces\n" 
+                          "each sample within a trace by a\n"
+                          "running mean of chosen window width.")
+
+        
+
+        
+
+        # profile Smoothing Button
+        profSmButton = tk.Button(
+            text="profile smoothing", fg="black",
+            command=lambda : [self.profileSmooth(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        profSmButton.config(height = 1, width = 2*halfwid)         
+        profSmButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(profSmButton,
+                          "First oversamples the profile (makes 'n' copies\n"
+                          "of each trace) and then replaces each trace by\n"
+                          "the mean of its neighboring 'm' traces."
+                          )
+        
+
+       
 
         # Gain
         tpowButton = tk.Button(
@@ -290,7 +310,7 @@ class GPRPyApp:
             command=lambda : [self.tpowGain(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         tpowButton.config(height=1, width=halfwid)
-        tpowButton.grid(row=9, column=rightcol, sticky='nsew')
+        tpowButton.grid(row=10, column=rightcol, sticky='nsew')
         self.balloon.bind(tpowButton,
                           "t-power gain. Increases the power of the\n"
                           "signal by a factor of (two-way travel time)^p,\n"
@@ -303,7 +323,7 @@ class GPRPyApp:
             command=lambda : [self.agcGain(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         agcButton.config(height=1, width=halfwid)
-        agcButton.grid(row=9, column=rightcol+1, sticky='nsew')
+        agcButton.grid(row=10, column=rightcol+1, sticky='nsew')
         self.balloon.bind(agcButton,
                           "Automatic gain controll. Normalizes the power\n"
                           "of the signal per given sample window along\n" 
@@ -314,7 +334,7 @@ class GPRPyApp:
             text="show hyperb", fg="black",
             command=lambda : [self.showHyp(proj,a), canvas.draw()])
         hypButton.config(height = 1, width = 2*halfwid)
-        hypButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        hypButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(hypButton,
                           "Draws a hyperbola depending on profile position,\n"
                           "two-way travel time, and estimated velocity. This\n" 
@@ -331,7 +351,7 @@ class GPRPyApp:
             command=lambda : [self.setVelocity(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         setVelButton.config(height = 1, width = 2*halfwid)         
-        setVelButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(setVelButton,
                           "Set the known subsurface radar velocity. This will\n" 
                           "turn the y-axis from two-way travel time to depth.\n"
@@ -344,7 +364,7 @@ class GPRPyApp:
             command=lambda : [self.fkMigration(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         migButton.config(height = 1, width = 2*halfwid)         
-        migButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
+        migButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(migButton,
                           "Stolt fk migration using a code originally written\n"
                           "in Matlab for the CREWES software package.\n" 
@@ -355,19 +375,6 @@ class GPRPyApp:
                           "if you would like to use it.")
                          
 
-
-        # profile Smoothing Button
-        profSmButton = tk.Button(
-            text="profile smoothing", fg="black",
-            command=lambda : [self.profileSmooth(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        profSmButton.config(height = 1, width = 2*halfwid)         
-        profSmButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(profSmButton,
-                          "First oversamples the profile (makes 'n' copies\n"
-                          "of each trace) and then replaces each trace by\n"
-                          "the mean of its neighboring 'm' traces."
-                          )
         
         
         # Topo Correct
