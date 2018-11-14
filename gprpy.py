@@ -262,12 +262,12 @@ class gprpy2d:
         self.history.append(histstr)
     
 
-    def timeZeroAdjust(self):
+    def alignTraces(self):
         # Store previous state for undo
         self.storePrevious()        
-        self.data = tools.timeZeroAdjust(self.data)      
+        self.data = tools.alignTraces(self.data)      
         # Put what you did in history
-        histstr = "mygpr.timeZeroAdjust()"
+        histstr = "mygpr.alignTraces()"
         self.history.append(histstr)
 
 

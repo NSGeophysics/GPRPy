@@ -216,13 +216,13 @@ class GPRPyApp:
 
 
         # TimeZero Adjust = align traces
-        TZAButton = tk.Button(
+        TrAlignButton = tk.Button(
             text="align traces", fg="black",
-            command=lambda : [proj.timeZeroAdjust(),
+            command=lambda : [proj.alignTraces(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        TZAButton.config(height = 1, width = 2*halfwid)         
-        TZAButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(TZAButton,
+        TrAlignButton.config(height = 1, width = 2*halfwid)         
+        TrAlignButton.grid(row=4, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(TrAlignButton,
                          'Automatically shifts each trace up or down\n'
                          'such that the maximum aplitudes of the individual\n'
                          'traces align. Can lead to problems when the maxima\n' 
