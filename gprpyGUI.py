@@ -199,7 +199,9 @@ class GPRPyApp:
         AdjProfileButton.grid(row=2, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(AdjProfileButton,
                           "Adjust the profile length to \n"
-                          "known start and end positions.")
+                          "known start and end positions\n"
+                          "and/or flip the profile horizontally\n"
+                          "(left to right)")
 
         
         # Set new zero time
@@ -520,6 +522,9 @@ class GPRPyApp:
         
 
     def adjProfile(self,proj):
+        flipit = mesbox.askyesno("Question","Flip the profile (left to right)?")
+        if flipit:
+            proj.flipProfile()        
         minPos = sd.askfloat("Input","Start x coordinate")
         if minPos is not None:
             maxPos = sd.askfloat("Input","End x coordinate")
@@ -527,6 +532,7 @@ class GPRPyApp:
                 proj.adjProfile(minPos=minPos,maxPos=maxPos)
                 self.xrng=[minPos,maxPos]
 
+                
     def setZeroTime(self,proj):
         newZeroTime = sd.askfloat("Input","New zero time")
         if newZeroTime is not None:

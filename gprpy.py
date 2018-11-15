@@ -260,7 +260,15 @@ class gprpy2d:
         self.profilePos=np.linspace(minPos,maxPos,np.size(self.profilePos))
         histstr = "mygpr.setRange(%g,%g)" %(minPos,maxPos)
         self.history.append(histstr)
-    
+
+
+    def flipProfile(self):
+        # Flips the profile left to right (start to end)
+        self.storePrevious()
+        self.data=np.flip(self.data,1)
+        histstr = "mygpr.flipProfile()"
+        self.history.append(histstr)
+        
 
     def alignTraces(self):
         # Store previous state for undo
