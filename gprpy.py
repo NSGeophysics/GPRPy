@@ -410,7 +410,7 @@ class gprpy2d:
         # Store previous state for undo
         self.storePrevious()
         self.data_pretopo = self.data
-        topoPos, topoVal, self.threeD = tools.prepTopo(topofile,delimiter)
+        topoPos, topoVal, self.threeD = tools.prepTopo(topofile,delimiter,self.profilePos[0])
         self.data, self.twtt, self.maxTopo, self.minTopo = tools.correctTopo(self.data,
                                                                              velocity=self.velocity,
                                                                              profilePos=self.profilePos,

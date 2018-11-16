@@ -195,7 +195,7 @@ def agcGain(data,window):
     return newdata
         
 
-def prepTopo(topofile,delimiter=','):
+def prepTopo(topofile,delimiter=',',xStart=0):
     # Read topofile, see if it is two columns or three columns.
     # Here I'm using numpy's loadtxt. There are more advanced readers around
     # but this one should do for this simple situation
@@ -216,7 +216,7 @@ def prepTopo(topofile,delimiter=','):
             np.power( topomat[1:npos,2]-topomat[0:npos-1,2] ,2.0)
         )
         alongdist = np.cumsum(steplen)
-        topoPos = np.append(0,alongdist)
+        topoPos = np.append(xStart,alongdist+xStart)
     elif topomat.shape[1] is 2:
         threeD = None
         topoPos = topomat[:,0]
