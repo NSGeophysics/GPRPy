@@ -307,8 +307,7 @@ class GPRPyApp:
                           )
         
 
-       
-
+        
         # Gain
         tpowButton = tk.Button(
             text="tpow", fg="black",

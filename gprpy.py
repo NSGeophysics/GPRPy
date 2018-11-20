@@ -164,8 +164,6 @@ class gprpy2d:
         histstr = "mygpr.save('%s')" %(filename)
         self.history.append(histstr)
 
-
-
     
     # This is a helper function
     def prepProfileFig(self, color="gray", contrast=1.0, yrng=None, xrng=None, asp=None):
@@ -244,9 +242,9 @@ class gprpy2d:
         plt.close('all')
         # Put what you did in history
         if asp is None:
-            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],dpi)
+            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], dpi=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],dpi)
         else:
-            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpival=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
+            histstr = "mygpr.printProfile('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], asp=%g, dpi=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],asp,dpi)
         self.history.append(histstr)
         
 
@@ -440,17 +438,9 @@ class gprpy2d:
             downward = self.twtt*aspect
         else:
             downward = self.depth*aspect                        
-        # if self.maxTopo is None:
-        #     topY = 0
-        # else:
-        #     topY=self.maxTopo            
-        # Z = topY - np.reshape(downward,(1,len(downward))) + np.reshape(z,(len(z),1))
         Z = np.reshape(z,(len(z),1)) - np.reshape(downward,(1,len(downward)))
 
-               
-        #print(self.depth)
         
-        # ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (3,1,1))
         if thickness:
             ZZ = np.tile(np.reshape(Z, (1,Z.shape[0],Z.shape[1])), (2,1,1))
         else:
@@ -587,6 +577,7 @@ class gprpyCW(gprpy2d):
         print(filename)
         super().importdata(filename)
         self.dtype = dtype
+        self.vVals = None
         # Remove the history string from the super-class importing
         del self.history[-1]
         # Put what you did in history
@@ -618,15 +609,15 @@ class gprpyCW(gprpy2d):
         self.history.append(histstr) 
 
 
-    def linSemblance(self,vmin,vmax,vint):
+    def linSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
         # Store previous state for undo
         self.storePrevious()
-        vVals = np.arange(vmin,vmax+vint,vint)
+        self.vVals = np.arange(vmin,vmax+vint,vint)
         if self.dtype is "WARR":
             typefact = 1
         elif self.dtype is "CMP":
             typefact = 2
-        self.linSemb = tools.linSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
+        self.linSemb = tools.linSemblance(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
         print("calculated linear semblance")
         # Put what you did in history
         histstr = "mygpr.linSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
@@ -636,12 +627,12 @@ class gprpyCW(gprpy2d):
     def hypSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
         # Store previous state for undo
         self.storePrevious()
-        vVals = np.arange(vmin,vmax+vint,vint)
+        self.vVals = np.arange(vmin,vmax+vint,vint)
         if self.dtype is "WARR":
             typefact = 1
         elif self.dtype is "CMP":
             typefact = 2
-        self.hypSemb = tools.hypSemblance(self.data,self.profilePos,self.twtt,vVals,self.twtt,typefact)
+        self.hypSemb = tools.hypSemblance(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
         print("calculated hyperbola semblance")
         # Put what you did in history
         histstr = "mygpr.hypSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
@@ -680,3 +671,137 @@ class gprpyCW(gprpy2d):
         # Put what you did in history
         histstr = "mygpr.remHyp()" 
         self.history.append(histstr) 
+
+
+
+
+    # This is a helper function
+    def prepCWFig(self, contrast=1.0, color="gray", yrng=None, xrng=None, showlnhp=False):
+        dx=self.profilePos[1]-self.profilePos[0]
+        dt=self.twtt[1]-self.twtt[0]
+        stdcont = np.nanmax(np.abs(self.data)[:])       
+        
+        plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
+                                                max(self.profilePos)+dx/2.0,
+                                                max(self.twtt)+dt/2.0,
+                                                min(self.twtt)-dt/2.0],
+                   aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
+        plt.gca().set_ylabel("two-way travel time [ns]")
+        plt.gca().invert_yaxis()
+        if yrng is not None:
+            yrng=[np.max(yrng),np.min(yrng)]
+        else:
+            yrng=[np.max(self.twtt),np.min(self.twtt)]
+        plt.ylim(yrng)
+            
+        if xrng is None:
+            xrng=[min(self.profilePos),max(self.profilePos)]                           
+        plt.xlim(xrng)
+
+        plt.gca().get_xaxis().set_visible(True)
+        plt.gca().get_yaxis().set_visible(True)
+        if self.dtype == "WARR":
+            plt.gca().set_xlabel("antenna separation [m]")
+            typefact=1
+        elif self.dtype == "CMP":
+            plt.gca().set_xlabel("distance from midpoint [m]")
+            typefact=2
+        plt.gca().xaxis.tick_top()
+        plt.gca().xaxis.set_label_position('top')
+
+        # Show hyperbolae / lines if you want
+        if showlnhp:
+            if self.lins:
+                for lin in self.lins:
+                    time = lin[0] + typefact*self.profilePos/lin[1]
+                    plt.plot(self.profilePos,time,linewidth=2,color='yellow')
+                    plt.plot(self.profilePos,time,linewidth=1,color='black')
+            if self.hyps:
+                x2 = np.power(typefact*self.profilePos,2.0)
+                for hyp in self.hyps:
+                    time = np.sqrt(x2 + 4*np.power(hyp[0]/2.0 * hyp[1],2.0))/hyp[1]
+                    plt.plot(self.profilePos,time,linewidth=2,color='yellow')
+                    plt.plot(self.profilePos,time,linewidth=1,color='black')
+                                    
+        return contrast, color, yrng, xrng, showlnhp
+
+
+
+    def prepSembFig(self, whichsemb="lin", saturation=1.0, yrng=None, vrng=None, sembrep="lin"):
+        dt=self.twtt[1]-self.twtt[0]
+        dv=self.vVals[1]-self.vVals[0]
+        if whichsemb == "lin":
+            semb = self.linSemb
+            title = "linear semblance"
+        elif whichsemb == "hyp":
+            semb = self.hypSemb
+            title = "hyperbolic semblance"
+        else:
+            semb = None
+            
+        if semb is not None:
+            if sembrep == "lin":
+                stdcont = np.nanmax(np.abs(semb)[:])
+                plt.imshow(np.flipud(np.abs(semb)), cmap='inferno',
+                           extent=[np.min(self.vVals)-dv/2.0, np.max(self.vVals)+dv/2.0,
+                                   np.min(self.twtt)-dt/2.0,  np.max(self.twtt)+dt/2.0],
+                           aspect='auto',
+                           vmin=0, vmax=stdcont/saturation)
+            elif self.sembrep.get() == "log":
+                stdcont = np.nanmax(np.log(np.abs(semb))[:])
+                plt.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno',
+                           extent=[np.min(self.vVals)-dv/2.0, np.max(self.vVals)+dv/2.0,
+                                   np.min(self.twtt)-dt/2.0,  np.max(self.twtt)+dt/2.0],
+                         aspect='auto',
+                         vmin=0, vmax=stdcont/saturation)
+
+            if yrng is not None:
+                yrng=[np.max(yrng),np.min(yrng)]
+            else:
+                yrng=[np.max(self.twtt),np.min(self.twtt)]
+            plt.ylim(yrng)
+            
+            if vrng is None:
+                vrng=[np.min(self.vVals),np.max(self.vVals)]                           
+            plt.xlim(vrng)
+                
+
+            plt.gca().set_xlabel("velocity [m/ns]")
+            plt.gca().set_ylabel("two-way travel time [ns]")
+            #plt.gca().invert_yaxis()
+            plt.gca().set_title(title)
+            plt.gca().get_xaxis().set_visible(True)
+            plt.gca().get_yaxis().set_visible(True)
+            plt.gca().get_xaxis().set_ticks_position('both')
+            plt.gca().get_yaxis().set_ticks_position('both')
+                                
+        return whichsemb, saturation, yrng, vrng, sembrep
+
+    
+    
+    def showCWFig(self, **kwargs):
+        self.prepCWFig(**kwargs)
+        plt.show(block=False)
+
+
+    def showSembFig(self, **kwargs):        
+        self.prepSembFig(**kwargs)
+        plt.show(block=False)
+        
+       
+
+    def printCWFigure(self, figname, dpi=600, **kwargs):
+        contrast, color, yrng, xrng, showlnhp = self.prepCWFig(**kwargs)
+        plt.savefig(figname, format='pdf', dpi=dpi)
+        plt.close('all')
+        # Put what you did in history
+        histstr = "mygpr.printCWFigure('%s', color='%s', contrast=%g, yrng=[%g,%g], xrng=[%g,%g], showlnhp=%r, dpi=%d)" %(figname,color,contrast,yrng[0],yrng[1],xrng[0],xrng[1],showlnhp,dpi)
+        self.history.append(histstr)
+
+
+    def printSembFigure(self, figname, dpi=600, **kwargs):
+        whichsemb, saturation, yrng, vrng, sembrep = self.prepSembFig(**kwargs)
+        plt.savefig(figname, format='pdf', dpi=dpi)
+        plt.close('all')
+        histstr = "mygpr.printSembFigure('%s', whichsemb='%s', saturation=%g, yrng=[%g,%g], vrng=[%g,%g], sembrep='%s')" %(figname, whichsemb, saturation, yrng[0], yrng[1], vrng[0], vrng[1], sembrep)
+        self.history.append(histstr)

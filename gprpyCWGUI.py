@@ -18,7 +18,7 @@ import scipy.interpolate as interp
 colsp=2
 rightcol=10
 halfwid=4
-figrowsp=13+1
+figrowsp=15+1
 
 class GPRPyCWApp:
 
@@ -35,16 +35,20 @@ class GPRPyCWApp:
         #adata.get_yaxis().set_visible(False)
         alin.get_yaxis().set_visible(False)
 
+        mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*1.1})
+        ahyp.tick_params(direction='out',length=6,width=1)
+        alin.tick_params(direction='out',length=6,width=1)
+        adata.tick_params(direction='out',length=6,width=1)
+        
         adata.set_title('data')
         adata.get_yaxis().tick_right()
         adata.get_yaxis().set_label_position('right')
-        adata.set_ylabel('two-way travel time [ns]')
+        adata.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])
         
         alin.set_title('linear semblance')
         ahyp.set_title('hyperbolic semblance')
-        ahyp.set_ylabel('two-way travel time [ns]')
+        ahyp.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])        
         
-
         canvas = FigureCanvasTkAgg(fig, master=self.window)
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=figrowsp,sticky='nsew')
         canvas.draw()
@@ -119,6 +123,19 @@ class GPRPyCWApp:
                           "from each trace a running mean of\n"
                           "chosen window width.") 
 
+
+        # Smooth 
+        SmoothButton = tk.Button(
+            text="smooth", fg="black",
+            command=lambda : [self.smooth(proj),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        SmoothButton.config(height = 1, width = 2*halfwid)         
+        SmoothButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(SmoothButton,
+                          "Trace-wise high-cut filter. Replaces\n" 
+                          "each sample within a trace by a\n"
+                          "running mean of chosen window width.")
+        
         
         # Normalize
         NormalizeButton = tk.Button(
@@ -126,27 +143,58 @@ class GPRPyCWApp:
             command = lambda : [proj.normalize(),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         NormalizeButton.config(height = 1, width = 2*halfwid)         
-        NormalizeButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
+        NormalizeButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(NormalizeButton,
                           "Normalizes each trace such that\n" 
                           "they all have equal energy") 
 
 
+        # Gain
+        tpowButton = tk.Button(
+            text="tpow", fg="black",
+            command=lambda : [self.tpowGain(proj),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        tpowButton.config(height=1, width=halfwid)
+        tpowButton.grid(row=8, column=rightcol, sticky='nsew')
+        self.balloon.bind(tpowButton,
+                          "t-power gain. Increases the power of the\n"
+                          "signal by a factor of (two-way travel time)^p,\n"
+                          "where the user provides p. This gain is often\n" 
+                          "less aggressive than agc.")
+
+        
+        agcButton = tk.Button(
+            text="agc",fg="black",
+            command=lambda : [self.agcGain(proj),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        agcButton.config(height=1, width=halfwid)
+        agcButton.grid(row=8, column=rightcol+1, sticky='nsew')
+        self.balloon.bind(agcButton,
+                          "Automatic gain controll. Normalizes the power\n"
+                          "of the signal per given sample window along\n" 
+                          "each trace.")
+
+        
         # Lin Semblance
         LinSembButton = tk.Button(
             text="lin semb", fg="black",
             command = lambda : [self.linSemb(proj),
-                                self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance')])
+                                self.plotSemb(proj,a=alin,canvas=canvas,
+                                              semb=proj.linSemb,title='linear semblance')])
         LinSembButton.config(height = 1, width = 2*halfwid)
-        LinSembButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
+        LinSembButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
 
+        
         # Hyp Semblance
         HypSembButton = tk.Button(
             text="hyp semb", fg="black",
             command = lambda : [self.hypSemb(proj),
-                                self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+                                self.plotSemb(proj,a=ahyp,canvas=canvas,
+                                              semb=proj.hypSemb,
+                                              title='hyperbolic semblance',
+                                              ylabel='two-way travel time [ns]')])
         HypSembButton.config(height = 1, width = 2*halfwid)
-        HypSembButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
+        HypSembButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
 
         # Add line on top of data
         AddLinButton = tk.Button(
@@ -154,7 +202,7 @@ class GPRPyCWApp:
             command = lambda : [self.addLin(proj),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddLinButton.config(height = 1, width = halfwid)
-        AddLinButton.grid(row=9,column=rightcol, sticky='nsew')
+        AddLinButton.grid(row=11,column=rightcol, sticky='nsew')
         
         # Draw hyperbola on top of data
         AddHypButton = tk.Button(
@@ -162,7 +210,7 @@ class GPRPyCWApp:
             command = lambda : [self.addHyp(proj),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddHypButton.config(height = 1, width = halfwid)
-        AddHypButton.grid(row=9,column=rightcol+1, sticky='nsew')
+        AddHypButton.grid(row=11,column=rightcol+1, sticky='nsew')
 
 
         # Remove most recent line
@@ -171,7 +219,7 @@ class GPRPyCWApp:
             command = lambda : [proj.remLin(),
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemLinButton.config(height = 1, width = halfwid)
-        RemLinButton.grid(row=10,column=rightcol, sticky='nsew')
+        RemLinButton.grid(row=12,column=rightcol, sticky='nsew')
 
         # Remove most recent hyperbola
         RemHypButton = tk.Button(
@@ -179,7 +227,7 @@ class GPRPyCWApp:
             command = lambda : [proj.remHyp(),
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemHypButton.config(height = 1, width = halfwid)
-        RemHypButton.grid(row=10,column=rightcol+1, sticky='nsew')
+        RemHypButton.grid(row=12,column=rightcol+1, sticky='nsew')
 
                           
         
@@ -189,15 +237,15 @@ class GPRPyCWApp:
             command = lambda : [self.toggleLnHp(),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         ShowLnHpButton.config(height = 1, width = 2*halfwid)
-        ShowLnHpButton.grid(row=11,column=rightcol, sticky='nsew',columnspan=colsp)
+        ShowLnHpButton.grid(row=13,column=rightcol, sticky='nsew',columnspan=colsp)
         
 
         # Print figure
         PrintFigButton = tk.Button(
             text="print figure", fg="black",
-            command = lambda : [self.plotCWData(proj,a=adata,canvas=canvas)])
+            command = lambda : [self.printFigures(proj,fig)])
         PrintFigButton.config(height = 1, width = 2*halfwid)
-        PrintFigButton.grid(row=12,column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintFigButton.grid(row=14,column=rightcol, sticky='nsew',columnspan=colsp)
 
         
         # Write script
@@ -205,7 +253,7 @@ class GPRPyCWApp:
             text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce the current \n'
                           'status as a\n'
@@ -357,13 +405,15 @@ class GPRPyCWApp:
 
     
     def loadData(self,proj):
-        filename = fd.askopenfilename( filetypes= (("Sensors and Software (.DT1)", "*.DT1"),
+        filename = fd.askopenfilename( filetypes= (("All", "*.*"),
+                                                   ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT")))
-        if filename is not '':
+        if filename:
             self.getType()
-            proj.importdata(filename,self.dtype)
-            self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
-            self.yrng = [0,np.max(proj.twtt)]
+            if self.dtype is not None:
+                proj.importdata(filename,self.dtype)
+                self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
+                self.yrng = [0,np.max(proj.twtt)]
            
 
     def getType(self):
@@ -410,12 +460,12 @@ class GPRPyCWApp:
         a.set_ylim(self.yrng)
         a.set_xlim(self.xrng)
         a.invert_yaxis()
-        if self.dtype is "WARR":
-            a.set_xlabel("antenna separation [m]")
-        elif self.dtype is "CMP":
-            a.set_xlabel("distance from midpoint [m]")
+        if self.dtype == "WARR":
+            a.set_xlabel("antenna separation [m]", fontsize=mpl.rcParams['font.size'])
+        elif self.dtype == "CMP":
+            a.set_xlabel("distance from midpoint [m]", fontsize=mpl.rcParams['font.size'])
         a.set_title('data')
-        a.set_ylabel('two-way travel time [ns]')
+        a.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])
         a.get_xaxis().set_ticks_position('both')
         a.get_yaxis().set_ticks_position('both')
         # If we have any hyperbolae or lines, we need to plot them too:
@@ -454,38 +504,42 @@ class GPRPyCWApp:
     def plotSemb(self,proj,a,canvas,semb,title,ylabel=None):
         dt=proj.twtt[1]-proj.twtt[0]
         if semb is not None:
+            dv=proj.vVals[1]-proj.vVals[0]
             a.clear()
             if self.sembrep.get() == "lin":
-                print("Linear semblance representation")
+                #print("Linear semblance representation")
                 stdcont = np.nanmax(np.abs(semb)[:])
-                a.imshow(np.flipud(np.abs(semb)), cmap='inferno', extent=[self.vmin-self.vint/2.0, self.vmax+self.vint/2.0,
-                                                                          min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
+                a.imshow(np.flipud(np.abs(semb)), cmap='inferno',
+                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
+                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
             elif self.sembrep.get() == "log":
-                print("Logarithmic semblance representation")
+                #print("Logarithmic semblance representation")
                 stdcont = np.nanmax(np.log(np.abs(semb))[:])
-                a.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
-                                                                                  min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
+                a.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno',
+                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
+                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
             elif self.sembrep.get() == "exp":
-                print("Exponential semblance representation")
+                #print("Exponential semblance representation")
                 stdcont = np.nanmax(np.exp(np.abs(semb))[:])
-                a.imshow(np.flipud(np.exp(np.abs(semb))), cmap='inferno', extent=[self.vmin, self.vmax,
-                                                                                  min(proj.twtt)-dt/2.0,max(proj.twtt)+dt/2.0],
+                a.imshow(np.flipud(np.exp(np.abs(semb))), cmap='inferno',
+                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
+                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
                          aspect='auto',
                          vmin=0, vmax=stdcont/self.saturation.get())
 
                 
             a.set_ylim(self.yrng)
-            a.set_xlabel("velocity [m/ns]")
+            a.set_xlabel("velocity [m/ns]", fontsize=mpl.rcParams['font.size'])
             a.invert_yaxis()
             a.set_title(title)
             a.get_xaxis().set_ticks_position('both')
             a.get_yaxis().set_ticks_position('both')
             if ylabel is not None:
-                a.set_ylabel(ylabel)            
+                a.set_ylabel(ylabel, fontsize=mpl.rcParams['font.size'])            
         
             def pressed(event):
                 if event.xdata is not None and event.ydata is not None:
@@ -553,6 +607,23 @@ class GPRPyCWApp:
         if window is not None:
             proj.dewow(window=window)
 
+    def smooth(self,proj):
+        window = sd.askinteger("Input",
+                               "Smoothing window width (number of samples)")
+        if window is not None:
+            proj.smooth(window=window)            
+            
+    def tpowGain(self,proj):
+        power = sd.askfloat("Input","Power for tpow gain?")
+        if power is not None:
+            proj.tpowGain(power=power)
+
+    def agcGain(self,proj):
+        window = sd.askinteger("Input","Window length for AGC?")
+        if window is not None:
+            proj.agcGain(window=window)
+
+            
     def linSemb(self,proj):
         proj.linSemblance(self.vmin,self.vmax,self.vint)
 
@@ -580,7 +651,41 @@ class GPRPyCWApp:
                 
     def toggleLnHp(self):
         self.showlnhp = not self.showlnhp
-        
+
+
+    def printFigures(self,proj,fig):
+        dpi=None
+        # Make combined figure
+        figname = fd.asksaveasfilename(defaultextension=".pdf",
+                                       title="Filename for figures")
+        if figname is not '':
+            fignamesplit=os.path.splitext(figname)
+            dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
+            if dpi is not None:
+                fig.savefig(figname, format='pdf', dpi=dpi)
+                print('Printed %s') %(figname)
+                # Also create individual figures
+                proj.printCWFigure(fignamesplit[0]+"_data"+fignamesplit[1], color=self.color.get(),
+                                   contrast=self.contrast.get(),
+                                   yrng=self.yrng, xrng=self.xrng,
+                                   dpi=dpi, showlnhp=self.showlnhp)                
+                print('Printed %s') %(fignamesplit[0]+"_data"+fignamesplit[1])
+                
+                if proj.linSemb is not None:
+                     proj.printSembFigure(fignamesplit[0]+"_linSemb"+fignamesplit[1], whichsemb="lin",
+                                          saturation=self.saturation.get(),
+                                          yrng=self.yrng, vrng=[self.vmin,self.vmax],
+                                          sembrep=self.sembrep.get(),
+                                          dpi=dpi)
+                     print('Printed %s') %(fignamesplit[0]+"_linSemb"+fignamesplit[1])
+                     
+                if proj.hypSemb is not None:
+                     proj.printSembFigure(fignamesplit[0]+"_hypSemb"+fignamesplit[1], whichsemb="hyp",
+                                          saturation=self.saturation.get(),
+                                          yrng=self.yrng, vrng=[self.vmin,self.vmax],
+                                          sembrep=self.sembrep.get(),
+                                          dpi=dpi)
+                     print('Printed %s') %(fignamesplit[0]+"_hypSemb"+fignamesplit[1])
                 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
