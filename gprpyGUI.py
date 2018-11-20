@@ -39,8 +39,11 @@ class GPRPyApp:
         normscrhigt=768
         scrwidt=master.winfo_screenwidth()
         scrhigt=master.winfo_screenheight()
-        self.widfac=scrwidt/normscrwidt
-        self.highfac=scrhigt/normscrhigt
+        # These to use if operating system doesn't automatically adjust
+        #self.widfac=scrwidt/normscrwidt
+        #self.highfac=scrhigt/normscrhigt
+        self.widfac=normscrwidt/normscrhigt
+        self.highfac=1
         
         master.title("GPRPy")
         
@@ -459,8 +462,8 @@ class GPRPyApp:
         HistButton.config(height = 1, width = 2*halfwid)         
         HistButton.grid(row=19, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
-                          'Writes a python script to reproduce of \n'
-                          'the current status.\n'
+                          'Writes a python script to reproduce the \n'
+                          'current status.\n'
                           '\n'
                           'If the current data is from a .gpr file, \n'  
                           'then the python script will contain all \n'
@@ -509,6 +512,7 @@ class GPRPyApp:
         else:
             self.yrng=[proj.minTopo-np.max(proj.depth),proj.maxTopo-np.min(proj.depth)]
 
+            
     def toggleGrid(self):
         self.grid = not self.grid
             

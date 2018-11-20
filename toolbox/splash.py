@@ -55,7 +55,8 @@ def showSplash(a,dir_path,widfac,highfac):
         'color':  'black',
         'weight': 'bold',
         'style': 'italic',
-        'size': 35*widfac,
+        'size': 50
+            # 'size': 35*widfac
         }
     a.text(35,-10000,'GPRPy',fontdict=font)
 
@@ -93,13 +94,15 @@ def showSplash(a,dir_path,widfac,highfac):
              interpolation='spline36')
     font2 = {'family': 'DejaVu Sans',
              'color':  'black',
-             'size': 7.5*widfac}
+             'size': 13.5}
+    # 'size': 7.5*widfac
     a.text(-5,-27000,'EAR-1550732',fontdict=font2)
 
     
     # Add name/email
     font3 = {'family': 'DejaVu Sans',
              'color':  'gray',
-             'size': 7.5*widfac}
+             'size': 13.5}
     a.text(70,-22000,'Alain Plattner',fontdict=font3)
-    a.text(59.5,-24000,'plattner@alumni.ethz.ch',fontdict=font3)
+    a.text(59,-24000,'plattner@alumni.ethz.ch',fontdict=font3)
+    #a.text(59.5,-24000,'plattner@alumni.ethz.ch',fontdict=font3)

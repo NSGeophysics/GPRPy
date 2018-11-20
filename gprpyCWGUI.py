@@ -16,8 +16,9 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=9
+rightcol=10
 halfwid=4
+figrowsp=13+1
 
 class GPRPyCWApp:
 
@@ -45,12 +46,12 @@ class GPRPyCWApp:
         
 
         canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=15,sticky='nsew')
+        canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=figrowsp,sticky='nsew')
         canvas.draw()
 
         self.vmin = 0.01
         self.vmax = 0.33
-        self.vint = 0.01
+        self.vint = 0.005
 
         self.showlnhp = False
         
@@ -190,22 +191,32 @@ class GPRPyCWApp:
         ShowLnHpButton.config(height = 1, width = 2*halfwid)
         ShowLnHpButton.grid(row=11,column=rightcol, sticky='nsew',columnspan=colsp)
         
+
+        # Print figure
+        PrintFigButton = tk.Button(
+            text="print figure", fg="black",
+            command = lambda : [self.plotCWData(proj,a=adata,canvas=canvas)])
+        PrintFigButton.config(height = 1, width = 2*halfwid)
+        PrintFigButton.grid(row=12,column=rightcol, sticky='nsew',columnspan=colsp)
+
         
-        # Write history
+        # Write script
         HistButton = tk.Button(
-            text="write history", fg="black",
+            text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
-                          'Saves the history of the current status as a\n'
-                          'python script which can be run directly from\n'
-                          'the command prompt. If the current data is\n'  
-                          'from a .gpr file, then the python script will\n'
-                          'contain all steps going back to the raw data.\n'
-                          'The script will not contain visualization settings\n'
-                          'such as x-range settings, unless the "print figure"\n'
-                          'command was used.')
+                          'Writes a python script to reproduce the current \n'
+                          'status as a\n'
+                          '\n'
+                          'If the current data is from a .gpr file, \n'  
+                          'then the python script will contain all \n'
+                          'steps going back to the raw data. \n'
+                          '\n'
+                          'The script will not contain visualization \n'
+                          'settings such as x-range settings, unless \n'
+                          'the "print figure" command was used. ')
 
 
 
@@ -229,22 +240,35 @@ class GPRPyCWApp:
                           'etc.')
 
 
+        # Full view
+        FullButton = tk.Button(
+            text="full view", fg="black",
+            command=lambda : [self.setFullView(proj),
+                              self.plotCWData(proj,a=adata,canvas=canvas),
+                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
+                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
+                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+        FullButton.config(height = 1, width = 2*halfwid)         
+        FullButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
+        self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
+
+        
         # Saturation
         sattext = tk.StringVar()
-        sattext.set("semblance saturation")
+        sattext.set("semblance sat")
         satlabel = tk.Label(master, textvariable=sattext,height = 1,width = 4*halfwid)
-        satlabel.grid(row=0, column=1, sticky='nsew')
+        satlabel.grid(row=0, column=2, sticky='nsew')
         self.balloon.bind(satlabel,"Semblance color saturation")
         self.saturation = tk.DoubleVar()
         satbox = tk.Entry(master, textvariable=self.saturation, width=4*halfwid)
-        satbox.grid(row=1, column=1, sticky='nsew')
+        satbox.grid(row=1, column=2, sticky='nsew')
         self.saturation.set("1.0")
 
         # Lin or log mode switch for semblance representation
         self.sembrep=tk.StringVar()
         self.sembrep.set("lin")
-        repswitch = tk.OptionMenu(master,self.sembrep,"lin","log","exp")
-        repswitch.grid(row=0, column=2, sticky='nsew',rowspan=2)
+        repswitch = tk.OptionMenu(master,self.sembrep,"lin","log")
+        repswitch.grid(row=0, column=3, sticky='nsew',rowspan=2)
         self.balloon.bind(repswitch,
                           "Choose between linear\n"
                           "and logarithmic scale\n" 
@@ -256,7 +280,7 @@ class GPRPyCWApp:
             text="set vel range", fg="black",
             command=lambda : [self.setVelRng()])
         VelrngButton.config(height = 1, width = 2*halfwid)         
-        VelrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
+        VelrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
         self.balloon.bind(VelrngButton,"Set the velocity range\n"
                                        "used in the semblance\n"
                                        "analysis.")
@@ -267,7 +291,7 @@ class GPRPyCWApp:
             command=lambda : [self.setXrng(),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         XrngButton.config(height = 1, width = 2*halfwid)         
-        XrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
+        XrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
         self.balloon.bind(XrngButton,"Set the x-axis display limits.")
         
         
@@ -275,9 +299,12 @@ class GPRPyCWApp:
         YrngButton = tk.Button(
             text="set y-range", fg="black",
             command=lambda : [self.setYrng(),
-                              self.plotCWData(proj,a=adata,canvas=canvas)])
+                              self.plotCWData(proj,a=adata,canvas=canvas),
+                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
+                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
+                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
         YrngButton.config(height = 1, width = 2*halfwid)         
-        YrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        YrngButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
         
@@ -286,11 +313,11 @@ class GPRPyCWApp:
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
-        contrlabel.grid(row=0, column=6, sticky='nsew')
+        contrlabel.grid(row=0, column=7, sticky='nsew')
         self.balloon.bind(contrlabel,"Data color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
-        contrbox.grid(row=1, column=6, sticky='nsew')
+        contrbox.grid(row=1, column=7, sticky='nsew')
         self.contrast.set("1.0")
 
         
@@ -298,7 +325,7 @@ class GPRPyCWApp:
         self.color=tk.StringVar()
         self.color.set("gray")
         colswitch = tk.OptionMenu(master,self.color,"gray","bwr")
-        colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
+        colswitch.grid(row=0, column=8, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
                           "and red-white-blue (rwb)\n" 
@@ -311,9 +338,10 @@ class GPRPyCWApp:
             text="refresh plot",
             command=lambda : [self.plotCWData(proj,a=adata,canvas=canvas),
                               self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
-                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
+                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=8, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=9, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -362,7 +390,11 @@ class GPRPyCWApp:
         self.dtype = 'WARR'
         print("Data type is WARR")
 
-        
+
+    def setFullView(self,proj):
+        self.xrng=[np.min(proj.profilePos),np.max(proj.profilePos)]
+        self.yrng=[np.min(proj.twtt),np.max(proj.twtt)]
+                
 
     def plotCWData(self,proj,a,canvas):
         a.clear()
@@ -560,8 +592,13 @@ class GPRPyCWApp:
          
 root = tk.Tk()
 
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+#root.columnconfigure(0, weight=1)
+#root.rowconfigure(0, weight=1)
+
+for col in range(rightcol):
+    root.columnconfigure(col, weight=1)
+for row in range(figrowsp):    
+    root.rowconfigure(row, weight=1)
 
 app = GPRPyCWApp(root)
 
