@@ -663,13 +663,13 @@ class GPRPyCWApp:
             dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
             if dpi is not None:
                 fig.savefig(figname, format='pdf', dpi=dpi)
-                print('Printed %s') %(figname)
+                print('Printed %s' %(figname))
                 # Also create individual figures
                 proj.printCWFigure(fignamesplit[0]+"_data"+fignamesplit[1], color=self.color.get(),
                                    contrast=self.contrast.get(),
                                    yrng=self.yrng, xrng=self.xrng,
                                    dpi=dpi, showlnhp=self.showlnhp)                
-                print('Printed %s') %(fignamesplit[0]+"_data"+fignamesplit[1])
+                print('Printed %s' %(fignamesplit[0]+"_data"+fignamesplit[1]))
                 
                 if proj.linSemb is not None:
                      proj.printSembFigure(fignamesplit[0]+"_linSemb"+fignamesplit[1], whichsemb="lin",
@@ -677,7 +677,7 @@ class GPRPyCWApp:
                                           yrng=self.yrng, vrng=[self.vmin,self.vmax],
                                           sembrep=self.sembrep.get(),
                                           dpi=dpi)
-                     print('Printed %s') %(fignamesplit[0]+"_linSemb"+fignamesplit[1])
+                     print('Printed %s' %(fignamesplit[0]+"_linSemb"+fignamesplit[1]))
                      
                 if proj.hypSemb is not None:
                      proj.printSembFigure(fignamesplit[0]+"_hypSemb"+fignamesplit[1], whichsemb="hyp",
@@ -685,7 +685,7 @@ class GPRPyCWApp:
                                           yrng=self.yrng, vrng=[self.vmin,self.vmax],
                                           sembrep=self.sembrep.get(),
                                           dpi=dpi)
-                     print('Printed %s') %(fignamesplit[0]+"_hypSemb"+fignamesplit[1])
+                     print('Printed %s' %(fignamesplit[0]+"_hypSemb"+fignamesplit[1]))
                 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
