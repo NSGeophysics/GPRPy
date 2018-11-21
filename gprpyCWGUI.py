@@ -20,18 +20,22 @@ rightcol=10
 halfwid=4
 figrowsp=15+1
 
+tagx=10 # 2
+tagy=5 # -3
+
+
 class GPRPyCWApp:
 
     def __init__(self,master):
         self.window = master
 
-        master.title("GPRPy CW")
+        master.title("GPRPy CMP / WARR")
 
         self.balloon = Pmw.Balloon()
         fig = Figure(figsize=(9,5))
-        ahyp = fig.add_axes([0.065,0.1,0.27,0.83])
-        alin = fig.add_axes([0.365,0.1,0.27,0.83])
-        adata= fig.add_axes([0.665,0.1,0.27,0.83])
+        ahyp = fig.add_axes([0.065,0.1,0.27,0.80])#0.83])
+        alin = fig.add_axes([0.365,0.1,0.27,0.80])
+        adata= fig.add_axes([0.665,0.1,0.27,0.80])
         #adata.get_yaxis().set_visible(False)
         alin.get_yaxis().set_visible(False)
 
@@ -494,8 +498,9 @@ class GPRPyCWApp:
                 
         canvas.mpl_connect('button_press_event', pressed)        
 
-        #tag = canvas.get_tk_widget().create_text(620, -2, text="", anchor="nw")
-        tag = canvas.get_tk_widget().create_text(2, -3, text="", anchor="nw")
+        tag = canvas.get_tk_widget().create_text(tagx, tagy, text="", anchor="nw")
+
+
         
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
         canvas.draw()
@@ -546,7 +551,7 @@ class GPRPyCWApp:
                     canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
                 
             canvas.mpl_connect('button_press_event', pressed)
-            tag = canvas.get_tk_widget().create_text(2, -3, text="", anchor="nw")
+            tag = canvas.get_tk_widget().create_text(tagx, tagy, text="", anchor="nw")
         
         
             canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
