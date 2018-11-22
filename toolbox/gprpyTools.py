@@ -275,7 +275,8 @@ def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porde
         z = np.zeros(x.size)
     else:
         #gpstable = np.loadtxt(gpsfile,delimiter=delimiter)
-        #gpsmat = np.asmatrix(gpstable)   
+        #gpsmat = np.asmatrix(gpstable)
+        #gpsmat=np.asmatrix(gpsmat)
         # Turn the three-dimensional positions into along-profile
         # distances
         if gpsmat.shape[1] is 3:

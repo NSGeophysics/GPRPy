@@ -55,6 +55,7 @@ class gprpy2d:
             self.maxTopo = None
             self.minTopo = None
             self.threeD = None
+            self.data_pretopo = None
             # Initialize previous
             self.initPrevious()
             
@@ -77,6 +78,7 @@ class gprpy2d:
             self.maxTopo = None
             self.minTopo = None
             self.threeD = None
+            self.data_pretopo = None
             # Initialize previous
             self.initPrevious()
             
@@ -88,7 +90,7 @@ class gprpy2d:
         elif file_ext==".gpr":
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history, velocity, depth, maxTopo, minTopo, threeD = pickle.load(f)
+                data, info, profilePos, twtt, history, velocity, depth, maxTopo, minTopo, threeD, data_pretopo = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
@@ -99,6 +101,7 @@ class gprpy2d:
             self.maxTopo = maxTopo
             self.minTopo = minTopo
             self.threeD = threeD
+            self.data_pretopo = data_pretopo
             
             # Initialize previous
             self.initPrevious()
@@ -126,6 +129,7 @@ class gprpy2d:
         self.maxTopo = self.previous["maxTopo"]
         self.minTopo = self.previous["minTopo"]
         self.threeD = self.previous["threeD"]
+        self.data_pretopo = self.previous["data_pretopo"]
         # Make sure to not keep deleting history
         # when applying undo several times. 
         histsav = copy.copy(self.previous["history"])
@@ -144,6 +148,7 @@ class gprpy2d:
         self.previous["maxTopo"] = self.maxTopo
         self.previous["minTopo"] = self.minTopo
         self.previous["threeD"] = self.threeD
+        self.previous["data_pretopo"] = self.data_pretopo
         histsav = copy.copy(self.history)
         self.previous["history"] = histsav
 
@@ -158,7 +163,7 @@ class gprpy2d:
         with open(filename, 'wb') as f:  
             pickle.dump([self.data, self.info, self.profilePos, self.twtt,
                          self.history, self.velocity, self.depth, self.maxTopo,
-                         self.minTopo, self.threeD], f)
+                         self.minTopo, self.threeD, self.data_pretopo], f)
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -531,6 +536,7 @@ class gprpy2d:
         self.previous["depth"] = self.depth
         self.previous["maxTopo"] = self.maxTopo
         self.previous["threeD"] = self.threeD
+        self.previous["data_pretopo"] = self.data_pretopo
 
 
 
