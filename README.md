@@ -41,7 +41,7 @@ This should open the graphical user interface
 
 numpy, scipy, matplotlib, pickle, tkinter, struct, re, tqdm, Pmw, pyevtk
 
-#### To run the GUI:
+#### To start the GUI, run in a Command Prompt:
 
 `python gprpyGUI.py`
 
@@ -49,6 +49,21 @@ or
 
 `python3 gprpyGUI.py`
 
+or
+
+`gprpyGUI.py`
+
+#### To start the Common Midpoint or Wide Angle Refraction and Reflection GUI:
+
+`python gprpyCWGUI.py`
+
+or
+
+`python3 gprpyCWGUI.py`
+
+or
+
+`gprpyGUI.py`
 
 
 
