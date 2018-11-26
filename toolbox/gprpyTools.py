@@ -357,29 +357,29 @@ def hypSemblance(data,profilePos,twtt,vVals,tVals,typefact):
 
 
 
-##### Some helper functions
-def nextpow2(i):
-    n = 1
-    while n < i: n *= 2
-    return n
+# ##### Some helper functions
+# def nextpow2(i):
+#     n = 1
+#     while n < i: n *= 2
+#     return n
 
 
-def padMat(mat,nrow,ncol):
-    padheight=nrow-mat.shape[0]
-    padwidth=ncol-mat.shape[1]
-    if padheight>0: 
-        mat = np.concatenate((mat,np.zeros((padheight,mat.shape[1]))))
-    if padwidth>0:    
-        pad = np.zeros((nrow,padwidth))
-        mat = np.concatenate((mat,pad),axis=1)
-    return mat
+# def padMat(mat,nrow,ncol):
+#     padheight=nrow-mat.shape[0]
+#     padwidth=ncol-mat.shape[1]
+#     if padheight>0: 
+#         mat = np.concatenate((mat,np.zeros((padheight,mat.shape[1]))))
+#     if padwidth>0:    
+#         pad = np.zeros((nrow,padwidth))
+#         mat = np.concatenate((mat,pad),axis=1)
+#     return mat
 
 
-def padVec(vec,totlen):
-    padwidth=totlen-len(vec)
-    if padwidth>0:
-        vec = np.append(vec,np.zeros(padwidth))
-    return vec
+# def padVec(vec,totlen):
+#     padwidth=totlen-len(vec)
+#     if padwidth>0:
+#         vec = np.append(vec,np.zeros(padwidth))
+#     return vec
 
 
 ##### Testing / trying to improve performance:
