@@ -493,14 +493,14 @@ class gprpy2d:
             data=self.data_pretopo.transpose()       
 
         data = np.asarray(data)
-        data = np.reshape(data,(1,data.shape[0],data.shape[1]))        
-        data = np.tile(data, (3,1,1))
+        data = np.reshape(data,(1,data.shape[0],data.shape[1]))                 
+        data = np.tile(data, (2,1,1))
         
         # Remove the last row and column to turn it into a cell
         # instead of point values 
         data = data[0:-1,0:-1,0:-1]
 
-        nx=3-1
+        nx=2-1
         ny=len(x)-1
         nz=len(downward)-1
         datarray = np.zeros(nx*ny*nz).reshape(nx,ny,nz)
@@ -523,8 +523,7 @@ class gprpy2d:
                 else:
                     histstr = "mygpr.exportVTK('%s',gpsinfo=mygpr.threeD,thickness=%g,delimiter='\\t',aspect=%g,smooth=%r, win_length=%d, porder=%d)" %(outfile,thickness,aspect,smooth,win_length,porder)
                     
-        self.history.append(histstr)
-
+        self.history.append(histstr)       
         
     def storePrevious(self):        
         self.previous["data"] = self.data
