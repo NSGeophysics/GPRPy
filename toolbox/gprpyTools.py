@@ -8,7 +8,7 @@ import time
 from tqdm import tqdm
 
 
-def alignTraces(data):        
+def alignTraces(data):
     maxlen = data.shape[0]
     newdata = np.asmatrix(np.zeros(data.shape))    
     # Go through all traces to find maximum spike

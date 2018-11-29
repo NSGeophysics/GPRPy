@@ -664,7 +664,8 @@ class GPRPyApp:
         filename = fd.askopenfilename( filetypes= (("All", "*.*"),
                                                    ("GPRPy (.gpr)", "*.gpr"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
-                                                   ("GSSI (.DZT)", "*.DZT")))
+                                                   ("GSSI (.DZT)", "*.DZT"),
+                                                   ("BSQ header","*.GPRhdr")))
         if filename is not '':
             proj.importdata(filename=filename)
             self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]

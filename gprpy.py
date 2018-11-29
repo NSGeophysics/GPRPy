@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pickle
 import toolbox.gprIO_DT1 as gprIO_DT1
 import toolbox.gprIO_DZT as gprIO_DZT
+import toolbox.gprIO_BSQ as gprIO_BSQ
 import toolbox.gprpyTools as tools
 try:
     import irlib.external.mig_fk as mig_fk
@@ -88,7 +89,30 @@ class gprpy2d:
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)
     
-                      
+        
+
+        elif file_ext==".GPRhdr":
+            # ENVI standard BSQ file
+            self.data, self.info = gprIO_BSQ.readBSQ(file_name)
+
+            self.profilePos = float(self.info["dx"])*np.arange(0,int(self.info["columns"]))
+            self.twtt = np.linspace(0,float(self.info["time_window"]),int(self.info["lines"]))
+            
+            self.velocity = None
+            self.depth = None
+            self.maxTopo = None
+            self.minTopo = None
+            self.threeD = None
+            self.data_pretopo = None
+            self.twtt_pretopo = None
+            # Initialize previous
+            self.initPrevious()
+            
+            # Put what you did in history
+            histstr = "mygpr.importdata('%s')" %(filename)
+            self.history.append(histstr)       
+
+
         elif file_ext==".gpr":
             ## Getting back the objects:
             with open(filename, 'rb') as f:
