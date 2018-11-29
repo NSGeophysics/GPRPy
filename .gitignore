@@ -2,7 +2,7 @@ __pycache__/
 toolbox/__pycache__
 .DS_Store
 notused/
-testing/
 irlib/
+tutorials/
 testprofile.vts
 *.pyc
