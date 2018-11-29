@@ -32,7 +32,11 @@ if you downloaded GPRPy directly onto your desktop
 
 7) In Anaconda Prompt, type and press Enter afterward:
 `python gprpyGUI.py`
-This should open the graphical user interface
+This will open the graphical user interface for profile data. 
+
+To upen the graphical user interface for common midpoint or wide angle reflection and refraction data, 
+type and press Enter afterward:
+`python gprpyCWGUI.py'
 
 
 ## General comments
