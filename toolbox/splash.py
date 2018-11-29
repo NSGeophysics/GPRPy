@@ -75,9 +75,26 @@ def showSplash(a,dir_path,widfac,highfac):
     ratio = a.get_data_ratio()*figratio
     xwidth = yheight/ratio
     a.imshow(ua, aspect='auto', extent=(xanchor, xanchor+xwidth,
-                                         yanchor, yanchor+yheight),
+                                        yanchor, yanchor+yheight),
              interpolation='spline36')
 
+    # # add UA words
+    # filename1=os.path.join(dir_path,'toolbox','splashdat',
+    #                         'UA-StackedNameplate.png')
+    # ua = im.imread(filename1)
+    # #yanchor = -24500
+    # #yheight = 10000*0.9
+    # yanchor = -24000
+    # yheight = 10000*0.4
+    # xanchor = -10
+    # figsize = a.figure.get_size_inches()
+    # figratio = figsize[0]/figsize[1]
+    # ratio = a.get_data_ratio()*figratio
+    # xwidth = 5*yheight/ratio
+    # a.imshow(ua, aspect='auto', extent=(xanchor, xanchor+xwidth,
+    #                                     yanchor, yanchor+yheight),
+    #          interpolation='spline36')
+    
     
     # Add NSF logo
     filename2=os.path.join(dir_path,'toolbox','splashdat',
