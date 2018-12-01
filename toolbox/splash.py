@@ -6,13 +6,20 @@ import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import os
 import matplotlib.image as im
+from scipy import signal
 
 def showSplash(a,dir_path,widfac,highfac):
-    filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
-    snakeGPR = gp.gprpy2d(filename)
-    maxpoint=100;
-    x=snakeGPR.twtt[0:maxpoint]
-    y=snakeGPR.data[0:maxpoint,10]
+    try:
+        filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
+        snakeGPR = gp.gprpy2d(filename)
+        maxpoint=100;
+        x=snakeGPR.twtt[0:maxpoint]
+        y=snakeGPR.data[0:maxpoint,10]
+    except:
+        rick = signal.ricker(150, 4.0)
+        x = np.linspace(0,85,100)
+        y = rick[50:150]*25000
+        
     # Snake body
     lw=7#5
     a.plot(x,y,'k',linewidth=lw*widfac,solid_capstyle='round')
