@@ -1,5 +1,5 @@
-import gprpy as gp
-import toolbox.gprpyTools as tools
+import gprpy.gprpy as gp
+import gprpy.toolbox.gprpyTools as tools
 import numpy as np
 import copy
 import scipy.interpolate as interp
