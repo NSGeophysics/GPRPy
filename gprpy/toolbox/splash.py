@@ -1,4 +1,4 @@
-import gprpy as gp
+import gprpy.gprpy as gp
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
