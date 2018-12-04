@@ -6,6 +6,7 @@
 #     import tkinter as tk
 #     from tkinter import filedialog as fd
 
+import sys
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
@@ -22,12 +23,14 @@ import Pmw
 import scipy.interpolate as interp
 
 
+
+
 colsp=2
 rightcol=9
 halfwid=6
-
 figrowsp=19+1
 figcolsp=9
+
 
 class GPRPyApp:
 
@@ -666,7 +669,7 @@ class GPRPyApp:
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT"),
                                                    ("BSQ header","*.GPRhdr")))
-        if filename is not '':
+        if filename:
             proj.importdata(filename=filename)
             self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
             if proj.depth is None:
@@ -840,18 +843,16 @@ class GPRPyApp:
         print("Delimiter set to tab")
 
 
-        
-root = tk.Tk()
+# root = tk.Tk()
+    
+# for col in range(rightcol):
+#     root.columnconfigure(col, weight=1)
+# for row in range(figrowsp):    
+#     root.rowconfigure(row, weight=1)
+            
+# app = GPRPyApp(root)
 
-for col in range(rightcol):
-    root.columnconfigure(col, weight=1)
-for row in range(figrowsp):    
-    root.rowconfigure(row, weight=1)
-
-app = GPRPyApp(root)
-
-root.mainloop()
-
+# root.mainloop()
 
 
 

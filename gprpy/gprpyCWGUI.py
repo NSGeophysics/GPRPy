@@ -700,16 +700,14 @@ class GPRPyCWApp:
             
             
          
-root = tk.Tk()
+# root = tk.Tk()
 
-#root.columnconfigure(0, weight=1)
-#root.rowconfigure(0, weight=1)
 
-for col in range(rightcol):
-    root.columnconfigure(col, weight=1)
-for row in range(figrowsp):    
-    root.rowconfigure(row, weight=1)
+# for col in range(rightcol):
+#     root.columnconfigure(col, weight=1)
+# for row in range(figrowsp):    
+#     root.rowconfigure(row, weight=1)
 
-app = GPRPyCWApp(root)
+# app = GPRPyCWApp(root)
 
-root.mainloop()
+# root.mainloop()
