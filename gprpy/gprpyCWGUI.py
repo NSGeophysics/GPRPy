@@ -6,9 +6,9 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import gprpy as gp
+import gprpy.gprpy as gp
 import numpy as np
-import toolbox.splash as splash
+import gprpy.toolbox.splash as splash
 import os
 import Pmw
 import scipy.interpolate as interp

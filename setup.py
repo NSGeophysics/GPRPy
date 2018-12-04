@@ -8,6 +8,7 @@ setuptools.setup(
     author="Alain Plattner",
     author_email="plattner@alumni.ethz.ch",
     description="GPRPy - open source ground penetrating radar processing and visualization",
+    scripts=['installMigration.py'],
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NSGeophysics/GPRPy",
@@ -21,7 +22,9 @@ setuptools.setup(
                             'exampledata/SnS/WARR/*.HD',
                             'exampledata/pickedSurfaceData/*.txt',
                             'toolbox/splashdat/*.png',
-                            'toolbox/*.py']},
+                            'toolbox/*.py',
+                            'irlib/*.py',
+                            'irlib/external/*.py']},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
