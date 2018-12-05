@@ -41,7 +41,7 @@ Type\
 `p`\
 and then enter for profile, or\
 `c`\
-end then enter for CMP / WARR.
+and then enter for CMP / WARR.
 
 You can also directly select one by running either\
 `gprpy p`\
@@ -69,4 +69,8 @@ and\
 If you have any troubles getting the software running, please send me an email or open an issue
 on GitHub and I will help you getting it running.
 
+
+## Uninstalling GPRPy
+To uninstall GPRPy, simply run, in the (Anaconda) command prompt
+`pip uninstall gprpy`
 
