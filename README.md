@@ -18,7 +18,7 @@ zip folder (typically by double-clicking on it).
 (on Windows: click on Start, then enter "Anaconda Prompt", without the 
 quotation marks into the "Search programs and files" field).
 
-4) In the command prompy, change to the directory  where you downloaded the GPRPy files.
+4) In the command prompt, change to the directory  where you downloaded the GPRPy files.
 This is usually through a command like for example\
 `cd Desktop\GPRPy`\
 if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
