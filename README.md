@@ -61,7 +61,7 @@ where myscriptname.py is the name of your automatically generated script.
 
 ## In case of trouble
 If you have several versions of python installed, for example on a Mac or Linux system, 
-replace in the previous commands\
+replace, in the commands shown earlier,
 `python` with `python3`\
 and\
 `pip` with `pip3`
