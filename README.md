@@ -29,7 +29,7 @@ afterward:
 `pip install .`
 (don't forget the period at the end).
 
-7) To run the profile graphical user interface, you can either run the included shell script 
+5) To run the profile graphical user interface, you can either run the included shell script 
 by, in the command prompt in the GPRPy folder, typing and pressing enter
 `profile.sh`
 or in any folder, type and press enter afterward:
