@@ -19,12 +19,10 @@ zip folder (typically by double-clicking on it).
 quotation marks into the "Search programs and files" field).
 
 4) In the command prompy, change to the directory  where you downloaded the GPRPy files.
-This is usually through a command like for example
-
- `cd Desktop\GPRPy`
-
- if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
- afterward:
+This is usually through a command like for example\
+`cd Desktop\GPRPy`\
+if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
+afterward:
 
  `python installMigration.py`
 
