@@ -1,5 +1,5 @@
 # GPRPy
-Ground Penetrating Radar processing and visualization software for python 3.
+Open-source Ground Penetrating Radar processing and visualization software.
 
 ![alt text](https://github.com/NSGeophysics/GPRPy/blob/master/profileGUI.png)
 
