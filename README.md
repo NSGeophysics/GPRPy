@@ -43,6 +43,11 @@ by, in the command prompt in the GPRPy folder, typing and pressing enter\
 Alternatively, you can open the CMP / WARR graphical user interface from any folder by running in the command prompt:\
 `python -c "import gprpy.__main__" c`
 
+If you just run\
+`python -c "import gprpy.__main__"`\
+then GPRPy will ask you if you want to run it in the profile or CMP/WARR mode.
+
+
 ## In case of trouble
 
 If you have several versions of python installed, for example on a Mac or Linux system, 
