@@ -12,62 +12,41 @@ Ground Penetrating Radar processing and visualization software for python 3.
 button and then "Download ZIP". Save the file somewhere on your computer and extract the 
 zip folder (typically by double-clicking on it).
 
-2) Install anaconda python (the python 3.6 version) from https://www.anaconda.com/download/
+2) Install Python 3.7 for example from https://conda.io/miniconda.html
 
-3) Once the installation finished, open Anaconda Prompt (on Windows: click on Start, 
-then enter "Anaconda Prompt", without the quotation marks into the 
-"Search programs and files" field).
+3) Once the installation finished, open a command prompt that can run Python
+(on Windows: click on Start, then enter "Anaconda Prompt", without the 
+quotation marks into the "Search programs and files" field).
 
-4) In the Anaconda Prompt, type the following and press enter afterward:
-`pip install numpy scipy matplotlib tqdm Pmw pyevtk`
-This will install the dependencies, if they are not already installed
-
-5) In the Anaconda Prompt, change into the directory where you downloaded the GPRPy files.
+4) In the command prompy, change to the directory  where you downloaded the GPRPy files.
 This is usually through a command like for example
 `cd Desktop\GPRPy`
-if you downloaded GPRPy directly onto your desktop
-
-6) To install migration, type and press Enter afterward:
+if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
+afterward:
 `python installMigration.py`
+Then type the following and press enter
+afterward:
+`pip install .`
+(don't forget the period at the end).
 
-7) In Anaconda Prompt, type and press Enter afterward:
-`python gprpyGUI.py`
-This will open the graphical user interface for profile data. 
+7) To run the profile graphical user interface, you can either run the included shell script 
+by, in the command prompt in the GPRPy folder, typing and pressing enter
+`profile.sh`
+or in any folder, type and press enter afterward:
+`python -c "import gprpy.__main__" p`
+ 
+To run the CMP/WARR graphical user interface, you can either run the included shell script 
+by, in the command prompt in the GPRPy folder, typing and pressing enter
+`cmpwarr.sh`
+or in any folder, type and press enter afterward:
+`python -c "import gprpy.__main__" c`
 
-To upen the graphical user interface for common midpoint or wide angle reflection and refraction data, 
-type and press Enter afterward:
-`python gprpyCWGUI.py'
+If you have several versions of python installed, for example on a Mac or Linux system, 
+replace in the previous commands
+`python` with `python3`
+and `pip` with `pip3`
 
-
-## General comments
-
-#### Requires:
-
-numpy, scipy, matplotlib, pickle, tkinter, struct, re, tqdm, Pmw, pyevtk
-
-#### To start the GUI, run in a Command Prompt:
-
-`python gprpyGUI.py`
-
-or
-
-`python3 gprpyGUI.py`
-
-or
-
-`gprpyGUI.py`
-
-#### To start the Common Midpoint or Wide Angle Refraction and Reflection GUI:
-
-`python gprpyCWGUI.py`
-
-or
-
-`python3 gprpyCWGUI.py`
-
-or
-
-`gprpyGUI.py`
-
+If you have any troubles getting the software running, please send me an email or open an issue
+on GitHub and I will help you getting it running.
 
 
