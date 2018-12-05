@@ -33,10 +33,9 @@ class GPRPyCWApp:
 
         self.balloon = Pmw.Balloon()
         fig = Figure(figsize=(9,5))
-        ahyp = fig.add_axes([0.065,0.1,0.27,0.80])#0.83])
+        ahyp = fig.add_axes([0.065,0.1,0.27,0.80])
         alin = fig.add_axes([0.365,0.1,0.27,0.80])
         adata= fig.add_axes([0.665,0.1,0.27,0.80])
-        #adata.get_yaxis().set_visible(False)
         alin.get_yaxis().set_visible(False)
 
         mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*1.1})
@@ -76,6 +75,7 @@ class GPRPyCWApp:
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         LoadButton.config(height = 1, width = 2*halfwid)         
         LoadButton.grid(row=0, column=rightcol, sticky='nsew',columnspan=colsp,rowspan=2)
+        self.balloon.bind(LoadButton,"Load .gpr, .DT1, .DZT, or BSQ data.")
 
 
         # Adjust profile length; if trigger wheel is not good
@@ -187,7 +187,10 @@ class GPRPyCWApp:
                                               semb=proj.linSemb,title='linear semblance')])
         LinSembButton.config(height = 1, width = 2*halfwid)
         LinSembButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(LinSembButton,
+                          "Calculate the linear semblance for the\n"
+                          "selected velocity ranges and two-way\n" 
+                          "travel times.")
         
         # Hyp Semblance
         HypSembButton = tk.Button(
@@ -199,6 +202,10 @@ class GPRPyCWApp:
                                               ylabel='two-way travel time [ns]')])
         HypSembButton.config(height = 1, width = 2*halfwid)
         HypSembButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(HypSembButton,
+                          "Calculate the hyperbolic semblance for\n"
+                          "the selected velocity ranges and two-way\n" 
+                          "travel times.")
 
         # Add line on top of data
         AddLinButton = tk.Button(
@@ -207,6 +214,10 @@ class GPRPyCWApp:
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddLinButton.config(height = 1, width = halfwid)
         AddLinButton.grid(row=11,column=rightcol, sticky='nsew')
+        self.balloon.bind(AddLinButton,
+                          "Draw line with chosen velocity\n"
+                          "and intercept two-way travel time \n"
+                          "on top of data.")        
         
         # Draw hyperbola on top of data
         AddHypButton = tk.Button(
@@ -215,7 +226,10 @@ class GPRPyCWApp:
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddHypButton.config(height = 1, width = halfwid)
         AddHypButton.grid(row=11,column=rightcol+1, sticky='nsew')
-
+        self.balloon.bind(AddHypButton,
+                          "Draw hyperbola with chosen velocity\n"
+                          "and apex two-way travel time \n"
+                          "on top of data.")  
 
         # Remove most recent line
         RemLinButton = tk.Button(
@@ -224,6 +238,9 @@ class GPRPyCWApp:
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemLinButton.config(height = 1, width = halfwid)
         RemLinButton.grid(row=12,column=rightcol, sticky='nsew')
+        self.balloon.bind(RemLinButton,
+                          "Remove the most recently drawn\n"
+                          "line from data")
 
         # Remove most recent hyperbola
         RemHypButton = tk.Button(
@@ -232,8 +249,9 @@ class GPRPyCWApp:
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemHypButton.config(height = 1, width = halfwid)
         RemHypButton.grid(row=12,column=rightcol+1, sticky='nsew')
-
-                          
+        self.balloon.bind(RemHypButton,
+                          "Remove the most recently drawn\n"
+                          "hyperbola from data")
         
         # Show ln hp toggle
         ShowLnHpButton = tk.Button(
@@ -242,7 +260,9 @@ class GPRPyCWApp:
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         ShowLnHpButton.config(height = 1, width = 2*halfwid)
         ShowLnHpButton.grid(row=13,column=rightcol, sticky='nsew',columnspan=colsp)
-        
+        self.balloon.bind(ShowLnHpButton,
+                          "Toggle on/off showing the\n"
+                          "drawn lines / hyperbolae")
 
         # Print figure
         PrintFigButton = tk.Button(
@@ -250,7 +270,11 @@ class GPRPyCWApp:
             command = lambda : [self.printFigures(proj,fig)])
         PrintFigButton.config(height = 1, width = 2*halfwid)
         PrintFigButton.grid(row=14,column=rightcol, sticky='nsew',columnspan=colsp)
-
+        self.balloon.bind(PrintFigButton,
+                          "Saves the current panels as pdfs with \n"
+                          "chosen resolution. If there are hyperbolae \n" 
+                          "or lines drawn on the data then they will also\n"
+                          "appear on the printed figure.")
         
         # Write script
         HistButton = tk.Button(
@@ -315,6 +339,7 @@ class GPRPyCWApp:
         satbox = tk.Entry(master, textvariable=self.saturation, width=4*halfwid)
         satbox.grid(row=1, column=2, sticky='nsew')
         self.saturation.set("1.0")
+        
 
         # Lin or log mode switch for semblance representation
         self.sembrep=tk.StringVar()
@@ -411,7 +436,8 @@ class GPRPyCWApp:
     def loadData(self,proj):
         filename = fd.askopenfilename( filetypes= (("All", "*.*"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
-                                                   ("GSSI (.DZT)", "*.DZT")))
+                                                   ("GSSI (.DZT)", "*.DZT"),
+                                                   ("BSQ header","*.GPRhdr")))
         if filename:
             self.getType()
             if self.dtype is not None:
