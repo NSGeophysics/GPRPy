@@ -22,45 +22,33 @@ quotation marks into the "Search programs and files" field).
 This is usually through a command like for example\
 `cd Desktop\GPRPy`\
 if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
-afterward:
-
- `python installMigration.py`
-
- Then type the following and press enter
- afterward:
-
- `pip install .`
-
- (don't forget the period at the end).
+afterward:\
+`python installMigration.py`\
+Then type the following and press enter afterward:\
+`pip install .`\
+(don't forget the period at the end).
 
 ## Running the software
 To run the **profile graphical user interface**, you can either run the included shell script 
-by, in the command prompt in the GPRPy folder, typing and pressing enter
-
+by, in the command prompt in the GPRPy folder, typing and pressing enter\
 `profile.sh`
 
-Alternatively, you can open the profile graphical user interface from any folder by running in the command prompt:
-
+Alternatively, you can open the profile graphical user interface from any folder by running in the command prompt:\
 `python -c "import gprpy.__main__" p`
  
 To run the **CMP / WARR graphical user interface**, you can either run the included shell script 
-by, in the command prompt in the GPRPy folder, typing and pressing enter
-
+by, in the command prompt in the GPRPy folder, typing and pressing enter\
 `cmpwarr.sh`
 
-Alternatively, you can open the CMP / WARR graphical user interface from any folder by running in the command prompt:
-
+Alternatively, you can open the CMP / WARR graphical user interface from any folder by running in the command prompt:\
 `python -c "import gprpy.__main__" c`
 
 ## In case of trouble
 
 If you have several versions of python installed, for example on a Mac or Linux system, 
-replace in the previous commands
-
-`python` with `python3`
-
-and 
-
+replace in the previous commands\
+`python` with `python3`\
+and\
 `pip` with `pip3`
 
 If you have any troubles getting the software running, please send me an email or open an issue
