@@ -28,6 +28,7 @@ Then type the following and press enter afterward:\
 `pip install .`\
 (don't forget the period at the end).
 
+
 ## Running the software
 To run the **profile graphical user interface**, you can either run the included shell script 
 by, in the command prompt in the GPRPy folder, typing and pressing enter\
@@ -46,6 +47,12 @@ Alternatively, you can open the CMP / WARR graphical user interface from any fol
 If you just run\
 `python -c "import gprpy.__main__"`\
 then GPRPy will ask you if you want to run it in the profile or CMP/WARR mode.
+
+
+## Running automatically generated scripts
+To run automatically generated scripts, open the command prompt that can run python, switch to the folder with the automatically generated script and run\
+`python myscriptname.py`\
+where myscriptname.py is the name of your automatically generated script.  
 
 
 ## In case of trouble
