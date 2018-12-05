@@ -30,23 +30,21 @@ Then type the following and press enter afterward:\
 
 
 ## Running the software
-To run the **profile graphical user interface**, you can either run the included shell script 
-by, in the command prompt in the GPRPy folder, typing and pressing enter\
-`profile.sh`
+After installation, you can run the script from the Anaconda Prompt (or your Python-enabled prompt) by running
+`gprpy`
 
-Alternatively, you can open the profile graphical user interface from any folder by running in the command prompt:\
-`python -c "import gprpy.__main__" p`
- 
-To run the **CMP / WARR graphical user interface**, you can either run the included shell script 
-by, in the command prompt in the GPRPy folder, typing and pressing enter\
-`cmpwarr.sh`
+The first time you run it it could take a while to initialize.
+GPRPy will ask you if you want to run the profile [p] or WARR / CMP [c] user interface.
+Type\
+`p`\
+and then enter for profile, or\
+`c`\
+end then enter for CMP / WARR.
 
-Alternatively, you can open the CMP / WARR graphical user interface from any folder by running in the command prompt:\
-`python -c "import gprpy.__main__" c`
-
-If you just run\
-`python -c "import gprpy.__main__"`\
-then GPRPy will ask you if you want to run it in the profile or CMP/WARR mode.
+You can also directly select one by running either\
+`gprpy p`\
+or\
+`gprpy c`
 
 
 ## Running automatically generated scripts
