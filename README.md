@@ -29,17 +29,20 @@ afterward:
 `pip install .`
 (don't forget the period at the end).
 
-5) To run the profile graphical user interface, you can either run the included shell script 
+## Running the software
+To run the **profile graphical user interface**, you can either run the included shell script 
 by, in the command prompt in the GPRPy folder, typing and pressing enter
 `profile.sh`
 or in any folder, type and press enter afterward:
 `python -c "import gprpy.__main__" p`
  
-To run the CMP/WARR graphical user interface, you can either run the included shell script 
+To run the **CMP/WARR graphical user interface**, you can either run the included shell script 
 by, in the command prompt in the GPRPy folder, typing and pressing enter
 `cmpwarr.sh`
 or in any folder, type and press enter afterward:
 `python -c "import gprpy.__main__" c`
+
+## In case of trouble
 
 If you have several versions of python installed, for example on a Mac or Linux system, 
 replace in the previous commands
