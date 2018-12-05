@@ -21,19 +21,19 @@ quotation marks into the "Search programs and files" field).
 4) In the command prompy, change to the directory  where you downloaded the GPRPy files.
 This is usually through a command like for example
 
-`cd Desktop\GPRPy`
+ `cd Desktop\GPRPy`
 
-if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
-afterward:
+ if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
+ afterward:
 
-`python installMigration.py`
+ `python installMigration.py`
 
-Then type the following and press enter
-afterward:
+ Then type the following and press enter
+ afterward:
 
-`pip install .`
+ `pip install .`
 
-(don't forget the period at the end).
+ (don't forget the period at the end).
 
 ## Running the software
 To run the **profile graphical user interface**, you can either run the included shell script 
