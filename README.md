@@ -7,10 +7,9 @@ Ground Penetrating Radar processing and visualization software for python 3.
 
 
 ## Simplemost installation
-
 1) Download the GPRPy software for example by clicking on the green "clone or download" 
 button and then "Download ZIP". Save the file somewhere on your computer and extract the 
-zip folder (typically by double-clicking on it).
+zip folder.
 
 2) Install Python 3.7 for example from https://conda.io/miniconda.html
 
@@ -31,9 +30,12 @@ Then type the following and press enter afterward:\
 
 ## Running the software
 After installation, you can run the script from the Anaconda Prompt (or your Python-enabled prompt) by running
-`gprpy`
+either\
+`gprpy`\
+or\
+`python -m gprpy`
 
-The first time you run it it could take a while to initialize.
+The first time you run GPRPy it could take a while to initialize.
 GPRPy will ask you if you want to run the profile [p] or WARR / CMP [c] user interface.
 Type\
 `p`\
@@ -44,17 +46,20 @@ end then enter for CMP / WARR.
 You can also directly select one by running either\
 `gprpy p`\
 or\
-`gprpy c`
+`gprpy c`\
+or\
+`python -m gprpy p`\
+or\
+`python -m gprpy c`
 
 
 ## Running automatically generated scripts
-To run automatically generated scripts, open the command prompt that can run python, switch to the folder with the automatically generated script and run\
+To run automatically generated scripts, open the command prompt that can run python (for example Anaconda Prompt), switch to the folder with the automatically generated script and run\
 `python myscriptname.py`\
 where myscriptname.py is the name of your automatically generated script.  
 
 
 ## In case of trouble
-
 If you have several versions of python installed, for example on a Mac or Linux system, 
 replace in the previous commands\
 `python` with `python3`\
