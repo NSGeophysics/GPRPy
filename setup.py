@@ -8,7 +8,7 @@ setuptools.setup(
     author="Alain Plattner",
     author_email="plattner@alumni.ethz.ch",
     description="GPRPy - open source ground penetrating radar processing and visualization",
-    entry_points={'console_scripts': ['gprpy = gprpy.__main__']},
+    entry_points={'console_scripts': ['gprpy = gprpy.__main__:main']},
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NSGeophysics/GPRPy",
