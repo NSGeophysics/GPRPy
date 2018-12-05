@@ -71,6 +71,6 @@ on GitHub and I will help you getting it running.
 
 
 ## Uninstalling GPRPy
-To uninstall GPRPy, simply run, in the (Anaconda) command prompt
+To uninstall GPRPy, simply run, in the (Anaconda) command prompt\
 `pip uninstall gprpy`
 
