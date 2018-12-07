@@ -8,7 +8,7 @@ import os
 import matplotlib.image as im
 from scipy import signal
 
-def showSplash(a,dir_path,widfac,highfac):
+def showSplash(a,dir_path,widfac,highfac,fontfac):
     try:
         filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
         snakeGPR = gp.gprpy2d(filename)
@@ -62,8 +62,8 @@ def showSplash(a,dir_path,widfac,highfac):
         'color':  'black',
         'weight': 'bold',
         'style': 'italic',
-        'size': 60
-            # 'size': 35*widfac
+        'size': 60*fontfac
+        #'size': 45.6
         }
 #    a.text(35,-10000,'GPRPy',fontdict=font)
     a.text(50,-10000,'GPRPy',fontdict=font)
@@ -119,15 +119,16 @@ def showSplash(a,dir_path,widfac,highfac):
              interpolation='spline36')
     font2 = {'family': 'DejaVu Sans',
              'color':  'black',
-             'size': 13.5}
-    # 'size': 7.5*widfac
+             'size': 13.5*fontfac}
+			 #'size': 10.26}
     a.text(-5,-27000,'EAR-1550732',fontdict=font2)
 
     
     # Add name/email
     font3 = {'family': 'DejaVu Sans',
              'color':  'gray',
-             'size': 13.5}
+             'size': 13.5*fontfac}
+			 #'size' : 10.26}
     a.text(70,-22000,'Alain Plattner',fontdict=font3)
     a.text(59,-24000,'plattner@alumni.ethz.ch',fontdict=font3)
     #a.text(59.5,-24000,'plattner@alumni.ethz.ch',fontdict=font3)

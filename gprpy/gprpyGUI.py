@@ -47,6 +47,7 @@ class GPRPyApp:
         #self.highfac=scrhigt/normscrhigt
         self.widfac=normscrwidt/normscrhigt
         self.highfac=1
+        fontfac=(normscrwidt/normscrhigt)/(scrwidt/scrhigt)
         
         master.title("GPRPy")
         
@@ -63,7 +64,7 @@ class GPRPyApp:
         fig=Figure(figsize=(8*self.widfac,5*self.highfac))
         a=fig.add_subplot(111)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        splash.showSplash(a,dir_path,self.widfac,self.highfac)
+        splash.showSplash(a,dir_path,self.widfac,self.highfac,fontfac)
 
         # Set font size for screen res
         mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*self.widfac})
