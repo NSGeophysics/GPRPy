@@ -652,11 +652,14 @@ class GPRPyApp:
                 alongdist = np.cumsum(steplen)
                 topoPos = np.append(0,alongdist)
                 pick3D = np.zeros((self.picked.shape[0],3))
+                # If profile is adjusted, need to start the picked at zero.
+                pickProfileShifted = self.picked[:,0] - np.min(proj.profilePos)
                 #for i in range(0,3):
                 for i in range(0,2):
                     pick3D[:,i] = interp.pchip_interpolate(topoPos,
                                                            proj.threeD[:,i],
-                                                           self.picked[:,0]).squeeze()
+                                                           pickProfileShifted).squeeze()
+                                                           #self.picked[:,0]).squeeze()
             
                 pick3D[:,2] = self.picked[:,1].squeeze()
                     
