@@ -5,6 +5,7 @@ import pickle
 import gprpy.toolbox.gprIO_DT1 as gprIO_DT1
 import gprpy.toolbox.gprIO_DZT as gprIO_DZT
 import gprpy.toolbox.gprIO_BSQ as gprIO_BSQ
+import gprpy.toolbox.gprIO_MALA as gprIO_MALA
 import gprpy.toolbox.gprpyTools as tools
 try:
     import gprpy.irlib.external.mig_fk as mig_fk
@@ -26,20 +27,25 @@ class gprpy2d:
         
     def importdata(self,filename):
         '''
-        Loads .gpr (native GPRPy), .DT1 (Sensors and Software), or
-        .DZT (GSSI) data files and populates all the gprpy2d fields.
+
+        Loads .gpr (native GPRPy), .DT1 (Sensors and Software),
+        .DZT (GSSI), .GPRhdr (ENVI standard BSQ), .rad (MALA)
+        data files and populates all the gprpy2d fields.
 
         INPUT: 
 
-        filename    name of the .gpr, DT1, or .DZT file you want to
-                    import
+        filename  name of the .gpr, .DT1, .DZT, .GPRhdr, or .rad file
+                  you want to import.
+                  The header file name and the data file name 
+                  have to be the same!
 
-        Last modified by plattner-at-alumni.ethz.ch, 5/22/2018
+        Last modified by plattner-at-alumni.ethz.ch, 12/18/2018
+
         '''
         
         file_name, file_ext = os.path.splitext(filename)
         
-        if file_ext==".DT1":
+        if file_ext==".DT1" or file_ext==".HD":
             self.data=gprIO_DT1.readdt1(filename)
             self.info=gprIO_DT1.readdt1Header(file_name + ".HD")
             
@@ -91,7 +97,7 @@ class gprpy2d:
     
         
 
-        elif file_ext==".GPRhdr":
+        elif file_ext==".GPRhdr" or file_ext==".dat":
             # ENVI standard BSQ file
             self.data, self.info = gprIO_BSQ.readBSQ(file_name)
 
@@ -112,6 +118,28 @@ class gprpy2d:
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)       
 
+
+        elif file_ext==".rad" or file_ext==".rd3" or file_ext==".rd7":
+            self.data, self.info = gprIO_MALA.readMALA(file_name)
+
+            self.twtt = np.linspace(0,float(self.info["TIMEWINDOW"]),int(self.info["SAMPLES"]))
+            self.profilePos = float(self.info["DISTANCE INTERVAL"])*np.arange(0,self.data.shape[1])
+
+            self.velocity = None
+            self.depth = None
+            self.maxTopo = None
+            self.minTopo = None
+            self.threeD = None
+            self.data_pretopo = None
+            self.twtt_pretopo = None
+            # Initialize previous
+            self.initPrevious()
+            
+            # Put what you did in history
+            histstr = "mygpr.importdata('%s')" %(filename)
+            self.history.append(histstr)
+            
+            
 
         elif file_ext==".gpr":
             ## Getting back the objects:
