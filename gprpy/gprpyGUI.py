@@ -672,7 +672,8 @@ class GPRPyApp:
                                                    ("GPRPy (.gpr)", "*.gpr"),
                                                    ("Sensors and Software (.DT1)", "*.DT1"),
                                                    ("GSSI (.DZT)", "*.DZT"),
-                                                   ("BSQ header","*.GPRhdr")))
+                                                   ("BSQ header","*.GPRhdr"),
+                                                   ("MALA header","*.rad")))
         if filename:
             proj.importdata(filename=filename)
             self.xrng = [np.min(proj.profilePos),np.max(proj.profilePos)]
