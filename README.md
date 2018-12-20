@@ -3,7 +3,7 @@ Open-source Ground Penetrating Radar processing and visualization software.
 
 ![Profile GUI](profileGUI.png)
 
-![CMP/WARR GUI](https://github.com/NSGeophysics/GPRPy/blob/master/CWGUI.png)
+![CMP/WARR GUI](CWGUI.png)
 
 
 ## Simplemost installation
