@@ -724,8 +724,8 @@ class GPRPyApp:
 
 
     def plotProfileData(self,proj,fig,a,canvas):
-        dx=proj.profilePos[1]-proj.profilePos[0]
-        dt=proj.twtt[1]-proj.twtt[0]
+        dx=proj.profilePos[3]-proj.profilePos[2]
+        dt=proj.twtt[3]-proj.twtt[2]
         a.clear()        
         stdcont = np.nanmax(np.abs(proj.data)[:])        
         if proj.velocity is None:

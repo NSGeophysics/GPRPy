@@ -42,13 +42,13 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
 
     # If they don't have the same along-profile sampling,
     # need to interpolate the data such that it makes sense:
-    if np.diff(profile1.profilePos)[0] < np.diff(profile2.profilePos)[0]:      
-        zfac = np.diff(profile2.profilePos)[0]/np.diff(profile1.profilePos)[0]
+    if np.diff(profile1.profilePos)[3] < np.diff(profile2.profilePos)[3]:      
+        zfac = np.diff(profile2.profilePos)[3]/np.diff(profile1.profilePos)[3]
         profile2.data = zoom(profile2.data,[1,zfac])
         profile2.profilePos=zoom(profile2.profilePos,zfac)       
 
-    elif np.diff(profile1.profilePos)[0] > np.diff(profile2.profilePos)[0]:
-        zfac = np.diff(profile1.profilePos)[0]/np.diff(profile2.profilePos)[0]
+    elif np.diff(profile1.profilePos)[3] > np.diff(profile2.profilePos)[3]:
+        zfac = np.diff(profile1.profilePos)[3]/np.diff(profile2.profilePos)[3]
         profile1.data = zoom(profile1.data,[1,zfac])
         profile1.profilePos=zoom(profile1.profilePos,zfac)
         

@@ -478,8 +478,8 @@ class GPRPyCWApp:
 
     def plotCWData(self,proj,a,canvas):
         a.clear()
-        dx=proj.profilePos[1]-proj.profilePos[0]
-        dt=proj.twtt[1]-proj.twtt[0]
+        dx=proj.profilePos[3]-proj.profilePos[2]
+        dt=proj.twtt[3]-proj.twtt[2]
         stdcont = np.nanmax(np.abs(proj.data)[:])
         a.imshow(proj.data,cmap=self.color.get(),extent=[min(proj.profilePos)-dx/2.0,
                                                          max(proj.profilePos)+dx/2.0,
@@ -533,7 +533,7 @@ class GPRPyCWApp:
 
         
     def plotSemb(self,proj,a,canvas,semb,title,ylabel=None):
-        dt=proj.twtt[1]-proj.twtt[0]
+        dt=proj.twtt[3]-proj.twtt[2]
         if semb is not None:
             dv=proj.vVals[1]-proj.vVals[0]
             a.clear()

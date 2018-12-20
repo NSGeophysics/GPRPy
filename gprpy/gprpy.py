@@ -230,8 +230,8 @@ class gprpy2d:
     
     # This is a helper function
     def prepProfileFig(self, color="gray", contrast=1.0, yrng=None, xrng=None, asp=None):
-        dx=self.profilePos[1]-self.profilePos[0]
-        dt=self.twtt[1]-self.twtt[0]
+        dx=self.profilePos[3]-self.profilePos[2]
+        dt=self.twtt[3]-self.twtt[2]
         stdcont = np.nanmax(np.abs(self.data)[:])       
         
         if self.velocity is None:
@@ -438,7 +438,7 @@ class gprpy2d:
         # Store previous state for undo
         self.storePrevious()
         # apply migration
-        dt=self.twtt[1]-self.twtt[0]
+        dt=self.twtt[3]-self.twtt[2]
         #dx=self.profilePos[1]-self.profilePos[0]
         dx=(self.profilePos[-1]-self.profilePos[0])/(len(self.profilePos)-1)
         # fkmig sets x profile to start at zero but resamples
@@ -753,8 +753,8 @@ class gprpyCW(gprpy2d):
 
     # This is a helper function
     def prepCWFig(self, contrast=1.0, color="gray", yrng=None, xrng=None, showlnhp=False):
-        dx=self.profilePos[1]-self.profilePos[0]
-        dt=self.twtt[1]-self.twtt[0]
+        dx=self.profilePos[3]-self.profilePos[2]
+        dt=self.twtt[3]-self.twtt[2]
         stdcont = np.nanmax(np.abs(self.data)[:])       
         
         plt.imshow(self.data,cmap=color,extent=[min(self.profilePos)-dx/2.0,
@@ -804,8 +804,8 @@ class gprpyCW(gprpy2d):
 
 
     def prepSembFig(self, whichsemb="lin", saturation=1.0, yrng=None, vrng=None, sembrep="lin"):
-        dt=self.twtt[1]-self.twtt[0]
-        dv=self.vVals[1]-self.vVals[0]
+        dt=self.twtt[3]-self.twtt[2]
+        dv=self.vVals[3]-self.vVals[2]
         if whichsemb == "lin":
             semb = self.linSemb
             title = "linear semblance"
