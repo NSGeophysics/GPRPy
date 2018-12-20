@@ -439,7 +439,8 @@ class gprpy2d:
         self.storePrevious()
         # apply migration
         dt=self.twtt[1]-self.twtt[0]
-        dx=self.profilePos[1]-self.profilePos[0]
+        #dx=self.profilePos[1]-self.profilePos[0]
+        dx=(self.profilePos[-1]-self.profilePos[0])/(len(self.profilePos)-1)
         # fkmig sets x profile to start at zero but resamples
         self.data,self.twtt,migProfilePos=mig_fk.fkmig(self.data,dt,dx,self.velocity)
         self.profilePos = migProfilePos + self.profilePos[0]

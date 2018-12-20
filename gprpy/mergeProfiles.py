@@ -32,23 +32,35 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
     # If they don't have the same number of samples,
     # then we need to interpolate the data to make them fit
     if len(profile1.twtt) > len(profile2.twtt):
-        zfac=len(profile1.twtt)/len(profile2.twtt)
+        zfac = len(profile1.twtt)/len(profile2.twtt)
         profile2.data = zoom(profile2.data,[zfac,1])
             
     elif len(profile1.twtt) < len(profile2.twtt):
-        zfac=len(profile2.twtt)/len(profile1.twtt)
+        zfac = len(profile2.twtt)/len(profile1.twtt)
         profile1.data = zoom(profile1.data,[zfac,1])
         profile1.twtt = profile2.twtt
 
+    # If they don't have the same along-profile sampling,
+    # need to interpolate the data such that it makes sense:
+    if np.diff(profile1.profilePos)[0] < np.diff(profile2.profilePos)[0]:      
+        zfac = np.diff(profile2.profilePos)[0]/np.diff(profile1.profilePos)[0]
+        profile2.data = zoom(profile2.data,[1,zfac])
+        profile2.profilePos=zoom(profile2.profilePos,zfac)       
 
+    elif np.diff(profile1.profilePos)[0] > np.diff(profile2.profilePos)[0]:
+        zfac = np.diff(profile1.profilePos)[0]/np.diff(profile2.profilePos)[0]
+        profile1.data = zoom(profile1.data,[1,zfac])
+        profile1.profilePos=zoom(profile1.profilePos,zfac)
+        
     # Now concatenate the profile positions
     # In case someone didn't adjust their profile but just tries to merge them:
-    if profile2.profilePos[0] == 0:
-        profile2.profilePos = profile2.profilePos + profile1.profilePos[-1]+np.diff(profile2.profilePos)[1]
+    if abs(profile2.profilePos[0]) < 1e-5:
+        profile2.profilePos = profile2.profilePos + profile1.profilePos[-1]+np.diff(profile2.profilePos)[1]    
+        
     # Otherwise they probably know what they are doing
     # If there is a gap, create an array with zeros or NaNs
     dx=np.diff(profile2.profilePos)[0]
-    if profile2.profilePos[0] > profile1.profilePos[-1]+2*dx:
+    if profile2.profilePos[0] - profile1.profilePos[-1] < dx:
         nfill = int(np.round((profile2.profilePos[0] -
                               profile1.profilePos[-1])/dx))
         posfill = np.arange(0,nfill)*dx + profile1.profilePos[-1] + dx
@@ -60,11 +72,12 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
         #datfill = np.zeros(((profile2.data).shape[0],nfill))
         profile2.profilePos=np.append(posfill,profile2.profilePos)
         profile2.data = np.hstack((datfill,profile2.data))
-    
-    profile1.profilePos = np.append(profile1.profilePos,profile2.profilePos)
 
+    # Append profile positions    
+    profile1.profilePos = np.append(profile1.profilePos,profile2.profilePos)
+    
     # Now merge them into profile 1      
-    profile1.data = np.hstack((profile1.data,profile2.data))
+    profile1.data = np.asmatrix(np.hstack((profile1.data,profile2.data)))
     
     # Set history to shortest possible:
     profile1.history = ["mergeProfiles(%s,%s,%s)" %(file1,file2,outfile) , "mygpr = gp.gprpy2d()"]
