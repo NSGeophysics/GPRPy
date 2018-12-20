@@ -11,7 +11,7 @@ Open-source Ground Penetrating Radar processing and visualization software.
 button and then "Download ZIP". Save the file somewhere on your computer and extract the 
 zip folder.
 
-2) Install Python 3.7 for example from https://conda.io/miniconda.html
+2) Install Python 3.7 for example from [https://conda.io/miniconda.html](https://conda.io/miniconda.html)
 
 3) Once the installation finished, open a command prompt that can run Python
 (on Windows: click on Start, then enter "Anaconda Prompt", without the 
