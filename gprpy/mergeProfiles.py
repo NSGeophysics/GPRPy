@@ -80,7 +80,7 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
     profile1.data = np.asmatrix(np.hstack((profile1.data,profile2.data)))
     
     # Set history to shortest possible:
-    profile1.history = ["mergeProfiles(%s,%s,%s)" %(file1,file2,outfile) , "mygpr = gp.gprpy2d()"]
+    profile1.history = ["mygpr = gp.gprpy2d()", "mygpr.importdata('%s.gpr')" %(outfile)]
 
     profile1.info="Merged"
 
