@@ -2,7 +2,7 @@ import gprpy.gprpy as gp
 import numpy as np
 from scipy.ndimage import zoom
 
-def mergeProfiles(file1,file2,outfile):
+def mergeProfiles(file1,file2,outfile,gapfill=0):
     '''
     Merges two GPR profiles by placing the second one at the end 
     of the first one. 
@@ -15,6 +15,8 @@ def mergeProfiles(file1,file2,outfile):
     file1    File name (including path) of the first profile
     file2    File name (including path) of the second profile
     outfile  File name (including path) for the merged file
+    gapfill  If there is a gap between the profiles, fill it with
+             zeros (0) or NaN ('NaN')? [default: 0]
     
     Last modified by plattner-at-alumni.ethz.ch, 12/20/2018
     '''
@@ -38,16 +40,32 @@ def mergeProfiles(file1,file2,outfile):
         profile1.data = zoom(profile1.data,[zfac,1])
         profile1.twtt = profile2.twtt
 
-    # Now merge them into profile 1      
-    profile1.data = np.hstack((profile1.data,profile2.data))
 
     # Now concatenate the profile positions
     # In case someone didn't adjust their profile but just tries to merge them:
     if profile2.profilePos[0] == 0:
         profile2.profilePos = profile2.profilePos + profile1.profilePos[-1]+np.diff(profile2.profilePos)[1]
-    # Otherwise they probably know what they are doing    
+    # Otherwise they probably know what they are doing
+    # If there is a gap, create an array with zeros or NaNs
+    dx=np.diff(profile2.profilePos)[0]
+    if profile2.profilePos[0] > profile1.profilePos[-1]+2*dx:
+        nfill = int(np.round((profile2.profilePos[0] -
+                              profile1.profilePos[-1])/dx))
+        posfill = np.arange(0,nfill)*dx + profile1.profilePos[-1] + dx
+        datfill = np.empty(((profile2.data).shape[0],nfill))
+        if gapfill == 0:
+            datfill.fill(0)
+        else:
+            datfill.fill(np.NaN)
+        #datfill = np.zeros(((profile2.data).shape[0],nfill))
+        profile2.profilePos=np.append(posfill,profile2.profilePos)
+        profile2.data = np.hstack((datfill,profile2.data))
+    
     profile1.profilePos = np.append(profile1.profilePos,profile2.profilePos)
 
+    # Now merge them into profile 1      
+    profile1.data = np.hstack((profile1.data,profile2.data))
+    
     # Set history to shortest possible:
     profile1.history = ["mergeProfiles(%s,%s,%s)" %(file1,file2,outfile) , "mygpr = gp.gprpy2d()"]
 
