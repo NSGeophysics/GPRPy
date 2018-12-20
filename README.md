@@ -21,49 +21,49 @@ quotation marks into the "Search programs and files" field).
 This is usually through a command like for example<br/>
 `cd Desktop\GPRPy`<br/>
 if you downloaded GPRPy directly onto your desktop. Then type the following and press enter
-afterward:\
-`python installMigration.py`\
-Then type the following and press enter afterward:\
-`pip install .`\
+afterward:<br/>
+`python installMigration.py`<br/>
+Then type the following and press enter afterward:<br/>
+`pip install .`<br/>
 (don't forget the period at the end).
 
 
 ## Running the software
 After installation, you can run the script from the Anaconda Prompt (or your Python-enabled prompt) by running
-either\
-`gprpy`\
-or\
+either<br/>
+`gprpy`<br/>
+or<br/>
 `python -m gprpy`
 
 The first time you run GPRPy it could take a while to initialize.
 GPRPy will ask you if you want to run the profile [p] or WARR / CMP [c] user interface.
-Type\
-`p`\
-and then enter for profile, or\
-`c`\
+Type<br/>
+`p`<br/>
+and then enter for profile, or<br/>
+`c`<br/>
 and then enter for CMP / WARR.
 
-You can also directly select one by running either\
-`gprpy p`\
-or\
-`gprpy c`\
-or\
-`python -m gprpy p`\
-or\
+You can also directly select one by running either<br/>
+`gprpy p`<br/>
+or<br/>
+`gprpy c`<br/>
+or<br/>
+`python -m gprpy p`<br/>
+or<br/>
 `python -m gprpy c`
 
 
 ## Running automatically generated scripts
-To run automatically generated scripts, open the command prompt that can run python (for example Anaconda Prompt), switch to the folder with the automatically generated script and run\
-`python myscriptname.py`\
+To run automatically generated scripts, open the command prompt that can run python (for example Anaconda Prompt), switch to the folder with the automatically generated script and run<br/>
+`python myscriptname.py`<br/>
 where myscriptname.py is the name of your automatically generated script.  
 
 
 ## In case of trouble
 If you have several versions of python installed, for example on a Mac or Linux system, 
 replace, in the commands shown earlier,
-`python` with `python3`\
-and\
+`python` with `python3`<br/>
+and<br/>
 `pip` with `pip3`
 
 If you have any troubles getting the software running, please send me an email or open an issue
@@ -71,6 +71,6 @@ on GitHub and I will help you getting it running.
 
 
 ## Uninstalling GPRPy
-To uninstall GPRPy, simply run, in the (Anaconda) command prompt\
+To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
 `pip uninstall gprpy`
 
