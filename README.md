@@ -10,7 +10,7 @@ Open-source Ground Penetrating Radar processing and visualization software.
 1) Download the GPRPy software for example from [https://github.com/NSGeophysics/GPRPy/archive/master.zip](https://github.com/NSGeophysics/GPRPy/archive/master.zip). Save the file somewhere on your computer and extract the 
 zip folder. <br/>
 As an **alternative**, you can install git from [https://git-scm.com/](https://git-scm.com/), then run in a command prompt:<br/>
-`git clone https://github.com/NSGeophysics/GPRPy.git`</br>
+`git clone https://github.com/NSGeophysics/GPRPy.git`<br/>
 The advantage of the latter is that you can easily update your software by running from the GPRPy folder in a command prompt:<br/>
 `git pull origin master`
 
