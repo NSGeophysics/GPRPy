@@ -21,6 +21,7 @@ setuptools.setup(
                             'exampledata/SnS/WARR/*.DT1',
                             'exampledata/SnS/WARR/*.HD',
                             'exampledata/pickedSurfaceData/*.txt',
+                            'examplescripts/*.py'
                             'toolbox/splashdat/*.png',
                             'toolbox/*.py',
                             'irlib/*.py',
