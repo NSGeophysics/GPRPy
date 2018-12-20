@@ -1,9 +1,9 @@
 # GPRPy
 Open-source Ground Penetrating Radar processing and visualization software.
 
-![alt text](https://github.com/NSGeophysics/GPRPy/blob/master/profileGUI.png)
+![Profile GUI](https://github.com/NSGeophysics/GPRPy/blob/master/profileGUI.png)
 
-![alt text](https://github.com/NSGeophysics/GPRPy/blob/master/CWGUI.png)
+![CMP/WARR GUI](https://github.com/NSGeophysics/GPRPy/blob/master/CWGUI.png)
 
 
 ## Simplemost installation
