@@ -357,6 +357,8 @@ class gprpy2d:
         zeroind = np.abs(self.twtt - newZeroTime).argmin() 
         # Cut out everything before
         self.twtt = self.twtt[zeroind:] - newZeroTime
+        # Set first value to 0
+        self.twtt[0] = 0
         self.data = self.data[zeroind:,:]
         # Put what you did in history
         histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
@@ -454,13 +456,18 @@ class gprpy2d:
             maxtwtt = maxY
             maxind = np.argmin( np.abs(self.twtt-maxY) )
             self.twtt = self.twtt[0:maxind]
+            # Set the last value to maxY
+            self.twtt[-1] = maxY
             self.data = self.data[0:maxind,:]
         else:
             maxtwtt = maxY*2.0/self.velocity
             maxind = np.argmin( np.abs(self.twtt-maxtwtt) )
             self.twtt = self.twtt[0:maxind]
+            # Set the last value to maxtwtt
+            self.twtt[-1] = maxtwtt
             self.data = self.data[0:maxind,:]
             self.depth = self.depth[0:maxind]
+            self.depth[-1] = maxY
         # Put in history
         histstr = "mygpr.truncateY(%g)" %(maxY)
         self.history.append(histstr)
