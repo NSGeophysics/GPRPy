@@ -60,7 +60,7 @@ def reduceSampling(gpr,nprofile,ntwtt):
 
 
 
-def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,ndepth=None,method='nearest'):
+def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,ndepth=None,method='nearest',absvals=False):
     # nprofile, ndepth: reduce along profile and time
     
     gpr=gp.gprpy2d(datalist[0])
@@ -153,6 +153,9 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
    
     DG = np.reshape(dataG,  XXg.shape)
 
+    if absvals:
+        DG = np.abs(DG)
+    
     # Smooth
     if smooth is not None:
         DG = gaussian_filter(DG,smooth)
