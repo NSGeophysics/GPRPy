@@ -6,6 +6,8 @@ import scipy.interpolate as interp
 from scipy.interpolate import griddata
 from pyevtk.hl import gridToVTK
 from tqdm import tqdm
+from scipy.ndimage import gaussian_filter
+
 
 def reduceSampling(gpr,nprofile,ntwtt):
     
@@ -58,7 +60,7 @@ def reduceSampling(gpr,nprofile,ntwtt):
 
 
 
-def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,nprofile=None,ndepth=None,method='nearest'):
+def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=1,nprofile=None,ndepth=None,method='nearest'):
     # nprofile, ndepth: reduce along profile and time
     
     gpr=gp.gprpy2d(datalist[0])
@@ -150,7 +152,11 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,nprofile=None,ndepth=None,me
                             method=method)
    
     DG = np.reshape(dataG,  XXg.shape)
-        
+
+    # Smooth
+    if smooth is not None:
+        DG = gaussian_filter(DG,smooth)
+    
     #gridToVTK(outname,XG,YG,ZG,cellData={'gpr data': DG})
     gridToVTK(outname,XXg,YYg,Zg,pointData={'gpr data': DG})
    
