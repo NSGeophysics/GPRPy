@@ -18,7 +18,7 @@ import scipy.interpolate as interp
 colsp=2
 rightcol=10
 halfwid=4
-figrowsp=15+1
+figrowsp=16+1
 
 tagx=10 # 2
 tagy=5 # -3
@@ -114,6 +114,16 @@ class GPRPyCWApp:
                           "is given: remove data points at depths greater\n"
                           "than the chosen value")   
 
+        # Cut
+        cutButton = tk.Button(
+            text="cut separation", fg="black",
+            command=lambda : [self.cut(proj),
+                              self.plotCWData(proj,a=adata,canvas=canvas)])
+        cutButton.config(height = 1, width = 2*halfwid)         
+        cutButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(cutButton,
+                          "trims data to desired antenna separation range.") 
+        
 
         # Dewow
         DewowButton = tk.Button(
@@ -121,7 +131,7 @@ class GPRPyCWApp:
             command=lambda : [self.dewow(proj),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         DewowButton.config(height = 1, width = 2*halfwid)         
-        DewowButton.grid(row=5, column=rightcol, sticky='nsew',columnspan=colsp)
+        DewowButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(DewowButton,
                           "Trace-wise low-cut filter. Removes\n" 
                           "from each trace a running mean of\n"
@@ -134,7 +144,7 @@ class GPRPyCWApp:
             command=lambda : [self.smooth(proj),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         SmoothButton.config(height = 1, width = 2*halfwid)         
-        SmoothButton.grid(row=6, column=rightcol, sticky='nsew',columnspan=colsp)
+        SmoothButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(SmoothButton,
                           "Trace-wise high-cut filter. Replaces\n" 
                           "each sample within a trace by a\n"
@@ -147,7 +157,7 @@ class GPRPyCWApp:
             command = lambda : [proj.normalize(),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         NormalizeButton.config(height = 1, width = 2*halfwid)         
-        NormalizeButton.grid(row=7, column=rightcol, sticky='nsew',columnspan=colsp)
+        NormalizeButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(NormalizeButton,
                           "Normalizes each trace such that\n" 
                           "they all have equal energy") 
@@ -159,7 +169,7 @@ class GPRPyCWApp:
             command=lambda : [self.tpowGain(proj),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         tpowButton.config(height=1, width=halfwid)
-        tpowButton.grid(row=8, column=rightcol, sticky='nsew')
+        tpowButton.grid(row=9, column=rightcol, sticky='nsew')
         self.balloon.bind(tpowButton,
                           "t-power gain. Increases the power of the\n"
                           "signal by a factor of (two-way travel time)^p,\n"
@@ -172,7 +182,7 @@ class GPRPyCWApp:
             command=lambda : [self.agcGain(proj),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         agcButton.config(height=1, width=halfwid)
-        agcButton.grid(row=8, column=rightcol+1, sticky='nsew')
+        agcButton.grid(row=9, column=rightcol+1, sticky='nsew')
         self.balloon.bind(agcButton,
                           "Automatic gain controll. Normalizes the power\n"
                           "of the signal per given sample window along\n" 
@@ -186,7 +196,7 @@ class GPRPyCWApp:
                                 self.plotSemb(proj,a=alin,canvas=canvas,
                                               semb=proj.linSemb,title='linear semblance')])
         LinSembButton.config(height = 1, width = 2*halfwid)
-        LinSembButton.grid(row=9, column=rightcol, sticky='nsew',columnspan=colsp)
+        LinSembButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(LinSembButton,
                           "Calculate the linear semblance for the\n"
                           "selected velocity ranges and two-way\n" 
@@ -201,7 +211,7 @@ class GPRPyCWApp:
                                               title='hyperbolic semblance',
                                               ylabel='two-way travel time [ns]')])
         HypSembButton.config(height = 1, width = 2*halfwid)
-        HypSembButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        HypSembButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HypSembButton,
                           "Calculate the hyperbolic semblance for\n"
                           "the selected velocity ranges and two-way\n" 
@@ -213,7 +223,7 @@ class GPRPyCWApp:
             command = lambda : [self.addLin(proj),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddLinButton.config(height = 1, width = halfwid)
-        AddLinButton.grid(row=11,column=rightcol, sticky='nsew')
+        AddLinButton.grid(row=12,column=rightcol, sticky='nsew')
         self.balloon.bind(AddLinButton,
                           "Draw line with chosen velocity\n"
                           "and intercept two-way travel time \n"
@@ -225,7 +235,7 @@ class GPRPyCWApp:
             command = lambda : [self.addHyp(proj),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         AddHypButton.config(height = 1, width = halfwid)
-        AddHypButton.grid(row=11,column=rightcol+1, sticky='nsew')
+        AddHypButton.grid(row=12,column=rightcol+1, sticky='nsew')
         self.balloon.bind(AddHypButton,
                           "Draw hyperbola with chosen velocity\n"
                           "and apex two-way travel time \n"
@@ -237,7 +247,7 @@ class GPRPyCWApp:
             command = lambda : [proj.remLin(),
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemLinButton.config(height = 1, width = halfwid)
-        RemLinButton.grid(row=12,column=rightcol, sticky='nsew')
+        RemLinButton.grid(row=13,column=rightcol, sticky='nsew')
         self.balloon.bind(RemLinButton,
                           "Remove the most recently drawn\n"
                           "line from data")
@@ -248,7 +258,7 @@ class GPRPyCWApp:
             command = lambda : [proj.remHyp(),
             self.plotCWData(proj,a=adata,canvas=canvas)])
         RemHypButton.config(height = 1, width = halfwid)
-        RemHypButton.grid(row=12,column=rightcol+1, sticky='nsew')
+        RemHypButton.grid(row=13,column=rightcol+1, sticky='nsew')
         self.balloon.bind(RemHypButton,
                           "Remove the most recently drawn\n"
                           "hyperbola from data")
@@ -259,7 +269,7 @@ class GPRPyCWApp:
             command = lambda : [self.toggleLnHp(),
                                 self.plotCWData(proj,a=adata,canvas=canvas)])
         ShowLnHpButton.config(height = 1, width = 2*halfwid)
-        ShowLnHpButton.grid(row=13,column=rightcol, sticky='nsew',columnspan=colsp)
+        ShowLnHpButton.grid(row=14,column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(ShowLnHpButton,
                           "Toggle on/off showing the\n"
                           "drawn lines / hyperbolae")
@@ -269,7 +279,7 @@ class GPRPyCWApp:
             text="print figure", fg="black",
             command = lambda : [self.printFigures(proj,fig)])
         PrintFigButton.config(height = 1, width = 2*halfwid)
-        PrintFigButton.grid(row=14,column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintFigButton.grid(row=15,column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(PrintFigButton,
                           "Saves the current panels as pdfs with \n"
                           "chosen resolution. If there are hyperbolae \n" 
@@ -281,7 +291,7 @@ class GPRPyCWApp:
             text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce the current \n'
                           'status as a\n'
@@ -633,6 +643,15 @@ class GPRPyCWApp:
         if maxY is not None:
             proj.truncateY(maxY)
 
+            
+    def cut(self,proj):
+        minX = sd.askfloat("Input","Minimum antenna separation")
+        if minX is not None:
+            maxX = sd.askfloat("Input","Maximum antenna separation")
+            if maxX is not None:
+                proj.cut(minX,maxX)
+
+            
     def dewow(self,proj):
         window = sd.askinteger("Input","Dewow window width (number of samples)")
         if window is not None:
