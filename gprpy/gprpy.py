@@ -347,8 +347,20 @@ class gprpy2d:
         self.profilePos = np.linspace(minPos,maxPos,len(self.profilePos))       
         # Put what you did in history
         histstr = "mygpr.adjProfile(%g,%g)" %(minPos,maxPos)
-        self.history.append(histstr)   
+        self.history.append(histstr)
 
+
+    def cut(self,minPos,maxPos):
+        # Store previous state for undo
+        self.storePrevious()
+        zeroind = np.abs(self.profilePos - minPos).argmin()
+        maxind = np.abs(self.profilePos - maxPos).argmin()
+        self.data = self.data[:,zeroind:(maxind+1)]
+        self.profilePos=self.profilePos[zeroind:(maxind+1)]
+        # Put into history string
+        histstr = "mygpr.cut(%g,%g)" %(minPos,maxPos)
+        self.history.append(histstr)
+        
         
     def setZeroTime(self,newZeroTime):
         # Store previous state for undo
