@@ -658,13 +658,10 @@ class GPRPyApp:
                 # First calculate along-track points
                 topoVal = proj.threeD[:,2]
                 npos = proj.threeD.shape[0]
-                # Here, the we do not include the elevation, because the topography
-                # has been corrected (unlike when we lay out the tape measure on a
-                # tilted surface).
                 steplen = np.sqrt(
                     np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
-                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0)
-                    #np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
+                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
+                    np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
                 )
                 alongdist = np.cumsum(steplen)
                 topoPos = np.append(0,alongdist)
