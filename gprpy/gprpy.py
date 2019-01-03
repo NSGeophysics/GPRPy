@@ -357,6 +357,8 @@ class gprpy2d:
         maxind = np.abs(self.profilePos - maxPos).argmin()
         self.data = self.data[:,zeroind:(maxind+1)]
         self.profilePos=self.profilePos[zeroind:(maxind+1)]
+        if self.data_pretopo is not None:
+            self.data_pretopo = self.data_pretopo[:,zeroind:(maxind+1)]
         # Put into history string
         histstr = "mygpr.cut(%g,%g)" %(minPos,maxPos)
         self.history.append(histstr)
