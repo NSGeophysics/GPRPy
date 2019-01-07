@@ -725,7 +725,7 @@ class GPRPyApp:
                 if gpyes:
                     filename = fd.askopenfilename()
                     self.getDelimiter()
-                    proj.exportVTK(outfile,gpsinfo=filename,thickness=thickness,delimiter=self.delimiter,aspect=aspect)        
+                    proj.exportVTK(outfile,gpsinfo=filename,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
             else:
                 proj.exportVTK(outfile,gpsinfo=proj.threeD,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
             print('... done with exporting to VTK.')

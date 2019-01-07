@@ -287,7 +287,8 @@ def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porde
                 np.power( gpsmat[1:npos,2]-gpsmat[0:npos-1,2] ,2.0)
             )
             alongdist = np.cumsum(steplen)
-            gpsPos = np.append(0,alongdist)
+            # gpsPos = np.append(0,alongdist)
+            gpsPos = np.append(0,alongdist) + np.min(profilePos)
             # We assume that the profilePos are the correct along-profile
             # points of the measurements (they can be correted with adj profile)
             # For some along-profile points, we have the elevation from prepTopo
@@ -305,7 +306,8 @@ def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porde
                 np.power( gpsmat[1:npos,1]-gpsmat[0:npos-1,1] ,2.0)  
             )
             alongdist = np.cumsum(steplen)
-            gpsPos = np.append(0,alongdist)
+            # gpsPos = np.append(0,alongdist)
+            gpsPos = np.append(0,alongdist) + np.min(profilePos)
             xval = gpsmat[:,0]
             zval = gpsmat[:,1]
             x = interp.pchip_interpolate(gpsPos,xval,profilePos)

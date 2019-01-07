@@ -327,6 +327,8 @@ class gprpy2d:
         # Flips the profile left to right (start to end)
         self.storePrevious()
         self.data=np.flip(self.data,1)
+        if self.data_pretopo is not None:
+            self.data_pretopo = np.flip(self.data_pretopo,1)
         histstr = "mygpr.flipProfile()"
         self.history.append(histstr)
         
