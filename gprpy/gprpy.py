@@ -639,9 +639,9 @@ class gprpyCW(gprpy2d):
         # Initialize previous for undo
         self.previous = {}
         self.dtype = dtype
-        # Semblance plots
-        self.linSemb = None
-        self.hypSemb = None
+        # Stacked amplitude plots
+        self.linStAmp = None
+        self.hypStAmp = None
         # Picked lines and hyperbolae
         self.lins = list()
         self.hyps = list()
@@ -657,8 +657,8 @@ class gprpyCW(gprpy2d):
         self.previous["profilePos"] = self.profilePos
         self.previous["history"] = self.history
         self.previous["dtype"] = self.dtype
-        self.previous["hypSemb"] = self.hypSemb
-        self.previous["linSemb"] = self.linSemb
+        self.previous["hypStAmp"] = self.hypStAmp
+        self.previous["linStAmp"] = self.linStAmp
         self.previous["lins"] = self.lins
         self.previous["hyps"] = self.hyps
 
@@ -701,7 +701,7 @@ class gprpyCW(gprpy2d):
         self.history.append(histstr) 
 
 
-    def linSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
+    def linStackedAmplitude(self,vmin=0.01,vmax=0.35,vint=0.01):
         # Store previous state for undo
         self.storePrevious()
         self.vVals = np.arange(vmin,vmax+vint,vint)
@@ -709,14 +709,14 @@ class gprpyCW(gprpy2d):
             typefact = 1
         elif self.dtype is "CMP":
             typefact = 2
-        self.linSemb = tools.linSemblance(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
-        print("calculated linear semblance")
+        self.linStAmp = tools.linStackedAmplitude(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
+        print("calculated linear stacked amplitude")
         # Put what you did in history
-        histstr = "mygpr.linSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
+        histstr = "mygpr.linStackedAmplitude(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
         self.history.append(histstr)
         
 
-    def hypSemblance(self,vmin=0.01,vmax=0.35,vint=0.01):
+    def hypStackedAmplitude(self,vmin=0.01,vmax=0.35,vint=0.01):
         # Store previous state for undo
         self.storePrevious()
         self.vVals = np.arange(vmin,vmax+vint,vint)
@@ -724,10 +724,10 @@ class gprpyCW(gprpy2d):
             typefact = 1
         elif self.dtype is "CMP":
             typefact = 2
-        self.hypSemb = tools.hypSemblance(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
-        print("calculated hyperbola semblance")
+        self.hypStAmp = tools.hypStackedAmplitude(self.data,self.profilePos,self.twtt,self.vVals,self.twtt,typefact)
+        print("calculated hyperbola stacked amplitude")
         # Put what you did in history
-        histstr = "mygpr.hypSemblance(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
+        histstr = "mygpr.hypStackedAmplitude(vmin=%g,vmax=%g,vint=%g)" %(vmin,vmax,vint)
         self.history.append(histstr)                  
 
 
@@ -819,33 +819,27 @@ class gprpyCW(gprpy2d):
 
 
 
-    def prepSembFig(self, whichsemb="lin", saturation=1.0, yrng=None, vrng=None, sembrep="lin"):
+    def prepStAmpFig(self, whichstamp="lin", saturation=1.0, yrng=None, vrng=None):
         dt=self.twtt[3]-self.twtt[2]
         dv=self.vVals[3]-self.vVals[2]
-        if whichsemb == "lin":
-            semb = self.linSemb
-            title = "linear semblance"
-        elif whichsemb == "hyp":
-            semb = self.hypSemb
-            title = "hyperbolic semblance"
+        if whichstamp == "lin":
+            stamp = self.linStAmp
+            title = "linear stacked amplitude"
+        elif whichstamp == "hyp":
+            stamp = self.hypStAmp
+            title = "hyperbolic stacked amplitude"
         else:
-            semb = None
+            stamp = None
             
-        if semb is not None:
-            if sembrep == "lin":
-                stdcont = np.nanmax(np.abs(semb)[:])
-                plt.imshow(np.flipud(np.abs(semb)), cmap='inferno',
-                           extent=[np.min(self.vVals)-dv/2.0, np.max(self.vVals)+dv/2.0,
-                                   np.min(self.twtt)-dt/2.0,  np.max(self.twtt)+dt/2.0],
-                           aspect='auto',
-                           vmin=0, vmax=stdcont/saturation)
-            elif self.sembrep.get() == "log":
-                stdcont = np.nanmax(np.log(np.abs(semb))[:])
-                plt.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno',
-                           extent=[np.min(self.vVals)-dv/2.0, np.max(self.vVals)+dv/2.0,
-                                   np.min(self.twtt)-dt/2.0,  np.max(self.twtt)+dt/2.0],
-                         aspect='auto',
-                         vmin=0, vmax=stdcont/saturation)
+        if stamp is not None:
+            stdcont = np.nanmax(np.abs(stamp)[:])
+            plt.imshow(np.flipud(np.abs(stamp)), cmap='inferno',
+                       extent=[np.min(self.vVals)-dv/2.0,
+                               np.max(self.vVals)+dv/2.0,
+                               np.min(self.twtt)-dt/2.0,
+                               np.max(self.twtt)+dt/2.0],
+                       aspect='auto',
+                       vmin=0, vmax=stdcont/saturation)
 
             if yrng is not None:
                 yrng=[np.max(yrng),np.min(yrng)]
@@ -867,7 +861,7 @@ class gprpyCW(gprpy2d):
             plt.gca().get_xaxis().set_ticks_position('both')
             plt.gca().get_yaxis().set_ticks_position('both')
                                 
-        return whichsemb, saturation, yrng, vrng, sembrep
+        return whichstamp, saturation, yrng, vrng
 
     
     
@@ -876,8 +870,8 @@ class gprpyCW(gprpy2d):
         plt.show(block=False)
 
 
-    def showSembFig(self, **kwargs):        
-        self.prepSembFig(**kwargs)
+    def showStAmpFig(self, **kwargs):        
+        self.prepStAmpFig(**kwargs)
         plt.show(block=False)
         
        
@@ -891,9 +885,9 @@ class gprpyCW(gprpy2d):
         self.history.append(histstr)
 
 
-    def printSembFigure(self, figname, dpi=600, **kwargs):
-        whichsemb, saturation, yrng, vrng, sembrep = self.prepSembFig(**kwargs)
+    def printStAmpFigure(self, figname, dpi=600, **kwargs):
+        whichstamp, saturation, yrng, vrng = self.prepStAmpFig(**kwargs)
         plt.savefig(figname, format='pdf', dpi=dpi)
         plt.close('all')
-        histstr = "mygpr.printSembFigure('%s', whichsemb='%s', saturation=%g, yrng=[%g,%g], vrng=[%g,%g], sembrep='%s')" %(figname, whichsemb, saturation, yrng[0], yrng[1], vrng[0], vrng[1], sembrep)
+        histstr = "mygpr.printStAmpFigure('%s', whichstamp='%s', saturation=%g, yrng=[%g,%g], vrng=[%g,%g])" %(figname, whichstamp, saturation, yrng[0], yrng[1], vrng[0], vrng[1])
         self.history.append(histstr)

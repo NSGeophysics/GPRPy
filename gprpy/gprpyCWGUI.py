@@ -16,7 +16,7 @@ import scipy.interpolate as interp
 
 
 colsp=2
-rightcol=10
+rightcol=9
 halfwid=4
 figrowsp=16+1
 
@@ -48,8 +48,8 @@ class GPRPyCWApp:
         adata.get_yaxis().set_label_position('right')
         adata.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])
         
-        alin.set_title('linear semblance')
-        ahyp.set_title('hyperbolic semblance')
+        alin.set_title('linear stacked amplitude')
+        ahyp.set_title('hyperbolic stacked amplitude')
         ahyp.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])        
         
         canvas = FigureCanvasTkAgg(fig, master=self.window)
@@ -189,33 +189,33 @@ class GPRPyCWApp:
                           "each trace.")
 
         
-        # Lin Semblance
-        LinSembButton = tk.Button(
-            text="lin semb", fg="black",
-            command = lambda : [self.linSemb(proj),
-                                self.plotSemb(proj,a=alin,canvas=canvas,
-                                              semb=proj.linSemb,title='linear semblance')])
-        LinSembButton.config(height = 1, width = 2*halfwid)
-        LinSembButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(LinSembButton,
-                          "Calculate the linear semblance for the\n"
-                          "selected velocity ranges and two-way\n" 
-                          "travel times.")
-        
-        # Hyp Semblance
-        HypSembButton = tk.Button(
-            text="hyp semb", fg="black",
-            command = lambda : [self.hypSemb(proj),
-                                self.plotSemb(proj,a=ahyp,canvas=canvas,
-                                              semb=proj.hypSemb,
-                                              title='hyperbolic semblance',
-                                              ylabel='two-way travel time [ns]')])
-        HypSembButton.config(height = 1, width = 2*halfwid)
-        HypSembButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
-        self.balloon.bind(HypSembButton,
-                          "Calculate the hyperbolic semblance for\n"
+        # Lin Stacked Amplitude
+        LinStAmpButton = tk.Button(
+            text="lin st amp", fg="black",
+            command = lambda : [self.linStAmp(proj),
+                                self.plotStAmp(proj,a=alin,canvas=canvas,
+                                               stamp=proj.linStAmp,title='linear stacked amplitude')])
+        LinStAmpButton.config(height = 1, width = 2*halfwid)
+        LinStAmpButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(LinStAmpButton,
+                          "Calculate the linear stacked amplitude for\n"
                           "the selected velocity ranges and two-way\n" 
                           "travel times.")
+        
+        # Hyp Stacked Amplitude
+        HypStAmpButton = tk.Button(
+            text="hyp st amp", fg="black",
+            command = lambda : [self.hypStAmp(proj),
+                                self.plotStAmp(proj,a=ahyp,canvas=canvas,
+                                               stamp=proj.hypStAmp,
+                                               title='hyperbolic stacked amplitude',
+                                               ylabel='two-way travel time [ns]')])
+        HypStAmpButton.config(height = 1, width = 2*halfwid)
+        HypStAmpButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
+        self.balloon.bind(HypStAmpButton,
+                          "Calculate the hyperbolic stacked amplitude for\n"
+                          "the selected velocity ranges and two-way travel\n" 
+                          "times.")
 
         # Add line on top of data
         AddLinButton = tk.Button(
@@ -331,9 +331,11 @@ class GPRPyCWApp:
             text="full view", fg="black",
             command=lambda : [self.setFullView(proj),
                               self.plotCWData(proj,a=adata,canvas=canvas),
-                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
-                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
-                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+                              self.plotStAmp(proj,a=alin,canvas=canvas,stamp=proj.linStAmp,
+                                             title='linear stacked amplitude'),
+                              self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
+                                            title='hyperbolic stacked amplitude',
+                                             ylabel='two-way travel time [ns]')])
         FullButton.config(height = 1, width = 2*halfwid)         
         FullButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
         self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
@@ -341,35 +343,24 @@ class GPRPyCWApp:
         
         # Saturation
         sattext = tk.StringVar()
-        sattext.set("semblance sat")
+        sattext.set("stacked amp sat")
         satlabel = tk.Label(master, textvariable=sattext,height = 1,width = 4*halfwid)
         satlabel.grid(row=0, column=2, sticky='nsew')
-        self.balloon.bind(satlabel,"Semblance color saturation")
+        self.balloon.bind(satlabel,"Stacked amplitude color saturation")
         self.saturation = tk.DoubleVar()
         satbox = tk.Entry(master, textvariable=self.saturation, width=4*halfwid)
         satbox.grid(row=1, column=2, sticky='nsew')
         self.saturation.set("1.0")
         
-
-        # Lin or log mode switch for semblance representation
-        self.sembrep=tk.StringVar()
-        self.sembrep.set("lin")
-        repswitch = tk.OptionMenu(master,self.sembrep,"lin","log")
-        repswitch.grid(row=0, column=3, sticky='nsew',rowspan=2)
-        self.balloon.bind(repswitch,
-                          "Choose between linear\n"
-                          "and logarithmic scale\n" 
-                          "for semblance colors.")
-
         
-         # Set velocity range
+        # Set velocity range
         VelrngButton = tk.Button(
             text="set vel range", fg="black",
             command=lambda : [self.setVelRng()])
         VelrngButton.config(height = 1, width = 2*halfwid)         
-        VelrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
+        VelrngButton.grid(row=0, column=3, sticky='nsew',rowspan=2)
         self.balloon.bind(VelrngButton,"Set the velocity range\n"
-                                       "used in the semblance\n"
+                                       "used in the stacked amplitude\n"
                                        "analysis.")
         
         # X range
@@ -378,7 +369,7 @@ class GPRPyCWApp:
             command=lambda : [self.setXrng(),
                               self.plotCWData(proj,a=adata,canvas=canvas)])
         XrngButton.config(height = 1, width = 2*halfwid)         
-        XrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
+        XrngButton.grid(row=0, column=4, sticky='nsew',rowspan=2)
         self.balloon.bind(XrngButton,"Set the x-axis display limits.")
         
         
@@ -387,11 +378,13 @@ class GPRPyCWApp:
             text="set y-range", fg="black",
             command=lambda : [self.setYrng(),
                               self.plotCWData(proj,a=adata,canvas=canvas),
-                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
-                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
-                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+                              self.plotStAmp(proj,a=alin,canvas=canvas,
+                                             stamp=proj.linStAmp,title='linear stacked amplitude'),
+                              self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
+                                            title='hyperbolic stacked amplitude',
+                                            ylabel='two-way travel time [ns]')])
         YrngButton.config(height = 1, width = 2*halfwid)         
-        YrngButton.grid(row=0, column=6, sticky='nsew',rowspan=2)
+        YrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
         
@@ -400,11 +393,11 @@ class GPRPyCWApp:
         contrtext = tk.StringVar()
         contrtext.set("contrast")
         contrlabel = tk.Label(master, textvariable=contrtext,height = 1,width = 2*halfwid)
-        contrlabel.grid(row=0, column=7, sticky='nsew')
+        contrlabel.grid(row=0, column=6, sticky='nsew')
         self.balloon.bind(contrlabel,"Data color saturation")
         self.contrast = tk.DoubleVar()
         contrbox = tk.Entry(master, textvariable=self.contrast, width=2*halfwid)
-        contrbox.grid(row=1, column=7, sticky='nsew')
+        contrbox.grid(row=1, column=6, sticky='nsew')
         self.contrast.set("1.0")
 
         
@@ -412,7 +405,7 @@ class GPRPyCWApp:
         self.color=tk.StringVar()
         self.color.set("gray")
         colswitch = tk.OptionMenu(master,self.color,"gray","bwr")
-        colswitch.grid(row=0, column=8, sticky='nsew',rowspan=2)
+        colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
                           "and red-white-blue (rwb)\n" 
@@ -424,11 +417,13 @@ class GPRPyCWApp:
         plotButton = tk.Button(
             text="refresh plot",
             command=lambda : [self.plotCWData(proj,a=adata,canvas=canvas),
-                              self.plotSemb(proj,a=alin,canvas=canvas,semb=proj.linSemb,title='linear semblance'),
-                              self.plotSemb(proj,a=ahyp,canvas=canvas,semb=proj.hypSemb,
-                                            title='hyperbolic semblance',ylabel='two-way travel time [ns]')])
+                              self.plotStAmp(proj,a=alin,canvas=canvas,
+                                             stamp=proj.linStAmp,title='linear stacked amplitude'),
+                              self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
+                                            title='hyperbolic stacked amplitude',
+                                             ylabel='two-way travel time [ns]')])
         plotButton.config(height = 1, width = 2*halfwid)
-        plotButton.grid(row=0, column=9, sticky='nsew',rowspan=2)
+        plotButton.grid(row=0, column=8, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
                           "Refreshes the figure after changes\n"
                           "in the visualization settings. Also\n"
@@ -542,35 +537,17 @@ class GPRPyCWApp:
         canvas.draw()
 
         
-    def plotSemb(self,proj,a,canvas,semb,title,ylabel=None):
+    def plotStAmp(self,proj,a,canvas,stamp,title,ylabel=None):
         dt=proj.twtt[3]-proj.twtt[2]
-        if semb is not None:
+        if stamp is not None:
             dv=proj.vVals[1]-proj.vVals[0]
             a.clear()
-            if self.sembrep.get() == "lin":
-                #print("Linear semblance representation")
-                stdcont = np.nanmax(np.abs(semb)[:])
-                a.imshow(np.flipud(np.abs(semb)), cmap='inferno',
-                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
-                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
-                         aspect='auto',
-                         vmin=0, vmax=stdcont/self.saturation.get())
-            elif self.sembrep.get() == "log":
-                #print("Logarithmic semblance representation")
-                stdcont = np.nanmax(np.log(np.abs(semb))[:])
-                a.imshow(np.flipud(np.log(np.abs(semb))), cmap='inferno',
-                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
-                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
-                         aspect='auto',
-                         vmin=0, vmax=stdcont/self.saturation.get())
-            elif self.sembrep.get() == "exp":
-                #print("Exponential semblance representation")
-                stdcont = np.nanmax(np.exp(np.abs(semb))[:])
-                a.imshow(np.flipud(np.exp(np.abs(semb))), cmap='inferno',
-                         extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
-                                 np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
-                         aspect='auto',
-                         vmin=0, vmax=stdcont/self.saturation.get())
+            stdcont = np.nanmax(np.abs(stamp)[:])
+            a.imshow(np.flipud(np.abs(stamp)), cmap='inferno',
+                     extent=[np.min(proj.vVals)-dv/2.0, np.max(proj.vVals)+dv/2.0,
+                             np.min(proj.twtt)-dt/2.0,  np.max(proj.twtt)+dt/2.0],
+                     aspect='auto',
+                     vmin=0, vmax=stdcont/self.saturation.get())
 
                 
             a.set_ylim(self.yrng)
@@ -674,11 +651,11 @@ class GPRPyCWApp:
             proj.agcGain(window=window)
 
             
-    def linSemb(self,proj):
-        proj.linSemblance(self.vmin,self.vmax,self.vint)
+    def linStAmp(self,proj):
+        proj.linStackedAmplitude(self.vmin,self.vmax,self.vint)
 
-    def hypSemb(self,proj):
-        proj.hypSemblance(self.vmin,self.vmax,self.vint)
+    def hypStAmp(self,proj):
+        proj.hypStackedAmplitude(self.vmin,self.vmax,self.vint)
         
 
     def addLin(self,proj):
@@ -721,21 +698,19 @@ class GPRPyCWApp:
                                    dpi=dpi, showlnhp=self.showlnhp)                
                 print('Printed %s' %(fignamesplit[0]+"_data"+fignamesplit[1]))
                 
-                if proj.linSemb is not None:
-                     proj.printSembFigure(fignamesplit[0]+"_linSemb"+fignamesplit[1], whichsemb="lin",
-                                          saturation=self.saturation.get(),
-                                          yrng=self.yrng, vrng=[self.vmin,self.vmax],
-                                          sembrep=self.sembrep.get(),
-                                          dpi=dpi)
-                     print('Printed %s' %(fignamesplit[0]+"_linSemb"+fignamesplit[1]))
+                if proj.linStAmp is not None:
+                     proj.printStAmpFigure(fignamesplit[0]+"_linStAmp"+fignamesplit[1], whichstamp="lin",
+                                           saturation=self.saturation.get(),
+                                           yrng=self.yrng, vrng=[self.vmin,self.vmax],
+                                           dpi=dpi)
+                     print('Printed %s' %(fignamesplit[0]+"_linStAmp"+fignamesplit[1]))
                      
-                if proj.hypSemb is not None:
-                     proj.printSembFigure(fignamesplit[0]+"_hypSemb"+fignamesplit[1], whichsemb="hyp",
-                                          saturation=self.saturation.get(),
-                                          yrng=self.yrng, vrng=[self.vmin,self.vmax],
-                                          sembrep=self.sembrep.get(),
-                                          dpi=dpi)
-                     print('Printed %s' %(fignamesplit[0]+"_hypSemb"+fignamesplit[1]))
+                if proj.hypStAmp is not None:
+                     proj.printStAmpFigure(fignamesplit[0]+"_hypStAmp"+fignamesplit[1], whichstamp="hyp",
+                                           saturation=self.saturation.get(),
+                                           yrng=self.yrng, vrng=[self.vmin,self.vmax],
+                                           dpi=dpi)
+                     print('Printed %s' %(fignamesplit[0]+"_hypStAmp"+fignamesplit[1]))
                 
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
