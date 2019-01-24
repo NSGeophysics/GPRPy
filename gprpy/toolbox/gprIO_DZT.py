@@ -3,7 +3,18 @@ import numpy as np
 #import re # Regular expressions
 
 def readdzt(filename):
+    '''
+    Reads a GSSI .DZT data file. I learned from A. Tzanis' MatGPR 
+    dzt import function how the dzt file header is stored.
 
+    INPUT: 
+    filename     data file name including .DZT extension
+
+    OUTPUT:
+    data          data matrix whose columns contain the traces
+    info          dict with information from the header
+    '''
+    
     # With help from reviewdztheader.m by Andreas Tzanis
 
     info = {}

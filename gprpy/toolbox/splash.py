@@ -9,9 +9,13 @@ import matplotlib.image as im
 from scipy import signal
 
 def showSplash(a,dir_path,widfac,highfac,fontfac):
+    '''
+    Creates the splash screen shown when starting GPRPy GUI for 
+    common-offset profiles.
+    '''
     try:
         filename=os.path.join(dir_path,'exampledata','SnS','ComOffs','XLINE00.DT1')
-        snakeGPR = gp.gprpy2d(filename)
+        snakeGPR = gp.gprpyProfile(filename)
         maxpoint=100;
         x=snakeGPR.twtt[0:maxpoint]
         y=snakeGPR.data[0:maxpoint,10]
@@ -66,7 +70,15 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         #'size': 45.6
         }
 #    a.text(35,-10000,'GPRPy',fontdict=font)
-    a.text(50,-10000,'GPRPy',fontdict=font)
+    a.text(70,-10000,'GPRPy',fontdict=font)
+
+    fontver = {'family': 'DejaVu Sans',
+        'color':  'black',
+        'style': 'italic',
+        'size': 10*fontfac
+        #'size': 45.6
+        }
+    a.text(10,-22000,'Version 1.0.0',fontdict=fontver)
 
     # add UA logo
     filename1=os.path.join(dir_path,'toolbox','splashdat',

@@ -4,6 +4,18 @@ import re # Regular expressions
 
 
 def readMALA(file_name):
+    '''
+    Reads the MALA .rd3 data file and the .rad header. Can also be used
+    to read .rd7 files but I'm not sure if they are really organized
+    the same way.
+
+    INPUT: 
+    file_name     data file name without the extension!
+
+    OUTPUT:
+    data          data matrix whose columns contain the traces
+    info          dict with information from the header
+    '''
     # First read header
     info = readGPRhdr(file_name+'.rad')
     try:
@@ -23,6 +35,15 @@ def readMALA(file_name):
 
 
 def readGPRhdr(filename):
+    '''
+    Reads the MALA header
+
+    INPUT: 
+    filename      file name for header with .rad extension
+    
+    OUTPUT:
+    info          dict with information from the header
+    '''
     # Read in text file
     info = {}
     with open(filename) as f:

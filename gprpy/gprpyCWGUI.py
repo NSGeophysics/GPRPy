@@ -25,6 +25,10 @@ tagy=5 # -3
 
 
 class GPRPyCWApp:
+    '''
+    GPRPy class for graphical user interface for GPR common midpoint
+    and wide angle reflection and refraction data.
+    '''
 
     def __init__(self,master):
         self.window = master

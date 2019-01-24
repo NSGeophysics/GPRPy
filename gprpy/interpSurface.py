@@ -4,6 +4,24 @@ from pyevtk.hl import gridToVTK
 
 
 def interpSurface(pointfile,outfile,nxgrid=100,nygrid=100,method='spline',delimiter='\t',kx=1,ky=1):
+    '''
+    Creates a surface interpolating the provided three dimensional points.
+
+    INPUT:
+    pointfile      ASCII text file with three columns containing 
+                   x, y, z or Easting, Northing, Elevation points               
+    outfile        filename for VTK file containing the surface 
+                   interpolating the given points
+    nxgrid         number of mesh points along x-axis
+    nygrid         number of mesh points along y-axis
+    method         interpolation method: "spline", "nearest",
+                   "linear", or "cubic" [default: spline]
+    delimiter      for ASCII text input file: what is the delimiter?
+                   [default: '\t'  meaining tab]
+    kx, ky         If spline interpolation is used: 
+                   Spline polynomial order in x and y direction
+    '''
+    
     # method could be 'nearest', 'linear', 'cubic', or 'spline'.
     # For spline: Set kx and ky. They are the orders of the polynomial
     

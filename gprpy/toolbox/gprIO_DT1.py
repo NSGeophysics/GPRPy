@@ -3,6 +3,16 @@ import numpy as np
 import re # Regular expressions
 
 def readdt1(filename):
+    '''
+    Reads the Sensors and Software .DT1 data files. This function is
+    a Python translation of http://www.lucabaradello.it/files/dt1read.m
+
+    INPUT: 
+    filename      data file name including the .DT1 extension
+
+    OUTPUT:
+    data          data matrix whose columns contain the traces
+    '''
     # This function is a python translation of dt1read.m from
     # http://www.lucabaradello.it/files/dt1read.m
     headlen = 32
@@ -36,6 +46,16 @@ def readdt1(filename):
         
        
 def readdt1Header(filename):
+    '''
+    Reads the Sensors and Software .HD header files.
+
+    INPUT: 
+    filename      header file name including the .HD extension
+
+    OUTPUT:
+    info          dict with information from the header
+    '''
+    
     info = {}
     with open(filename,"r") as datafile:
         datafile.readline()

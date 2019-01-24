@@ -10,6 +10,16 @@ from scipy.ndimage import gaussian_filter
 
 
 def reduceSampling(gpr,nprofile,ntwtt):
+    '''
+    Helper function to coarsen the input data in order
+    to reduce memory and computational cost. This could 
+    probably be replaced by scipy.ndimage.zoom
+
+    INPUT:
+    gpr          gprProfile object
+    nprofile     number of samples along the profile
+    ntwtt        number of samples along the two-way travel time
+    '''
     
     #gpr2 = copy.copy(gpr)
     if gpr.data_pretopo is None:
@@ -61,9 +71,41 @@ def reduceSampling(gpr,nprofile,ntwtt):
 
 
 def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,ndepth=None,method='nearest',absvals=False):
-    # nprofile, ndepth: reduce along profile and time
+    '''
+    Creates an interpolated data cube from a list of .gpr (GPRPy)
+    preprocessed files. Allows for subsampling (to reduce computational 
+    cost) and for smoothing (to help interpretation) 
     
-    gpr=gp.gprpy2d(datalist[0])
+    INPUT:
+    datalist      Python list containing the filenames (strings) for
+                  the preprocessed .gpr (GPRPy) data
+    outname       file name for the VTK file containing the resulting
+                  interpolated (and smoothed) data cube. Can be visualized 
+                  using for example Paraview or MayaVi
+    nx            number of mesh points along x-axis [default: 50]
+    ny            number of mesh points along y-axis [default: 50]
+    nz            number of mesh points along z-axis [default: 50]
+    smooth        if smoothing is desired: Standard deviation for Gaussian
+                  kernel. Either as a single number for same smoothing in all
+                  directions, or as (smx,smy,smz) with smx smoothing in 
+                  x-direction, smy smoothing in y-direction, and smz smoothing
+                  in z-direction [default: None]
+    nprofile      if subsampling is desired: Number of samples along 
+                  the profile [default: None  meaning do not subsample]
+    ndepth        if subsampling is desired: Number of samples along the 
+                  two-way travel time [default: None  meaning do not subsample]
+    method        method for interpolation: "nearest", "linear", or "cubic" 
+                  I highly highly recommend "nearest" because the others
+                  are computationally much more costly [default: "nearest"]
+                  If "nearest" leads to too blocky results, use smoothing.
+    absvals       False or True: Use absolute values of the data? 
+                  I recommend this when using smoothing as the positive and 
+                  negative part of reflected waves will then be smoothed into 
+                  one big positive reflector instead of cancelling out.
+                  [default: False]
+    '''
+    
+    gpr=gp.gprpyProfile(datalist[0])
 
     gpr,nprofile,ndepth = reduceSampling(gpr,nprofile,ndepth)
             
@@ -80,7 +122,7 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
     print('Reading in profiles ...')
     for i in tqdm(range(0,len(datalist))):
         # These need to have a topo correction       
-        gpr=gp.gprpy2d(datalist[i])                
+        gpr=gp.gprpyProfile(datalist[i])                
         gpr,nprofile,ndepth=reduceSampling(gpr,nprofile,ndepth)
         if i==0:
             currentmaxdepth = np.max(np.abs(gpr.depth))

@@ -33,6 +33,9 @@ figcolsp=9
 
 
 class GPRPyApp:
+    '''
+    GPRPy class for graphical user interface for GPR profile data
+    '''
 
     def __init__(self,master):
         self.window = master
@@ -58,7 +61,7 @@ class GPRPyApp:
         self.grid = False
 
         # Initialize the gprpy
-        proj = gp.gprpy2d()
+        proj = gp.gprpyProfile()
 
         # Show splash screen
         fig=Figure(figsize=(8*self.widfac,5*self.highfac))

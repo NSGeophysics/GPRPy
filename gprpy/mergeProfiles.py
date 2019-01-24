@@ -8,22 +8,20 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
     of the first one. 
 
     Make sure you preprocessed them in GPRPy and save them to have the 
-    same starting and end times.
+    correct starting and end times for the profile, or to both start at
+    0 to just append the second profile at the end of the first profile.
 
     INPUT: 
-
-    file1    File name (including path) of the first profile
-    file2    File name (including path) of the second profile
-    outfile  File name (including path) for the merged file
-    gapfill  If there is a gap between the profiles, fill it with
-             zeros (0) or NaN ('NaN')? [default: 0]
-    
-    Last modified by plattner-at-alumni.ethz.ch, 12/20/2018
+    file1      File name (including path) of the first profile
+    file2      File name (including path) of the second profile
+    outfile    File name (including path) for the merged file
+    gapfill    If there is a gap between the profiles, fill it with
+               zeros (0) or NaN ('NaN')? [default: 0]
     '''
 
     # Load the two profiles
-    profile1 = gp.gprpy2d(file1)
-    profile2 = gp.gprpy2d(file2)
+    profile1 = gp.gprpyProfile(file1)
+    profile2 = gp.gprpyProfile(file2)
 
     # make sure starting and end times are the same
     assert (profile1.twtt[0]==profile2.twtt[0] and profile1.twtt[-1]==profile2.twtt[-1]), "\n\nUse GPRPy to cut the profiles to the same two-way travel times\nCurrently: file 1 is %g ns to %g ns and file 2 is %g ns to %g ns \n" %(profile1.twtt[0],profile1.twtt[-1],profile2.twtt[0],profile2.twtt[-1])
@@ -80,7 +78,7 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
     profile1.data = np.asmatrix(np.hstack((profile1.data,profile2.data)))
     
     # Set history to shortest possible:
-    profile1.history = ["mygpr = gp.gprpy2d()", "mygpr.importdata('%s.gpr')" %(outfile)]
+    profile1.history = ["mygpr = gp.gprpyProfile()", "mygpr.importdata('%s.gpr')" %(outfile)]
 
     profile1.info="Merged"
 

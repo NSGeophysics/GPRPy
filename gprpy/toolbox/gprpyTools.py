@@ -9,6 +9,18 @@ from tqdm import tqdm
 
 
 def alignTraces(data):
+    '''
+    Aligns the traces in the profile such that their maximum 
+    amplitudes align at the average two-way travel time of the 
+    maximum amplitudes 
+
+    INPUT:
+    data       data matrix whose columns contain the traces
+
+    OUTPUT:
+    newdata    data matrix with aligned traces
+    '''
+    
     maxlen = data.shape[0]
     newdata = np.asmatrix(np.zeros(data.shape))    
     # Go through all traces to find maximum spike
@@ -33,6 +45,20 @@ def alignTraces(data):
 
 
 def dewow(data,window):
+    '''
+    Subtracts from each sample along each trace an 
+    along-time moving average.
+
+    Can be used as a low-cut filter.
+
+    INPUT:
+    data       data matrix whose columns contain the traces 
+    window     length of moving average window 
+               [in "number of samples"]
+
+    OUTPUT:
+    newdata    data matrix after dewow
+    '''
     totsamps = data.shape[0]
     # If the window is larger or equal to the number of samples,
     # then we can do a much faster dewow
@@ -63,6 +89,20 @@ def dewow(data,window):
 
 
 def smooth(data,window):
+    '''
+    Replaces each sample along each trace with an 
+    along-time moving average.
+
+    Can be used as high-cut filter.
+
+    INPUT:
+    data      data matrix whose columns contain the traces 
+    window    length of moving average window
+              [in "number of samples"]
+
+    OUTPUT:
+    newdata   data matrix after applying smoothing
+    '''
     totsamps = data.shape[0]
     # If the window is larger or equal to the number of samples,
     # then we can do a much faster dewow
@@ -94,6 +134,22 @@ def smooth(data,window):
 
 
 def remMeanTrace(data,ntraces):
+    '''
+    Subtracts from each trace the average trace over
+    a moving average window.
+
+    Can be used to remove horizontal arrivals, 
+    such as the airwave.
+
+    INPUT:
+    data       data matrix whose columns contain the traces 
+    ntraces    window width; over how many traces 
+               to take the moving average.
+
+    OUTPUT:
+    newdata    data matrix after subtracting average traces
+    '''
+
     data=np.asmatrix(data)
     tottraces = data.shape[1]
     # For ridiculous ntraces values, just remove the entire average
@@ -124,6 +180,26 @@ def remMeanTrace(data,ntraces):
 
 
 def profileSmooth(data,profilePos,ntraces=1,noversample=1):
+    '''
+    First creates copies of each trace and appends the copies 
+    next to each trace, then replaces each trace with the 
+    average trace over a moving average window.
+
+    Can be used to smooth-out noisy reflectors appearing 
+    in neighboring traces, or simply to increase the along-profile 
+    resolution by interpolating between the traces.
+
+    INPUT:
+    data            data matrix whose columns contain the traces 
+    profilePos      profile coordinates for the traces in data
+    ntraces         window width [in "number of samples"]; 
+                    over how many traces to take the moving average. 
+    noversample     how many copies of each trace
+
+    OUTPUT:
+    newdata         data matrix after along-profile smoothing 
+    newProfilePos   profile coordinates for output data matrix
+    '''
     # New profile positions
     newProfilePos = np.linspace(profilePos[0],
                                 profilePos[-1],
@@ -159,6 +235,17 @@ def profileSmooth(data,profilePos,ntraces=1,noversample=1):
 
 
 def tpowGain(data,twtt,power):
+    '''
+    Apply a t-power gain to each trace with the given exponent.
+
+    INPUT:
+    data      data matrix whose columns contain the traces
+    twtt      two-way travel time values for the rows in data
+    power     exponent
+
+    OUTPUT:
+    newdata   data matrix after t-power gain
+    '''
     factor = np.reshape(twtt**(float(power)),(len(twtt),1))
     factmat = matlib.repmat(factor,1,data.shape[1])  
     return np.multiply(data,factmat)
@@ -166,6 +253,18 @@ def tpowGain(data,twtt,power):
 
 
 def agcGain(data,window):
+    '''
+    Apply automated gain controll (AGC) by normalizing the energy
+    of the signal over a given window width in each trace
+
+    INPUT:
+    data       data matrix whose columns contain the traces
+    window     window width [in "number of samples"]
+    
+    OUTPUT:
+    newdata    data matrix after AGC gain
+    '''
+    
     eps=1e-8
     totsamps = data.shape[0]
     # If window is a ridiculous value
@@ -196,6 +295,26 @@ def agcGain(data,window):
         
 
 def prepTopo(topofile,delimiter=',',xStart=0):
+    '''
+    Reads an ASCII text file containing either profile/topo coordinates 
+    (if given as two columns) or x,y,z or Easting,Northing,Elevation
+    (if given as three columns)
+
+    INPUT:
+    topofile    file name for the ASCII text file
+    delimiter   delimiter by which the entries are separated 
+                (e.g. ',' or tab '\t') [default: ',']
+    xStart      if three-dimensional topo data is given:
+                profile position of the first x,y,z entry
+                [default: 0]
+
+    OUTPUT:
+    topoPos     the along-profile coordinates for the elevation points      
+    topoVal     the elevation values for the given profile coordinates
+    threeD      n x 3 matrix containing the x, y, z values for the 
+                topography points
+    '''
+    
     # Read topofile, see if it is two columns or three columns.
     # Here I'm using numpy's loadtxt. There are more advanced readers around
     # but this one should do for this simple situation
@@ -233,6 +352,26 @@ def prepTopo(topofile,delimiter=',',xStart=0):
 
 
 def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
+    '''
+    Corrects for topography along the profile by shifting each 
+    Trace up or down depending on provided coordinates.
+
+    INPUT:
+    data          data matrix whose columns contain the traces
+    velocity      subsurface RMS velocity in m/ns
+    profilePos    along-profile coordinates of the traces
+    topoPos       along-profile coordinates for provided elevation
+                  in meters
+    topoVal       elevation values for provided along-profile 
+                  coordinates, in meters
+    twtt          two-way travel time values for the samples, in ns
+
+    OUTPUT:
+    newdata       data matrix with shifted traces, padded with NaN 
+    newtwtt       twtt for the shifted / padded data matrix
+    maxElev       maximum elevation value
+    minElev       minimum elevation value
+    '''
     # We assume that the profilePos are the correct along-profile
     # points of the measurements (they can be correted with adj profile)
     # For some along-profile points, we have the elevation from prepTopo
@@ -268,7 +407,27 @@ def correctTopo(data, velocity, profilePos, topoPos, topoVal, twtt):
     
 
     
-def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porder=3):
+def prepVTK(profilePos,gpsmat=None,smooth=True,win_length=51,porder=3):
+    '''
+    Calculates the three-dimensional coordinates for each trace
+    by interpolating the given three dimensional points along the
+    profile.
+
+    INPUT:
+    profilePos    the along-profile coordinates of the traces
+    gpsmat        n x 3 matrix containing the x, y, z coordinates 
+                  of given three-dimensional points for the profile
+    smooth        Want to smooth the profile's three-dimensional alignment
+                  instead of piecewise linear? [Default: True]
+    win_length    If smoothing, the window length for 
+                  scipy.signal.savgol_filter [default: 51]
+    porder        If smoothing, the polynomial order for
+                  scipy.signal.savgol_filter [default: 3]
+
+    OUTPUT:
+    x, y, z       three-dimensional coordinates for the traces
+    '''
+    
     if gpsmat is None:
         x = profilePos
         y = np.zeros(x.size)
@@ -328,6 +487,27 @@ def prepVTK(profilePos,gpsmat=None,delimiter=',',smooth=True,win_length=51,porde
 
 
 def linStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
+    '''
+    Calculates the linear stacked amplitudes for each two-way 
+    travel time sample and the provided velocity range 
+    by summing the pixels of the data that follow a line given 
+    by the two-way travel time zero offset and the velocity.
+
+    INPUT:
+    data          data matrix whose columns contain the traces
+    profilePos    along-profile coordinates of the traces
+    twtt          two-way travel time values for the samples, in ns
+    vVals         list of velocity values for which to calculate the
+                  linear stacked amplitudes, in m/ns
+    tVals         list of twtt zero-offsets for which to calculate
+                  the linear stacked amplitudes, in ns
+    typefact      factor for antenna separation depending if this is
+                  for CMP (typefact=2) or WARR (typefact=1) data
+
+    OUTPUT:
+    linStAmp      matrix containing the linear stacked amplitudes
+                  for the given data, tVals, and vVals
+    '''
     linStAmp=np.zeros((len(tVals),len(vVals)))
     for vi in tqdm(range(0,len(vVals))):       
         for ti in range(0,len(tVals)):
@@ -342,6 +522,27 @@ def linStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
 
 
 def hypStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
+    '''
+    Calculates the hyperbolic stacked amplitudes for each two-way 
+    travel time sample and the provided velocity range 
+    by summing the pixels of the data that follow a hyperbola given 
+    by the two-way travel time apex and the velocity.
+
+    INPUT:
+    data          data matrix whose columns contain the traces
+    profilePos    along-profile coordinates of the traces
+    twtt          two-way travel time values for the samples, in ns
+    vVals         list of velocity values for which to calculate the
+                  hyperbolic stacked amplitudes, in m/ns
+    tVals         list of twtt zero-offsets for which to calculate
+                  the hyperbolic stacked amplitudes, in ns
+    typefact      factor for antenna separation depending if this is
+                  for CMP (typefact=2) or WARR (typefact=1) data
+
+    OUTPUT:
+    hypStAmp      matrix containing the hyperbolic stacked amplitudes
+                  for the given data, tVals, and vVals
+    '''
     hypStAmp=np.zeros((len(tVals),len(vVals)))
     x2 = np.power(typefact*profilePos,2.0)
     for vi in tqdm(range(0,len(vVals))):       
@@ -386,6 +587,27 @@ def hypStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
 
 ##### Testing / trying to improve performance:
 def linStackedAmplitude_alt1(data,profilePos,twtt,vVals,tVals,typefact):
+    '''
+    Calculates the linear stacked amplitudes for each two-way 
+    travel time sample and the provided velocity range 
+    by summing the pixels of the data that follow a line given 
+    by the two-way travel time zero offset and the velocity.
+
+    INPUT:
+    data          data matrix whose columns contain the traces
+    profilePos    along-profile coordinates of the traces
+    twtt          two-way travel time values for the samples, in ns
+    vVals         list of velocity values for which to calculate the
+                  linear stacked amplitudes, in m/ns
+    tVals         list of twtt zero-offsets for which to calculate
+                  the linear stacked amplitudes, in ns
+    typefact      factor for antenna separation depending if this is
+                  for CMP (typefact=2) or WARR (typefact=1) data
+
+    OUTPUT:
+    linStAmp      matrix containing the linear stacked amplitudes
+                  for the given data, tVals, and vVals
+    '''
     linStAmp=np.zeros((len(tVals),len(vVals)))
     f = interp.interp2d(profilePos, twtt, data)        
     for vi in  tqdm(range(0,len(vVals))):
@@ -397,6 +619,27 @@ def linStackedAmplitude_alt1(data,profilePos,twtt,vVals,tVals,typefact):
 
 
 def linStackedAmplitude_alt2(data,profilePos,twtt,vVals,tVals,typefact):
+    '''
+    Calculates the linear stacked amplitudes for each two-way 
+    travel time sample and the provided velocity range 
+    by summing the pixels of the data that follow a line given 
+    by the two-way travel time zero offset and the velocity.
+
+    INPUT:
+    data          data matrix whose columns contain the traces
+    profilePos    along-profile coordinates of the traces
+    twtt          two-way travel time values for the samples, in ns
+    vVals         list of velocity values for which to calculate the
+                  linear stacked amplitudes, in m/ns
+    tVals         list of twtt zero-offsets for which to calculate
+                  the linear stacked amplitudes, in ns
+    typefact      factor for antenna separation depending if this is
+                  for CMP (typefact=2) or WARR (typefact=1) data
+
+    OUTPUT:
+    linStAmp      matrix containing the linear stacked amplitudes
+                  for the given data, tVals, and vVals
+    '''    
     linStAmp=np.zeros((len(tVals),len(vVals)))
     
     tVals = np.asmatrix(tVals).transpose()   
