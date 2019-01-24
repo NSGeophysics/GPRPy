@@ -70,15 +70,15 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         #'size': 45.6
         }
 #    a.text(35,-10000,'GPRPy',fontdict=font)
-    a.text(70,-10000,'GPRPy',fontdict=font)
+    a.text(50,-10000,'GPRPy',fontdict=font)
 
     fontver = {'family': 'DejaVu Sans',
         'color':  'black',
         'style': 'italic',
-        'size': 10*fontfac
+        'size': 13.5*fontfac
         #'size': 45.6
         }
-    a.text(10,-22000,'Version 1.0.0',fontdict=fontver)
+    a.text(50,-12000,'Version 1.0.0',fontdict=fontver)
 
     # add UA logo
     filename1=os.path.join(dir_path,'toolbox','splashdat',
