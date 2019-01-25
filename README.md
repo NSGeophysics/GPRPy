@@ -7,6 +7,9 @@ Open-source Ground Penetrating Radar processing and visualization software.
 
 
 ## Simplemost installation
+
+** In the following instructions, if you use Windows, use the comands `python` and `pip`. If you use Mac or Linux, use the commands `python3` and `pip3` instead. **
+
 1) Download the GPRPy software from [https://github.com/NSGeophysics/GPRPy/archive/master.zip](https://github.com/NSGeophysics/GPRPy/archive/master.zip). Save the file somewhere on your computer and extract the 
 zip folder. <br/>
 As an **alternative**, you can install git from [https://git-scm.com/](https://git-scm.com/), then run in a command prompt:<br/>
@@ -77,3 +80,6 @@ on GitHub and I will help you getting it running.
 To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
 `pip uninstall gprpy`
 
+## News
+To stay updated, follow GPRPySoftware on twitter:
+{% twitter https://twitter.com/GPRPySoftware maxwidth=500 limit=5 %}
