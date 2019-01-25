@@ -75,4 +75,4 @@ To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
 `pip uninstall gprpy`
 
 ## News
-Follow @GPRPySoftware on twitter to hear about news and updates.
+Follow [@GPRPySoftware](https://twitter.com/GPRPySoftware) on twitter to hear about news and updates.
