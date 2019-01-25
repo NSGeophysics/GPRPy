@@ -20,7 +20,7 @@ Open-source Ground Penetrating Radar processing and visualization software.
 
 2) Install Python 3.7 for example from [https://conda.io/miniconda.html](https://conda.io/miniconda.html)
 
-3) Once the installation finished, open a command prompt that can run Python</br>
+3) Once the installation finished, open a command prompt that can run Python <br/>
    On Windows: click on Start, then enter "Anaconda Prompt", without the quotation marks into the "Search programs and files" field. On Mac or Linux, open the regular terminal.
 
 4) In the command prompt, change to the directory  where you downloaded the GPRPy files.
