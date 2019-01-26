@@ -77,6 +77,9 @@ To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
 ## News
 Follow [@GPRPySoftware](https://twitter.com/GPRPySoftware) on twitter to hear about news and updates.
 Recent tweets:
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I will post updates, changes, and GPRPy news here.</p>&mdash; GPRPy (@GPRPySoftware) <a href="https://twitter.com/GPRPySoftware/status/1089246592786485251?ref_src=twsrc%5Etfw">January 26, 2019</a></blockquote>
+
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">GPRPy is a free ground penetrating radar processing and visualization software developed at the University of Alabama. You can download it and install it following the instructions here: <a href="https://nsgeophysics.github.io/GPRPy/">nsgeophysics.github.io/GPRPy/</a></p>&mdash; GPRPy (@GPRPySoftware) <a href="https://twitter.com/GPRPySoftware/status/1088806792191197188?ref_src=twsrc%5Etfw">January 25, 2019</a></blockquote>
 
 
