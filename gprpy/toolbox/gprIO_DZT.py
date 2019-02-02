@@ -4,8 +4,7 @@ import numpy as np
 
 def readdzt(filename):
     '''
-    Reads a GSSI .DZT data file. I learned from A. Tzanis' MatGPR 
-    dzt import function how the dzt file header is stored.
+    Reads a GSSI .DZT data file. 
 
     INPUT: 
     filename     data file name including .DZT extension
@@ -13,10 +12,13 @@ def readdzt(filename):
     OUTPUT:
     data          data matrix whose columns contain the traces
     info          dict with information from the header
-    '''
-    
-    # With help from reviewdztheader.m by Andreas Tzanis
 
+    Thanks to Ian Nesbitt for pointing out extended headers and
+    providing the documentation file.
+    '''
+
+    # Documentation file is DZT.File.Format.6-14-16.pdf
+    
     info = {}
     
     fid = open(filename,'rb');
@@ -27,68 +29,117 @@ def readdzt(filename):
     # I is unsigned int 32 (uint = uint32)
     # i is int32
     # f is float
+
+    # All of the following information is from DZT.File.Format.6-14-16.pdf
+    # Provided by Ian Nesbitt
     
-    nchannels = struct.unpack('H', fid.read(2))[0]
-
+    minheadsize = 1024
+    infoareasize = 128
+    
+    rh_tag = struct.unpack('h', fid.read(2))[0]  # Pos 00
+    
     # Size of the header
-    headsize = struct.unpack('H', fid.read(2))[0]
-
+    rh_data = struct.unpack('h', fid.read(2))[0] # Pos 02
+    
     # Samples per trace
-    sptrace = struct.unpack('H', fid.read(2))[0]
-    info["sptrace"] = sptrace
+    rh_nsamp = struct.unpack('h', fid.read(2))[0] # Pos 04
+    info["rh_nsamp"] = rh_nsamp
 
     # Bits per word
-    bpdatum = struct.unpack('H', fid.read(2))[0]
-
+    rh_bits = struct.unpack('h', fid.read(2))[0] # Pos 06
+    
     # Binary offset
-    binoffs = struct.unpack('h', fid.read(2))[0]
+    rh_zero = struct.unpack('h', fid.read(2))[0] # Pos 08
 
     # Scans per second
-    scpsec = struct.unpack('f', fid.read(4))[0]
-    info["scpsec"] = scpsec
+    rhf_sps = struct.unpack('f', fid.read(4))[0] # Pos 10
+    info["rhf_sps"] = rhf_sps
     
     # Scans per meter
-    scpmeter = struct.unpack('f', fid.read(4))[0]
-    info["scpmeter"] = scpmeter
+    rhf_spm = struct.unpack('f', fid.read(4))[0] # Pos 14
+    info["rhf_spm"] = rhf_spm
 
     # Meters per mark
-    mpmark = struct.unpack('f', fid.read(4))[0]
+    rhf_mpm = struct.unpack('f', fid.read(4))[0] # Pos 18
 
-    # Startposition
-    startposition = struct.unpack('f', fid.read(4))[0]
-    info["startposition"] = startposition
+    # Startposition [ns]
+    rhf_position = struct.unpack('f', fid.read(4))[0] # Pos 22
+    info["rhf_position"] = rhf_position
 
-    nanosecptrace = struct.unpack('f', fid.read(4))[0]
-    info["nanosecptrace"] = nanosecptrace
+    # length of trace [ns]
+    rhf_range = struct.unpack('f', fid.read(4))[0] # Pos 26
+    info["rhf_range"] = rhf_range
 
-    scansppass = struct.unpack('H', fid.read(2))[0]
-    info["scansppass"] =  scansppass
+    # Number of passes
+    rh_npass = struct.unpack('h', fid.read(2))[0] # Pos 30
+    info["rh_npass"] =  rh_npass
+
+    # Creation date and time
+    rhb_cdt = struct.unpack('f', fid.read(4))[0] # Pos 32
+    info["rhb_cdt"] = rhb_cdt
+    
+    # Last modified date & time
+    rhb_mdt = struct.unpack('f', fid.read(4))[0]  # Pos 36
+    
+    # no idea
+    rh_mapOffset = struct.unpack('h', fid.read(2))[0] # Pos 40
+
+    # No idea
+    rh_mapSize = struct.unpack('h',fid.read(2))[0] # Pos 42
+
+    # offset to text
+    rh_text = struct.unpack('h',fid.read(2))[0] # Pos 44
+
+    # Size of text
+    rh_ntext = struct.unpack('h',fid.read(2))[0] # Pos 46
+
+    # offset to processing history
+    rh_proc = struct.unpack('h',fid.read(2))[0] # Pos 48
+
+    # size of processing history
+    rh_nproc = struct.unpack('h',fid.read(2))[0] # Pos 50
+
+    # number of channels
+    rh_nchan = struct.unpack('h',fid.read(2))[0] # Pos 52
+
+    # ... and more stuff we don't really need
 
     fid.close()
 
-    if bpdatum == 8:
-        datatype = 'B' # unsigned char
-    elif bpdatum == 16:
-        datatype = 'H' # unsigned int
-    elif bpdatum == 32:
-        datatype = 'I'
+    # offset will tell us how long the header is in total
+    # There could be a minimal header of 1024 bits
+    # (very old files may have had 512 bits)
+    if rh_data < minheadsize:
+        offset = minheadsize*rh_data
+    else:
+        offset = minheadsize*rh_nchan   
 
-    # Now read the entire file
-    vec=np.fromfile(filename,dtype=datatype)    
+    # Define data type based on words per bit
+    # From documentation: Eight byte and sixteen byte samples are
+    # unsigned integers. Thirty-two bit samples are signed integers.
+    if rh_bits == 8:
+        datatype = 'uint8' # unsigned char
+    elif rh_bits == 16:
+        datatype = 'uint16' # unsigned int
+    elif rh_bits == 32:
+        datatype = 'int32'
+
         
-    # Separate between header and data
-    headlength=headsize/(bpdatum/8)
-    
-    datvec=vec[int(headlength):]
+    # Read the entire file
+    vec = np.fromfile(filename,dtype=datatype)
+        
+    headlength = offset/(rh_bits/8)
 
+    # Only use the data, discard the header
+    datvec = vec[int(headlength):]
+    
     # Turn unsigned integers into signed integers
-    datvec = datvec - (2**bpdatum)/2.
+    # Only necessary where unsigned
+    if rh_bits == 8 or rh_bits == 16:
+        datvec = datvec - (2**rh_bits)/2.0
 
     # reshape into matrix
-    #print(sptrace)
-    #print(int(len(datvec)/sptrace))
-    #data = np.reshape(datvec,[sptrace,int(len(datvec)/sptrace)])
-    data = np.reshape(datvec,[int(len(datvec)/sptrace),sptrace])
+    data = np.reshape(datvec,[int(len(datvec)/rh_nsamp),rh_nsamp])
 
     data = np.asmatrix(data)
     

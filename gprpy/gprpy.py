@@ -85,11 +85,16 @@ class gprpyProfile:
 
             self.data, self.info = gprIO_DZT.readdzt(filename)
 
-            self.profilePos = self.info["startposition"]+np.linspace(0.0,
-                                                                     self.data.shape[1]/self.info["scpmeter"],
-                                                                     self.data.shape[1])
-            
-            self.twtt = np.linspace(0,self.info["nanosecptrace"],self.info["sptrace"])
+            if self.info["rhf_spm"] != 0:
+                self.profilePos = self.info["rhf_position"]+np.linspace(0.0,
+                                                                        self.data.shape[1]/self.info["rhf_spm"],
+                                                                        self.data.shape[1])
+            else:
+                self.profilePos = self.info["rhf_position"]+np.linspace(0.0,
+                                                                        self.data.shape[1]/self.info["rhf_sps"],
+                                                                        self.data.shape[1])
+                
+            self.twtt = np.linspace(0,self.info["rhf_range"],self.info["rh_nsamp"])
 
             self.velocity = None
             self.depth = None
