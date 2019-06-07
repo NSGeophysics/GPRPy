@@ -433,7 +433,7 @@ class GPRPyApp:
         
         stopPickButton.config(height = 1, width = halfwid)
         stopPickButton.grid(row=16, column=rightcol+1, sticky='nsew',columnspan=1)
-        self.balloon.bind(startPickButton,
+        self.balloon.bind(stopPickButton,
                           "Stop collecting location information\n"
                           "and save the locations you collected\n"
                           "in a text file.")
