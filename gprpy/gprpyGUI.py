@@ -222,7 +222,7 @@ class GPRPyApp:
         SetZeroTimeButton.config(height = 1, width = 2*halfwid)         
         SetZeroTimeButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)    
         self.balloon.bind(SetZeroTimeButton,
-                          "Set the two-way travel time that \n" 
+                          "Set the two-way travel time \n" 
                           "that corresponds to the surface.")
 
 
@@ -291,10 +291,10 @@ class GPRPyApp:
         remMeanTraceButton.config(height = 1, width = 2*halfwid)         
         remMeanTraceButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(remMeanTraceButton,
-                          "Removes from each traces the average\n" 
+                          "Removes from each trace the average\n" 
                           "of its surrounding traces. This can be\n"
-                          "useful to remove air waves, or\n" 
-                          "horizontal features.")
+                          "useful to remove air waves, ground\n" 
+                          "waves, or horizontal features.")
         
 
         # Smooth 
@@ -421,7 +421,10 @@ class GPRPyApp:
             command=lambda : self.startPicking(proj,fig=fig,a=a,canvas=canvas))        
         startPickButton.config(height = 1, width = halfwid)
         startPickButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=1)
-
+        self.balloon.bind(startPickButton,
+                          "Start collecting location information\n" 
+                          "by clicking on the profile.")  
+        
 
         stopPickButton = tk.Button(
             text="stop pick", fg="black",
@@ -430,7 +433,10 @@ class GPRPyApp:
         
         stopPickButton.config(height = 1, width = halfwid)
         stopPickButton.grid(row=16, column=rightcol+1, sticky='nsew',columnspan=1)
-        
+        self.balloon.bind(startPickButton,
+                          "Stop collecting location information\n"
+                          "and save the locations you collected\n"
+                          "in a text file.")
         
         # Save data
         SaveButton = tk.Button(
