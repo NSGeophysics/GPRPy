@@ -79,8 +79,8 @@ class GPRPyApp:
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=figcolsp,rowspan=figrowsp,sticky='nsew')
 
         canvas.draw() 
-
-
+               
+        
 
         ## Visualization Buttons              
 
@@ -751,6 +751,9 @@ class GPRPyApp:
 
 
     def plotProfileData(self,proj,fig,a,canvas):
+        # Clear cursor coordinate cid if if exists to avoid multiple instances
+        if 'self.cursor_cid' in locals():
+            canvas.mpl_disconnect(self.cursor_cid)            
         dx=proj.profilePos[3]-proj.profilePos[2]
         dt=proj.twtt[3]-proj.twtt[2]
         a.clear()        
@@ -805,19 +808,17 @@ class GPRPyApp:
         if self.picking:
             a.plot(self.picked[:,0],self.picked[:,1],'-x',color='yellow',linewidth=3*self.highfac) 
             a.plot(self.picked[:,0],self.picked[:,1],'-x',color='black',linewidth=2*self.highfac)                               
-
+        
         # Allow for cursor coordinates being displayed        
         def moved(event):
             if event.xdata is not None and event.ydata is not None:
                 canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
                 
-        canvas.mpl_connect('button_press_event', moved)
+        self.cursor_cid = canvas.mpl_connect('button_press_event', moved)
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
 
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=figcolsp, rowspan=figrowsp, sticky='nsew')
         canvas.draw()
-
-
         
 
     # Show hyperbola
