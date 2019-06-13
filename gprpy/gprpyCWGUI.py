@@ -60,6 +60,12 @@ class GPRPyCWApp:
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=figrowsp,sticky='nsew')
         canvas.draw()
 
+        # Prepare the cursor canvas variable dict
+        self.cidict = {}
+        self.cidict["cwdata"] = None
+        self.cidict["linear stacked amplitude"] = None
+        self.cidict["hyperbolic stacked amplitude"] = None
+        
         self.vmin = 0.01
         self.vmax = 0.33
         self.vint = 0.005
@@ -486,6 +492,9 @@ class GPRPyCWApp:
                 
 
     def plotCWData(self,proj,a,canvas):
+        # Clear cursor coordinate cid if if exists to avoid multiple instances
+        if self.cidict["cwdata"] in locals():
+            canvas.mpl_disconnect(self.cidict["cwdata"])
         a.clear()
         dx=proj.profilePos[3]-proj.profilePos[2]
         dt=proj.twtt[3]-proj.twtt[2]
@@ -531,17 +540,18 @@ class GPRPyCWApp:
             if event.xdata is not None and event.ydata is not None:
                 canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
                 
-        canvas.mpl_connect('button_press_event', pressed)        
+        self.cidict["cwdata"] = canvas.mpl_connect('button_press_event', pressed)        
 
         tag = canvas.get_tk_widget().create_text(tagx, tagy, text="", anchor="nw")
-
-
         
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
         canvas.draw()
 
         
     def plotStAmp(self,proj,a,canvas,stamp,title,ylabel=None):
+        # Clear cursor coordinate cid if if exists to avoid multiple instances
+        if self.cidict[title] in locals():
+            canvas.mpl_disconnect(self.cidict[title])
         dt=proj.twtt[3]-proj.twtt[2]
         if stamp is not None:
             dv=proj.vVals[1]-proj.vVals[0]
@@ -567,9 +577,8 @@ class GPRPyCWApp:
                 if event.xdata is not None and event.ydata is not None:
                     canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
                 
-            canvas.mpl_connect('button_press_event', pressed)
+            self.cidict[title] = canvas.mpl_connect('button_press_event', pressed)
             tag = canvas.get_tk_widget().create_text(tagx, tagy, text="", anchor="nw")
-        
         
             canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol, rowspan=15, sticky='nsew')
             canvas.draw()
