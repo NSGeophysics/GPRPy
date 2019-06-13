@@ -56,7 +56,7 @@ class GPRPyApp:
         
         # Variables specific to GUI
         self.balloon = Pmw.Balloon()
-        self.picking = False
+        self.picking = False       
         self.delimiter = None
         self.grid = False
 
@@ -428,7 +428,7 @@ class GPRPyApp:
 
         stopPickButton = tk.Button(
             text="stop pick", fg="black",
-            command=lambda : [self.stopPicking(proj),
+            command=lambda : [self.stopPicking(proj,canvas),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         
         stopPickButton.config(height = 1, width = halfwid)
@@ -653,14 +653,16 @@ class GPRPyApp:
         def addPoint(event):
             self.picked = np.append(self.picked,np.asmatrix([event.xdata,event.ydata]),axis=0)
             self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)
-        canvas.mpl_connect('button_press_event', addPoint)
+            print(self.picked)
+        self.pick_cid = canvas.mpl_connect('button_press_event', addPoint)
 
             
 
-    def stopPicking(self,proj):
+    def stopPicking(self,proj,canvas):
         filename = fd.asksaveasfilename()
         if filename is not '':
             self.picking = False
+            canvas.mpl_disconnect(self.pick_cid)
             print("Picking mode off")
             np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
             print('saved picked file as "%s"' %(filename+'_profile.txt'))
@@ -689,8 +691,8 @@ class GPRPyApp:
                 pick3D[:,2] = self.picked[:,1].squeeze()
                     
                 np.savetxt(filename+'_3D.txt',pick3D,delimiter='\t')
-                print('saved picked file as "%s"' %(filename+'_3D.txt'))
-
+                print('saved picked file as "%s"' %(filename+'_3D.txt'))              
+                
         
     def loadData(self,proj):
         filename = fd.askopenfilename( filetypes= (("All", "*.*"),
