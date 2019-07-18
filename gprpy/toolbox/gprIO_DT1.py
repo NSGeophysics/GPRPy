@@ -57,56 +57,46 @@ def readdt1Header(filename):
     '''
     
     info = {}
-    with open(filename,"r") as datafile:
-        datafile.readline()
-        datafile.readline()
-        info["system"] = datafile.readline()
-        datafile.readline()
-        info["date"] = datafile.readline()
-        datafile.readline()
-        string = datafile.readline()
+    with open(filename,"r",newline='\n') as datafile:
+        datafile.readline().strip()
+        info["system"] = datafile.readline().strip()
+        info["date"] = datafile.readline().strip()
+        string = datafile.readline().strip()
         var = re.match(r'NUMBER OF TRACES   = (.*)', string)
         info["N_traces"] = int(var.group(1)) 
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'NUMBER OF PTS/TRC  = (.*)', string)
         info["N_pts_per_trace"] = int(var.group(1)) 
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'TIMEZERO AT POINT  = (.*)', string)
         info["TZ_at_pt"] = float(var.group(1)) 
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'TOTAL TIME WINDOW  = (.*)', string)
         info["Total_time_window"] = float(var.group(1)) 
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'STARTING POSITION  = (.*)', string)
         info["Start_pos"] = float(var.group(1)) 
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'FINAL POSITION     = (.*)', string)
         info["Final_pos"] = float(var.group(1))
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'STEP SIZE USED     = (.*)', string)
         info["Step_size"] = float(var.group(1))
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'POSITION UNITS     = (.*)', string)
         info["Pos_units"] = str(var.group(1))
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'NOMINAL FREQUENCY  = (.*)', string)
         info["Freq"] = float(var.group(1))
-        datafile.readline()
-        string = datafile.readline()
+        string = datafile.readline().strip()
         var = re.match(r'ANTENNA SEPARATION = (.*)', string)
         info["Antenna_sep"] = float(var.group(1))                   
         # If you need more of the header info, you can just continue as above
         # Transform feet to meters
-        if info['Pos_units'] == 'ft ':
+        if info['Pos_units'] == 'ft':
             info["Start_pos"] = info["Start_pos"]*0.3048
             info["Final_pos"] = info["Final_pos"]*0.3048
             info["Step_size"] = info["Step_size"]*0.3048
+            info["Antenna_sep"] = info["Antenna_sep"]*0.3048
+            info['Pos_units'] = 'm'
     return info
