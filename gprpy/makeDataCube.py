@@ -104,17 +104,27 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
                   one big positive reflector instead of cancelling out.
                   [default: False]
     '''
-    
-    gpr=gp.gprpyProfile(datalist[0])
 
-    gpr,nprofile,ndepth = reduceSampling(gpr,nprofile,ndepth)
+
+    # Read all profiles to find out total data size
+    totlen = 0
+    totprof = 0 
+    for i in range(0,len(datalist)):
+        gpr=gp.gprpyProfile(datalist[i])                
+        #gpr,nprofile,ndepth=reduceSampling(gpr,nprofile,ndepth)
+        if gpr.data_pretopo is None:
+            totlen = totlen + gpr.data.shape[0]*gpr.data.shape[1]
+            totprof = totprof + gpr.data.shape[1]
+        else:
+            totlen = totlen +  gpr.data_pretopo.shape[0]*gpr.data_pretopo.shape[1]
+            totprof = totprof + gpr.data_pretopo.shape[1]
             
     # Allocate memory based on nprofile and ndepth. May be overallocating
-    allpoints = np.zeros((nprofile*ndepth*len(datalist),3))
-    alldata = np.zeros(nprofile*ndepth*len(datalist))
+    allpoints = np.zeros((totlen,3))
+    alldata = np.zeros(totlen)
     datalength = np.zeros(len(datalist),dtype=int)
     
-    topopoints = 2*np.zeros((nprofile*len(datalist),3))
+    topopoints = 2*np.zeros((totprof,3))
     topolength = np.zeros(len(datalist),dtype=int)
     
     npoints=0

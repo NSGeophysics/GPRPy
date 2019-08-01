@@ -78,7 +78,7 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         'size': 13.5*fontfac
         #'size': 45.6
         }
-    a.text(50,-12000,'Version 1.0.4',fontdict=fontver)
+    a.text(50,-12000,'Version 1.0.5',fontdict=fontver)
 
     # add UA logo
     filename1=os.path.join(dir_path,'toolbox','splashdat',
