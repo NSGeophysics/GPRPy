@@ -47,17 +47,21 @@ class gprpyProfile:
         data files and populates all the gprpyProfile fields.
 
         INPUT: 
-        filename  name of the .gpr, .DT1, .DZT, .GPRhdr, dat, rd3, 
-                  or .rad file you want to import.
+        filename  name of the .gpr, .DT1, dt1, .DZT, .GPRhdr, dat, 
+                  rd3, or .rad file you want to import.
                   The header file name and the data file name 
                   have to be the same!
         '''
         
         file_name, file_ext = os.path.splitext(filename)
         
-        if file_ext==".DT1" or file_ext==".HD":
-            self.data=gprIO_DT1.readdt1(filename)
-            self.info=gprIO_DT1.readdt1Header(file_name + ".HD")
+        if file_ext==".DT1" or file_ext==".HD" or file_ext==".dt1" or file_ext==".hd":
+            if file_ext==".DT1" or  file_ext==".HD":
+                self.data=gprIO_DT1.readdt1(file_name + ".DT1")
+                self.info=gprIO_DT1.readdt1Header(file_name + ".HD")  
+            else:
+                self.data=gprIO_DT1.readdt1(file_name + ".dt1")
+                self.info=gprIO_DT1.readdt1Header(file_name + ".hd")
             
             self.profilePos = np.linspace(self.info["Start_pos"],
                                           self.info["Final_pos"],
