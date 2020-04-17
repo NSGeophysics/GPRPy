@@ -71,6 +71,7 @@ class gprpyProfile:
                                     self.info["Total_time_window"],
                                     self.info["N_pts_per_trace"])
 
+            self.antsep = self.info["Antenna_sep"] # Set to m in the loading routine 
             self.velocity = None
             self.depth = None
             self.maxTopo = None
@@ -100,6 +101,7 @@ class gprpyProfile:
                 
             self.twtt = np.linspace(0,self.info["rhf_range"],self.info["rh_nsamp"])
 
+            self.antsep = 0
             self.velocity = None
             self.depth = None
             self.maxTopo = None
@@ -122,7 +124,8 @@ class gprpyProfile:
 
             self.profilePos = float(self.info["dx"])*np.arange(0,int(self.info["columns"]))
             self.twtt = np.linspace(0,float(self.info["time_window"]),int(self.info["lines"]))
-            
+
+            self.antsep = 0
             self.velocity = None
             self.depth = None
             self.maxTopo = None
@@ -144,6 +147,7 @@ class gprpyProfile:
             self.twtt = np.linspace(0,float(self.info["TIMEWINDOW"]),int(self.info["SAMPLES"]))
             self.profilePos = float(self.info["DISTANCE INTERVAL"])*np.arange(0,self.data.shape[1])
 
+            self.antsep = self.info["ANTENNA SEPARATION"]
             self.velocity = None
             self.depth = None
             self.maxTopo = None
@@ -163,12 +167,13 @@ class gprpyProfile:
         elif file_ext==".gpr":
             ## Getting back the objects:
             with open(filename, 'rb') as f:
-                data, info, profilePos, twtt, history, velocity, depth, maxTopo, minTopo, threeD, data_pretopo, twtt_pretopo = pickle.load(f)
+                data, info, profilePos, twtt, history, antsep, velocity, depth, maxTopo, minTopo, threeD, data_pretopo, twtt_pretopo = pickle.load(f)
             self.data = data
             self.info = info
             self.profilePos = profilePos
             self.twtt = twtt
             self.history = history
+            self.antsep = antsep
             self.velocity = velocity
             self.depth = depth
             self.maxTopo = maxTopo
@@ -181,7 +186,7 @@ class gprpyProfile:
             self.initPrevious()
             
         else:
-            print("Can only read dt1 or dzt files")
+            print("Can only read dt1, DT1, hd, HD, DZT, dat, GPRhdr, rad, rd3, rd7, and gpr files")
 
     def showHistory(self):
         '''
@@ -264,9 +269,9 @@ class gprpyProfile:
             filename = filename + '.gpr'
         with open(filename, 'wb') as f:  
             pickle.dump([self.data, self.info, self.profilePos, self.twtt,
-                         self.history, self.velocity, self.depth, self.maxTopo,
-                         self.minTopo, self.threeD, self.data_pretopo,
-                         self.twtt_pretopo], f)
+                         self.history, self.antsep, self.velocity, self.depth,
+                         self.maxTopo, self.minTopo, self.threeD, self.data_pretopo,
+                         self.twtt_pretopo], f)            
         print("Saved " + filename)
         # Add to history string
         histstr = "mygpr.save('%s')" %(filename)
@@ -629,12 +634,40 @@ class gprpyProfile:
 
         self.velocity = velocity
         self.depth = self.twtt * velocity/2.0
-
+        
         # Put in history
         histstr = "mygpr.setVelocity(%g)" %(velocity)
         self.history.append(histstr)
 
 
+    def antennaSep(self):
+        ''' 
+        Corrects for distortions of arrival times caused by the
+        separation of the antennae.
+
+        For this to work properly, you must have set the velocity
+        and you must have set the zero time to the beginning of the 
+        arrival of the airwave.
+
+        '''
+
+        # Store previous state for undo
+        self.storePrevious()
+
+        # Take into account that the airwave first break
+        # is after the airwave has already traveled the
+        # antenna separation. And we only look at half the
+        # two-way travel time. Hence divide by two
+        self.depth = self.depth + self.antsep/2
+        
+        # Correct for antenna offset distortion close to surface
+        self.depth = np.sqrt( (self.depth**2) - (self.antsep**2)/4 )
+
+        # Put in history
+        histstr = "mygpr.antennaSep()"
+        self.history.append(histstr)
+
+        
     def fkMigration(self):
         '''
         Apply Stolt's f-k migration to the profile. Requires the 

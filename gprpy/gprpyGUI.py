@@ -371,16 +371,30 @@ class GPRPyApp:
 
         # Set Velocity
         setVelButton = tk.Button(
-            text="set velocity", fg="black",
+            text="set vel", fg="black",
             command=lambda : [self.setVelocity(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        setVelButton.config(height = 1, width = 2*halfwid)         
-        setVelButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.config(height = 1, width = halfwid)         
+        setVelButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=1)
         self.balloon.bind(setVelButton,
                           "Set the known subsurface radar velocity. This will\n" 
                           "turn the y-axis from two-way travel time to depth.\n"
                           "This step is necessary for topographic correction.")
 
+        # Correct for antenna separation
+        antennaSepButton = tk.Button(
+            text="ant sep", fg="black",
+            command=lambda : [self.antennaSep(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        antennaSepButton.config(height = 1, width = halfwid)         
+        antennaSepButton.grid(row=13, column=rightcol+1, sticky='nsew',columnspan=1)
+        self.balloon.bind(antennaSepButton,                        
+                          "If the antenna offset is provided, this corrects for\n"
+                          "distortion of arrival times near the surface due to\n"
+                          "the separation of transmitter and receiver antenna."
+                          "You must have picked the first break of the airwave\n"
+                          "for this to function properly and the velocity must be set.")
+        
 
         # Migration Button
         migButton = tk.Button(
@@ -611,13 +625,18 @@ class GPRPyApp:
                 proj.cut(minX,maxX)
             
     def setVelocity(self,proj):
-        velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")
+        velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")        
         if velocity is not None:
             proj.setVelocity(velocity)
             self.prevyrng=self.yrng
             self.yrng=[0,np.max(proj.depth)]
 
+    def antennaSep(self,proj):
+        if proj.velocity is None:
+            mesbox.showinfo("Antenna Sep Error","You have to set the velocity first")
+        proj.antennaSep()
 
+            
     def fkMigration(self,proj):
         if proj.velocity is None:
             mesbox.showinfo("Migration Error","You have to set the velocity first")
