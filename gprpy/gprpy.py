@@ -656,13 +656,38 @@ class gprpyProfile:
 
         # Take into account that the airwave first break
         # is after the airwave has already traveled the
-        # antenna separation. And we only look at half the
+        # antenna separation with the speed of light 0.3 m/ns.
+        # And we only look at half the
         # two-way travel time. Hence divide by two
-        self.depth = self.depth + self.antsep/2
-        
-        # Correct for antenna offset distortion close to surface
-        self.depth = np.sqrt( (self.depth**2) - (self.antsep**2)/4 )
+        t0 = self.twtt/2 + self.antsep/(2*0.3)
 
+        # t0 is when the waves left the transmitter antenna.
+        # To be able to calculate the depth time from the
+        # single-way travel time we need to shift the time reference
+        # frame. Lets set it "arriving at midpoint time", so
+        ta = t0 + self.antsep/(2*self.velocity)
+        # Later we will need to undo this reference frame transformation
+
+        # Now use the pythagorean relationship between single-way travel
+        # time to the depth point and the depth time td
+        tad = np.sqrt( ta**2 - (self.antsep/(2*self.velocity))**2 )
+
+        # We are still in the "arriving at midpoint" time frame ta
+        # To transform ta into depth time td, we need to shift it back
+        # by the time it took for the ground wave to get to the midpoint.
+        # This makes sense because the times before the groundwave got to the
+        # midpoint will not actually be underground in the sense of:
+        # No travel into depth has been recorded at the receiver.
+        # These "arrivals" will just be shifted into "negative arrival times"
+        # and hence "negative depth"
+        td = tad - self.antsep/(2*self.velocity)
+
+        # Finally, translate time into depth
+        self.depth = td*self.velocity
+
+        # And update the two-way travel time
+        self.twtt = td
+        
         # Put in history
         histstr = "mygpr.antennaSep()"
         self.history.append(histstr)
