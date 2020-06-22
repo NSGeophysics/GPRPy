@@ -4,5 +4,7 @@ toolbox/__pycache__
 notused/
 irlib/
 tutorials/
+build/
+gprpy.egg-info/
 testprofile.vts
 *.pyc
