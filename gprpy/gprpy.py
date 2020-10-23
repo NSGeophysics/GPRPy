@@ -67,9 +67,15 @@ class gprpyProfile:
                                           self.info["Final_pos"],
                                           self.info["N_traces"])
 
-            self.twtt = np.linspace(self.info["TZ_at_pt"],
-                                    self.info["Total_time_window"],
-                                    self.info["N_pts_per_trace"])
+            #self.twtt = np.linspace(self.info["TZ_at_pt"],
+            #                        self.info["Total_time_window"],
+            #                        self.info["N_pts_per_trace"])
+
+            sec_per_samp = self.info["Total_time_window"]/self.info["N_pts_per_trace"]
+            tshift = self.info["TZ_at_pt"]*sec_per_samp
+            
+            self.twtt = np.linspace(0,self.info["Total_time_window"],
+                                    self.info["N_pts_per_trace"]) - tshift
 
             self.antsep = self.info["Antenna_sep"] # Set to m in the loading routine 
             self.velocity = None
@@ -1018,24 +1024,24 @@ class gprpyCW(gprpyProfile):
         self.history.append(histstr)  
 
 
-    def setZeroTimeCW(self,newZeroTime):
-        '''
-        Deletes all data recorded before newZeroTime and 
-        sets newZeroTime to zero.
+    # def setZeroTimeCW(self,newZeroTime):
+    #     '''
+    #     Deletes all data recorded before newZeroTime and 
+    #     sets newZeroTime to zero.
 
-        INPUT:
-        newZeroTime     The new zero-time
-        '''
-        # Store previous state for undo
-        self.storePrevious()
-        # Find index of value that is nearest to newZeroTime
-        zeroind = np.abs(self.twtt - newZeroTime).argmin()
-        # Cut out everything before
-        self.twtt = self.twtt[zeroind:] - newZeroTime
-        #self.data = self.data[zeroind:,:]
-        # Put what you did in history
-        histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
-        self.history.append(histstr)  
+    #     INPUT:
+    #     newZeroTime     The new zero-time
+    #     '''
+    #     # Store previous state for undo
+    #     self.storePrevious()
+    #     # Find index of value that is nearest to newZeroTime
+    #     zeroind = np.abs(self.twtt - newZeroTime).argmin()
+    #     # Cut out everything before
+    #     self.twtt = self.twtt[zeroind:] - newZeroTime
+    #     #self.data = self.data[zeroind:,:]
+    #     # Put what you did in history
+    #     histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
+    #     self.history.append(histstr)  
         
     
     def normalize(self):

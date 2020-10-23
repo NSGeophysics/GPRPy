@@ -625,7 +625,8 @@ class GPRPyCWApp:
     def setZeroTime(self,proj):
         newZeroTime = sd.askfloat("Input","New zero time")
         if newZeroTime is not None:
-            proj.setZeroTimeCW(newZeroTime=newZeroTime)
+            #proj.setZeroTimeCW(newZeroTime=newZeroTime)
+            proj.setZeroTime(newZeroTime=newZeroTime)
 
 
     def truncateY(self,proj):
