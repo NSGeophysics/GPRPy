@@ -19,17 +19,18 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         maxpoint=100;
         x=snakeGPR.twtt[0:maxpoint]
         y=snakeGPR.data[0:maxpoint,10]
+        xshift=-7
     except:
         rick = signal.ricker(150, 4.0)
         x = np.linspace(0,85,100)
         y = rick[50:150]*25000
+        xshift=0
         
     # Snake body
     lw=7#5
     a.plot(x,y,'k',linewidth=lw*widfac,solid_capstyle='round')
     # Snake head
     Path = mpath.Path
-    xshift=0
     headval=2500*widfac/highfac
     path_data = [
         (Path.MOVETO, [xshift,headval]),
@@ -44,16 +45,16 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
     patch.set_facecolor('black')
     a.add_patch(patch)
     # Eyes
-    eye1 = mpatches.Ellipse([-2,1000], 3, 1000)
-    eye2 = mpatches.Ellipse([-2,-1000], 3, 1000)
+    eye1 = mpatches.Ellipse([-2+xshift,1000], 3, 1000)
+    eye2 = mpatches.Ellipse([-2+xshift,-1000], 3, 1000)
     eye1.set_facecolor('white')
     eye2.set_facecolor('white')
     a.add_patch(eye1)
     a.add_patch(eye2)
     # Tongue
-    x, y = np.array([[-10, -13, -15], [0.0, 0.0, 600]])
+    x, y = np.array([[-10+xshift, -13+xshift, -15+xshift], [0.0, 0.0, 600]])
     line1 = mlines.Line2D(x, y, lw=2*widfac, color='black')
-    x, y = np.array([[-10, -13, -15], [0.0, 0.0, -600]])
+    x, y = np.array([[-10+xshift, -13+xshift, -15+xshift], [0.0, 0.0, -600]])
     line2 = mlines.Line2D(x, y, lw=2*widfac, color='black')
     a.add_line(line1)
     a.add_line(line2)
@@ -78,7 +79,7 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         'size': 13.5*fontfac
         #'size': 45.6
         }
-    a.text(50,-12000,'Version 1.0.9',fontdict=fontver)
+    a.text(50,-12000,'Version 1.0.10',fontdict=fontver)
 
     # add UA logo
     filename1=os.path.join(dir_path,'toolbox','splashdat',

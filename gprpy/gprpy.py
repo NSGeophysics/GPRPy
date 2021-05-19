@@ -10,7 +10,7 @@ import gprpy.toolbox.gprpyTools as tools
 try:
     import gprpy.irlib.external.mig_fk as mig_fk
 except:
-    print("No fk migration in public version")
+    print("Install fk migration if needed")
 import copy
 import scipy.interpolate as interp
 from pyevtk.hl import gridToVTK
