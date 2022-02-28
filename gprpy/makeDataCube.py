@@ -66,7 +66,7 @@ def reduceSampling(gpr,nprofile,ntwtt):
         gpr.twtt_pretopo = twttred
         gpr.depth = twttred*gpr.velocity/2.0
     
-    return gpr,nprofile,ntwtt
+    return gpr
 
 
 
@@ -111,7 +111,6 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
     totprof = 0 
     for i in range(0,len(datalist)):
         gpr=gp.gprpyProfile(datalist[i])                
-        #gpr,nprofile,ndepth=reduceSampling(gpr,nprofile,ndepth)
         if gpr.data_pretopo is None:
             totlen = totlen + gpr.data.shape[0]*gpr.data.shape[1]
             totprof = totprof + gpr.data.shape[1]
@@ -133,7 +132,7 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
     for i in tqdm(range(0,len(datalist))):
         # These need to have a topo correction       
         gpr=gp.gprpyProfile(datalist[i])                
-        gpr,nprofile,ndepth=reduceSampling(gpr,nprofile,ndepth)
+        gpr=reduceSampling(gpr,nprofile,ndepth)
         if i==0:
             currentmaxdepth = np.max(np.abs(gpr.depth))
             depth = gpr.depth

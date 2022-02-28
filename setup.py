@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     
 setuptools.setup(
     name="gprpy",
-    version="1.0.10",
+    version="1.0.11",
     author="Alain Plattner",
     author_email="plattner@alumni.ethz.ch",
     description="GPRPy - open source ground penetrating radar processing and visualization",
