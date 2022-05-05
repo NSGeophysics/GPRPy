@@ -24,7 +24,7 @@ def readMALA(file_name):
     except:
         # I'm not sure what the format of rd7 is. Just assuming it's the same
         filename = file_name + '.rd7'
-        data = np.fromfile(filename, dtype=np.int16)
+        data = np.fromfile(filename, dtype=np.int32)
     
     nrows=int(len(data)/int(info['SAMPLES']))
     
