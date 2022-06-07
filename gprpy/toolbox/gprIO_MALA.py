@@ -1,7 +1,6 @@
 import struct
 import numpy as np
-import re # Regular expressions
-
+import os
 
 def readMALA(file_name):
     '''
@@ -16,7 +15,9 @@ def readMALA(file_name):
     data          data matrix whose columns contain the traces
     info          dict with information from the header
     '''
-    # First read header
+    # First read header, normalize the file name (get rid of extension)
+    file_name, extension = os.path.splitext(file_name)
+
     info = readGPRhdr(file_name+'.rad')
     try:
         filename = file_name + '.rd3'
@@ -49,6 +50,12 @@ def readGPRhdr(filename):
     with open(filename) as f:
         for line in f:
             strsp = line.split(':')
-            info[strsp[0]] = strsp[1].rstrip()
+            info[strsp[0]] = strsp[1].strip()
+
+    # if the distance interval is zero, set it to one
+    # TODO should be done properly with the coordinates (if available)
+    if float(info['DISTANCE INTERVAL']) < 0.1:
+        info['DISTANCE INTERVAL'] = 1.
+
     return info
 
