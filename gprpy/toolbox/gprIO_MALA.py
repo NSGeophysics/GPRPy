@@ -54,7 +54,8 @@ def readGPRhdr(filename):
 
     # if the distance interval is zero, set it to one
     # TODO should be done properly with the coordinates (if available)
-    if float(info['DISTANCE INTERVAL']) < 0.1:
+    # Alain: I changed 0.1 to eps, in case someone uses high spatial resolution (e.g. lab)
+    if float(info['DISTANCE INTERVAL']) < np.finfo(float).eps:
         info['DISTANCE INTERVAL'] = 1.
 
     return info
