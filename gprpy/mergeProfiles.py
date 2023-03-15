@@ -24,7 +24,7 @@ def mergeProfiles(file1,file2,outfile,gapfill=0):
     profile2 = gp.gprpyProfile(file2)
 
     # make sure starting and end times are the same
-    assert (profile1.twtt[0]==profile2.twtt[0] and profile1.twtt[-1]==profile2.twtt[-1]), "\n\nUse GPRPy to cut the profiles to the same two-way travel times\nCurrently: file 1 is %g ns to %g ns and file 2 is %g ns to %g ns \n" %(profile1.twtt[0],profile1.twtt[-1],profile2.twtt[0],profile2.twtt[-1])
+    assert (profile1.twtt[0]==profile2.twtt[0] and profile1.twtt[-1]==profile2.twtt[-1]), "\n\nUse GPRPy to cut the profiles to the same travel times\nCurrently: file 1 is %g ns to %g ns and file 2 is %g ns to %g ns \n" %(profile1.twtt[0],profile1.twtt[-1],profile2.twtt[0],profile2.twtt[-1])
     
 
     # If they don't have the same number of samples,

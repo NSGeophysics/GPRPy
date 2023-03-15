@@ -41,8 +41,8 @@ class GPRPyApp:
         self.window = master
 
         # Set up for high-resolution screens
-        normscrwidt=1024
-        normscrhigt=768
+        normscrwidt=1280 #1024
+        normscrhigt=720 #768
         scrwidt=master.winfo_screenwidth()
         scrhigt=master.winfo_screenheight()
         # These to use if operating system doesn't automatically adjust
@@ -50,7 +50,13 @@ class GPRPyApp:
         #self.highfac=scrhigt/normscrhigt
         self.widfac=normscrwidt/normscrhigt
         self.highfac=1
-        fontfac=(normscrwidt/normscrhigt)/(scrwidt/scrhigt)
+        #fontfac=(normscrwidt/normscrhigt)/(scrwidt/scrhigt)
+        fontfac=1
+        
+        # Set some default choices
+        self.hypx = 0
+        self.hypt = 0
+        self.hypv = 0.1
         
         master.title("GPRPy")
         
@@ -64,7 +70,8 @@ class GPRPyApp:
         proj = gp.gprpyProfile()
 
         # Show splash screen
-        fig=Figure(figsize=(8*self.widfac,5*self.highfac))
+        #fig=Figure(figsize=(8*self.widfac,5*self.highfac))
+        fig=Figure(figsize=(self.widfac,self.highfac))
         a=fig.add_subplot(111)
         dir_path = os.path.dirname(os.path.realpath(__file__))
         splash.showSplash(a,dir_path,self.widfac,self.highfac,fontfac)
@@ -170,7 +177,7 @@ class GPRPyApp:
         colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
-                          "and red-white-blue (rwb)\n" 
+                          "and blue-white-red (bwr)\n" 
                           "data representation.")
 
 
@@ -211,7 +218,7 @@ class GPRPyApp:
                           "Adjust the profile length to \n"
                           "known start and end positions\n"
                           "and/or flip the profile horizontally\n"
-                          "(left to right)")
+                          "(left to right).")
 
         
         # Set new zero time
@@ -222,8 +229,8 @@ class GPRPyApp:
         SetZeroTimeButton.config(height = 1, width = 2*halfwid)         
         SetZeroTimeButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)    
         self.balloon.bind(SetZeroTimeButton,
-                          "Set the two-way travel time \n" 
-                          "that corresponds to the surface.")
+                          "Set the travel time that \n" 
+                          "corresponds to the surface.")
 
 
 
@@ -254,7 +261,7 @@ class GPRPyApp:
                           "Remove data points at arrival times\n"
                           "later than the chosen value. If velocity\n"
                           "is given: remove data points at depths greater\n"
-                          "than the chosen value")   
+                          "than the chosen value.")   
  
 
 
@@ -337,8 +344,8 @@ class GPRPyApp:
         tpowButton.grid(row=11, column=rightcol, sticky='nsew')
         self.balloon.bind(tpowButton,
                           "t-power gain. Increases the power of the\n"
-                          "signal by a factor of (two-way travel time)^p,\n"
-                          "where the user provides p. This gain is often\n" 
+                          "signal by a factor of (travel time)^p, where\n"
+                          "the user provides p. This gain tends to be\n" 
                           "less aggressive than agc.")
 
         
@@ -361,11 +368,11 @@ class GPRPyApp:
         hypButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(hypButton,
                           "Draws a hyperbola depending on profile position,\n"
-                          "two-way travel time, and estimated velocity. This\n" 
-                          "can be used to find the subsurface velocity when\n"
-                          "a hyperbola is visible in the data.\n"
-                          "The plotted hyperbola will disappear when the image\n" 
-                          "is refreshed.")
+                          "travel time, and estimated velocity. This can be\n" 
+                          "used to find the subsurface velocity when a\n"
+                          "a hyperbola is visible in the data. The plotted\n"
+                          "hyperbola will disappear when the image is\n" 
+                          "refreshed.")
 
         
 
@@ -377,8 +384,8 @@ class GPRPyApp:
         setVelButton.config(height = 1, width = 2*halfwid)         
         setVelButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(setVelButton,
-                          "Set the known subsurface radar velocity. This will\n" 
-                          "turn the y-axis from two-way travel time to depth.\n"
+                          "Set the known subsurface radar velocity. This\n" 
+                          "turns the y-axis from travel time to depth.\n"
                           "This step is necessary for topographic correction.")
 
 
@@ -486,7 +493,7 @@ class GPRPyApp:
         self.balloon.bind(VTKButton,
                           "Exports the processed figure to a\n"
                           "VTK format, that can be read by\n" 
-                          "Paraview or similar 3D programs")
+                          "Paraview or similar 3D programs.")
         
 
 
@@ -610,7 +617,7 @@ class GPRPyApp:
 
     def truncateY(self,proj):
         maxY = sd.askfloat("Input","Truncate at what y value\n" 
-                           "(two-way travel time or depth)")
+                           "(travel time or depth)")
         if maxY is not None:
             proj.truncateY(maxY)
         
@@ -783,7 +790,7 @@ class GPRPyApp:
                      vmin=-stdcont/self.contrast.get(), vmax=stdcont/self.contrast.get())
             a.set_ylim(self.yrng)
             a.set_xlim(self.xrng)
-            a.set_ylabel("two-way travel time [ns]", fontsize=mpl.rcParams['font.size'])
+            a.set_ylabel("time [ns]", fontsize=mpl.rcParams['font.size'])
             a.invert_yaxis()
         elif proj.maxTopo is None:
             dy=dt*proj.velocity
@@ -839,17 +846,20 @@ class GPRPyApp:
 
     # Show hyperbola
     def showHyp(self,proj,a):
-        x0 = sd.askfloat("Input","Hyperbola center on profile [m]")
+        x0 = sd.askfloat("Input","Hyperbola center on profile [m]", initialvalue=self.hypx)
         if x0 is not None:
-            t0 = sd.askfloat("Input","Hyperbola apex location (two-way travel time [ns])")
+            t0 = sd.askfloat("Input","Hyperbola apex location (time [ns])", initialvalue=self.hypt)
             if t0 is not None:
-                v  = sd.askfloat("Input","Estimated velocity [m/ns]")
+                v  = sd.askfloat("Input","Estimated velocity [m/ns]", initialvalue=self.hypv)
                 if v is not None:
                     y=proj.profilePos-x0
                     d=v*t0/2.0
                     k=np.sqrt(d**2 + np.power(y,2))
                     t2=2*k/v
                     a.plot(proj.profilePos,t2,'--c',linewidth=3)
+                    self.hypx = x0
+                    self.hypt = t0
+                    self.hypv = v
         
 
     def printProfileFig(self,proj,fig):

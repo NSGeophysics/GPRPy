@@ -31,7 +31,7 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
     a.plot(x,y,'k',linewidth=lw*widfac,solid_capstyle='round')
     # Snake head
     Path = mpath.Path
-    headval=2500*widfac/highfac
+    headval=2000*widfac/highfac
     path_data = [
         (Path.MOVETO, [xshift,headval]),
         (Path.CURVE3, [-20+xshift,0]),
@@ -79,8 +79,8 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
         'size': 13.5*fontfac
         #'size': 45.6
         }
-    a.text(50,-12000,'Version 1.0.11',fontdict=fontver)
-
+    a.text(50,-12000,'Version 1.0.12',fontdict=fontver)
+   
     # add UA logo
     filename1=os.path.join(dir_path,'toolbox','splashdat',
                            'A_Square_Logo_4c.png')
@@ -127,21 +127,24 @@ def showSplash(a,dir_path,widfac,highfac,fontfac):
     figratio = figsize[0]/figsize[1]
     ratio = a.get_data_ratio()*figratio
     xwidth = yheight/ratio
-    a.imshow(nsf, aspect='auto', extent=(xanchor, xanchor+xwidth,
+    a.imshow(nsf, aspect=0.0016,extent=(xanchor, xanchor+xwidth,  #aspect='auto'
                                          yanchor, yanchor+yheight),
              interpolation='spline36')
     font2 = {'family': 'DejaVu Sans',
              'color':  'black',
-             'size': 13.5*fontfac}
+             'size': 12*fontfac}
 			 #'size': 10.26}
     a.text(-5,-27000,'EAR-1550732',fontdict=font2)
+    a.text(-5,-29000,'EAR-2022671',fontdict=font2)
+
+    a.text(30,-29000,'Please cite https://doi.org/10.1190/tle39050332.1',fontdict=font2)
+    a.set_url(['https://doi.org/10.1190/tle39050332.1'])
 
     
     # Add name/email
     font3 = {'family': 'DejaVu Sans',
              'color':  'gray',
-             'size': 13.5*fontfac}
+             'size': 12*fontfac}
 			 #'size' : 10.26}
-    a.text(70,-22000,'Alain Plattner',fontdict=font3)
+    a.text(59,-22000,'Alain Plattner',fontdict=font3)
     a.text(59,-24000,'plattner@alumni.ethz.ch',fontdict=font3)
-    #a.text(59.5,-24000,'plattner@alumni.ethz.ch',fontdict=font3)

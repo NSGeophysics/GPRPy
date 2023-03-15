@@ -50,11 +50,11 @@ class GPRPyCWApp:
         adata.set_title('data')
         adata.get_yaxis().tick_right()
         adata.get_yaxis().set_label_position('right')
-        adata.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])
+        adata.set_ylabel('time [ns]', fontsize=mpl.rcParams['font.size'])
         
         alin.set_title('linear stacked amplitude')
         ahyp.set_title('hyperbolic stacked amplitude')
-        ahyp.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])        
+        ahyp.set_ylabel('time [ns]', fontsize=mpl.rcParams['font.size'])        
         
         canvas = FigureCanvasTkAgg(fig, master=self.window)
         canvas.get_tk_widget().grid(row=2,column=0,columnspan=rightcol,rowspan=figrowsp,sticky='nsew')
@@ -108,8 +108,8 @@ class GPRPyCWApp:
         SetZeroTimeButton.config(height = 1, width = 2*halfwid)         
         SetZeroTimeButton.grid(row=3, column=rightcol, sticky='nsew',columnspan=colsp)    
         self.balloon.bind(SetZeroTimeButton,
-                          "Set the two-way travel time that \n" 
-                          "that corresponds to the surface.")
+                          "Set the travel time that \n" 
+                          "corresponds to the surface.")
 
         # truncate Y
         truncYButton = tk.Button(
@@ -170,7 +170,7 @@ class GPRPyCWApp:
         NormalizeButton.grid(row=8, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(NormalizeButton,
                           "Normalizes each trace such that\n" 
-                          "they all have equal energy") 
+                          "they all have equal energy.") 
 
 
         # Gain
@@ -182,8 +182,8 @@ class GPRPyCWApp:
         tpowButton.grid(row=9, column=rightcol, sticky='nsew')
         self.balloon.bind(tpowButton,
                           "t-power gain. Increases the power of the\n"
-                          "signal by a factor of (two-way travel time)^p,\n"
-                          "where the user provides p. This gain is often\n" 
+                          "signal by a factor of (travel time)^p, where\n"
+                          "the user provides p. This gain is typically\n" 
                           "less aggressive than agc.")
 
         
@@ -209,8 +209,8 @@ class GPRPyCWApp:
         LinStAmpButton.grid(row=10, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(LinStAmpButton,
                           "Calculate the linear stacked amplitude for\n"
-                          "the selected velocity ranges and two-way\n" 
-                          "travel times.")
+                          "the selected velocity ranges and travel\n" 
+                          "times.")
         
         # Hyp Stacked Amplitude
         HypStAmpButton = tk.Button(
@@ -219,13 +219,12 @@ class GPRPyCWApp:
                                 self.plotStAmp(proj,a=ahyp,canvas=canvas,
                                                stamp=proj.hypStAmp,
                                                title='hyperbolic stacked amplitude',
-                                               ylabel='two-way travel time [ns]')])
+                                               ylabel='time [ns]')])
         HypStAmpButton.config(height = 1, width = 2*halfwid)
         HypStAmpButton.grid(row=11, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HypStAmpButton,
                           "Calculate the hyperbolic stacked amplitude for\n"
-                          "the selected velocity ranges and two-way travel\n" 
-                          "times.")
+                          "the selected velocity ranges and travel times.")
 
         # Add line on top of data
         AddLinButton = tk.Button(
@@ -236,8 +235,8 @@ class GPRPyCWApp:
         AddLinButton.grid(row=12,column=rightcol, sticky='nsew')
         self.balloon.bind(AddLinButton,
                           "Draw line with chosen velocity\n"
-                          "and intercept two-way travel time \n"
-                          "on top of data.")        
+                          "and intercepttravel time on top \n"
+                          "of data.")        
         
         # Draw hyperbola on top of data
         AddHypButton = tk.Button(
@@ -248,8 +247,7 @@ class GPRPyCWApp:
         AddHypButton.grid(row=12,column=rightcol+1, sticky='nsew')
         self.balloon.bind(AddHypButton,
                           "Draw hyperbola with chosen velocity\n"
-                          "and apex two-way travel time \n"
-                          "on top of data.")  
+                          "and apex travel time on top of data.")  
 
         # Remove most recent line
         RemLinButton = tk.Button(
@@ -260,7 +258,7 @@ class GPRPyCWApp:
         RemLinButton.grid(row=13,column=rightcol, sticky='nsew')
         self.balloon.bind(RemLinButton,
                           "Remove the most recently drawn\n"
-                          "line from data")
+                          "line from data.")
 
         # Remove most recent hyperbola
         RemHypButton = tk.Button(
@@ -271,7 +269,7 @@ class GPRPyCWApp:
         RemHypButton.grid(row=13,column=rightcol+1, sticky='nsew')
         self.balloon.bind(RemHypButton,
                           "Remove the most recently drawn\n"
-                          "hyperbola from data")
+                          "hyperbola from data.")
         
         # Show ln hp toggle
         ShowLnHpButton = tk.Button(
@@ -282,7 +280,7 @@ class GPRPyCWApp:
         ShowLnHpButton.grid(row=14,column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(ShowLnHpButton,
                           "Toggle on/off showing the\n"
-                          "drawn lines / hyperbolae")
+                          "drawn lines / hyperbolae.")
 
         # Print figure
         PrintFigButton = tk.Button(
@@ -304,7 +302,7 @@ class GPRPyCWApp:
         HistButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce the current \n'
-                          'status as a\n'
+                          'status.\n'
                           '\n'
                           'If the current data is from a .gpr file, \n'  
                           'then the python script will contain all \n'
@@ -345,7 +343,7 @@ class GPRPyCWApp:
                                              title='linear stacked amplitude'),
                               self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
                                             title='hyperbolic stacked amplitude',
-                                             ylabel='two-way travel time [ns]')])
+                                             ylabel='time [ns]')])
         FullButton.config(height = 1, width = 2*halfwid)         
         FullButton.grid(row=0, column=1, sticky='nsew',rowspan=2)
         self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
@@ -392,7 +390,7 @@ class GPRPyCWApp:
                                              stamp=proj.linStAmp,title='linear stacked amplitude'),
                               self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
                                             title='hyperbolic stacked amplitude',
-                                            ylabel='two-way travel time [ns]')])
+                                            ylabel='time [ns]')])
         YrngButton.config(height = 1, width = 2*halfwid)         
         YrngButton.grid(row=0, column=5, sticky='nsew',rowspan=2)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
@@ -418,7 +416,7 @@ class GPRPyCWApp:
         colswitch.grid(row=0, column=7, sticky='nsew',rowspan=2)
         self.balloon.bind(colswitch,
                           "Choose between gray-scale\n"
-                          "and red-white-blue (rwb)\n" 
+                          "and blue-white-red (bwr)\n" 
                           "data representation.")
 
 
@@ -431,7 +429,7 @@ class GPRPyCWApp:
                                              stamp=proj.linStAmp,title='linear stacked amplitude'),
                               self.plotStAmp(proj,a=ahyp,canvas=canvas,stamp=proj.hypStAmp,
                                             title='hyperbolic stacked amplitude',
-                                             ylabel='two-way travel time [ns]')])
+                                             ylabel='time [ns]')])
         plotButton.config(height = 1, width = 2*halfwid)
         plotButton.grid(row=0, column=8, sticky='nsew',rowspan=2)
         self.balloon.bind(plotButton,
@@ -513,7 +511,7 @@ class GPRPyCWApp:
         elif self.dtype == "CMP":
             a.set_xlabel("distance from midpoint [m]", fontsize=mpl.rcParams['font.size'])
         a.set_title('data')
-        a.set_ylabel('two-way travel time [ns]', fontsize=mpl.rcParams['font.size'])
+        a.set_ylabel('time [ns]', fontsize=mpl.rcParams['font.size'])
         a.get_xaxis().set_ticks_position('both')
         a.get_yaxis().set_ticks_position('both')
         # If we have any hyperbolae or lines, we need to plot them too:
@@ -630,7 +628,7 @@ class GPRPyCWApp:
 
 
     def truncateY(self,proj):
-        maxY = sd.askfloat("Input","Maximum two-way travel time?")
+        maxY = sd.askfloat("Input","Maximum travel time?")
         if maxY is not None:
             proj.truncateY(maxY)
 
@@ -676,7 +674,7 @@ class GPRPyCWApp:
         self.showlnhp = True
         vel = sd.askfloat("Input","Velocity?")
         if vel is not None:
-            zerotwtt = sd.askfloat("Input","Zero two-way travel time?")
+            zerotwtt = sd.askfloat("Input","Zero travel time?")
             if zerotwtt is not None:           
                 proj.addLin(zerotwtt=zerotwtt,vel=vel)
 
@@ -685,7 +683,7 @@ class GPRPyCWApp:
         self.showlnhp = True
         vel = sd.askfloat("Input","Velocity?")
         if vel is not None:            
-            zerotwtt = sd.askfloat("Input","Zero two-way travel time?")
+            zerotwtt = sd.askfloat("Input","Zero travel time?")
             if zerotwtt is not None:
                 proj.addHyp(zerotwtt=zerotwtt,vel=vel)                                
 

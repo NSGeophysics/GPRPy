@@ -18,7 +18,7 @@ def reduceSampling(gpr,nprofile,ntwtt):
     INPUT:
     gpr          gprProfile object
     nprofile     number of samples along the profile
-    ntwtt        number of samples along the two-way travel time
+    ntwtt        number of samples along the travel time
     '''
     
     #gpr2 = copy.copy(gpr)
@@ -93,7 +93,7 @@ def makeDataCube(datalist,outname,nx=50,ny=50,nz=50,smooth=None,nprofile=None,nd
     nprofile      if subsampling is desired: Number of samples along 
                   the profile [default: None  meaning do not subsample]
     ndepth        if subsampling is desired: Number of samples along the 
-                  two-way travel time [default: None  meaning do not subsample]
+                  travel time [default: None  meaning do not subsample]
     method        method for interpolation: "nearest", "linear", or "cubic" 
                   I highly highly recommend "nearest" because the others
                   are computationally much more costly [default: "nearest"]

@@ -317,7 +317,7 @@ class gprpyProfile:
                                                     max(self.twtt)+dt/2.0,
                                                     min(self.twtt)-dt/2.0],
                        aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
-            plt.gca().set_ylabel("two-way travel time [ns]")
+            plt.gca().set_ylabel("time [ns]")
             plt.gca().invert_yaxis()
             if yrng is not None:
                 yrng=[np.max(yrng),np.min(yrng)]
@@ -452,7 +452,7 @@ class gprpyProfile:
     def alignTraces(self):
         '''
         Aligns the traces in the profile such that their maximum 
-        amplitudes align at the average two-way travel time of the 
+        amplitudes align at the average travel time of the 
         maximum amplitudes.
         '''
         # Store previous state for undo
@@ -1061,10 +1061,10 @@ class gprpyCW(gprpyProfile):
 
     def linStackedAmplitude(self,vmin=0.01,vmax=0.35,vint=0.01):
         '''
-        Calculates the linear stacked amplitudes for each two-way 
+        Calculates the linear stacked amplitudes for each 
         travel time sample and the provided velocity range 
         by summing the pixels of the data that follow a line given 
-        by the two-way travel time zero offset and the velocity.
+        by the travel time zero offset and the velocity.
 
         INPUT:
         vmin       minimal velocity for which to calculate the 
@@ -1089,10 +1089,10 @@ class gprpyCW(gprpyProfile):
 
     def hypStackedAmplitude(self,vmin=0.01,vmax=0.35,vint=0.01):
         '''
-        Calculates the hyperbolic stacked amplitudes for each two-way 
+        Calculates the hyperbolic stacked amplitudes for each 
         travel time sample and the provided velocity range 
         by summing the pixels of the data that follow a hyperbola given 
-        by the two-way travel time apex and the velocity.
+        by the travel time apex and the velocity.
 
         INPUT:
         vmin       minimal velocity for which to calculate the 
@@ -1117,11 +1117,11 @@ class gprpyCW(gprpyProfile):
 
     def addLin(self,zerotwtt,vel):
         '''
-        Adds an observed line given by its zero-offset two-way travel
+        Adds an observed line given by its zero-offset travel
         time and velocity to the list of lines.
 
         INPUT:
-        zerotwtt     the zero-offset two-way travel time (intercept)
+        zerotwtt     the zero-offset travel time (intercept)
                      of the observed line
         vel          the velocity (inverse slope) of the observed line
         '''
@@ -1135,11 +1135,11 @@ class gprpyCW(gprpyProfile):
 
     def addHyp(self,zerotwtt,vel):
         '''
-        Adds an observed hyperbola given by its apex two-way 
+        Adds an observed hyperbola given by its apex 
         travel time and velocity to the list of lines.
 
         INPUT:
-        zerotwtt     the apex two-way travel time of the observed line
+        zerotwtt     the apex travel time of the observed line
         vel          the velocity of the observed line
         '''
         # Store previous state for undo
@@ -1208,7 +1208,7 @@ class gprpyCW(gprpyProfile):
                                                 max(self.twtt)+dt/2.0,
                                                 min(self.twtt)-dt/2.0],
                    aspect="auto",vmin=-stdcont/contrast, vmax=stdcont/contrast)
-        plt.gca().set_ylabel("two-way travel time [ns]")
+        plt.gca().set_ylabel("time [ns]")
         plt.gca().invert_yaxis()
         if yrng is not None:
             yrng=[np.max(yrng),np.min(yrng)]
@@ -1302,7 +1302,7 @@ class gprpyCW(gprpyProfile):
                 
 
             plt.gca().set_xlabel("velocity [m/ns]")
-            plt.gca().set_ylabel("two-way travel time [ns]")
+            plt.gca().set_ylabel("time [ns]")
             #plt.gca().invert_yaxis()
             plt.gca().set_title(title)
             plt.gca().get_xaxis().set_visible(True)
