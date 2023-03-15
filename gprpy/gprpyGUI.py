@@ -520,9 +520,9 @@ class GPRPyApp:
         
       
     def setYrng(self):
-        ylow = sd.askfloat("Input","Min Y value")
+        ylow = sd.askfloat("Input","Min Y value",initialvalue=self.yrng[0])
         if ylow is not None:            
-            yhigh = sd.askfloat("Input","Max Y value")
+            yhigh = sd.askfloat("Input","Max Y value",initialvalue=self.yrng[1])
             if yhigh is not None:
                 self.prevyrng=self.yrng
                 self.yrng=[ylow,yhigh]
@@ -536,7 +536,7 @@ class GPRPyApp:
 
 
     def setAspect(self):
-        self.asp = sd.askfloat("Input","Plotting aspect ratio")
+        self.asp = sd.askfloat("Input","Plotting aspect ratio", initialvalue=self.asp)
         
 
     def setFullView(self,proj):    
@@ -554,9 +554,9 @@ class GPRPyApp:
             
             
     def setXrng(self):
-        xlow = sd.askfloat("Input","Min X value")
+        xlow = sd.askfloat("Input","Min X value",initialvalue=self.xrng[0])
         if xlow is not None:
-            xhigh = sd.askfloat("Input","Max X value")
+            xhigh = sd.askfloat("Input","Max X value",initialvalue=self.xrng[1])
             if xhigh is not None:
                 self.xrng=[xlow,xhigh]
         
@@ -565,9 +565,9 @@ class GPRPyApp:
         flipit = mesbox.askyesno("Question","Flip the profile (left to right)?")
         if flipit:
             proj.flipProfile()        
-        minPos = sd.askfloat("Input","Start x coordinate")
+        minPos = sd.askfloat("Input","Start x coordinate",initialvalue=self.xrng[0])
         if minPos is not None:
-            maxPos = sd.askfloat("Input","End x coordinate")
+            maxPos = sd.askfloat("Input","End x coordinate",initialvalue=self.xrng[1])
             if maxPos is not None:
                 proj.adjProfile(minPos=minPos,maxPos=maxPos)
                 self.xrng=[minPos,maxPos]
