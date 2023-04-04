@@ -538,7 +538,7 @@ class GPRPyApp:
     def resetYrng(self,proj):
         # Only needed in undo, and only if what you want to
         # undo changed the y axis
-        if ("setVelocity" in proj.history[-1]) or ("topoCorrect" in proj.history[-1]): 
+        if ("setVelocity" in proj.history[-1]) or ("topoCorrect" in proj.history[-1]) and not self.picking: 
             self.yrng=self.prevyrng
 
 
