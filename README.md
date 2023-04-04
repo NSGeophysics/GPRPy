@@ -1,5 +1,7 @@
 # GPRPy
-Open-source Ground Penetrating Radar processing and visualization software. Supported by the National Science Foundation under grant [EAR-1550732](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550732).
+Open-source Ground Penetrating Radar processing and visualization software. Supported by the National Science Foundation under grants [EAR-1550732](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550732) and EAR-2022671](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2022671)
+
+Please cite https://library.seg.org/doi/10.1190/tle39050332.1
 
 ![Profile GUI](profileGUI.png)
 
