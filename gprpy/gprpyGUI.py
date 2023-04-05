@@ -648,9 +648,9 @@ class GPRPyApp:
 
 
     def profileSmooth(self,proj):
-        ntraces = sd.askinteger("Input","Smooth over how many traces (m)")
+        ntraces = sd.askinteger("Input","Smooth over how many traces?")
         if ntraces is not None:
-            noversample = sd.askinteger("Input","Make how many copies of each trace (n).\nRecommended: Same as number of traces to be smoothed.")
+            noversample = sd.askinteger("Input","Make how many copies of each trace?\nRecommended: Same as number of traces to be smoothed.")
             if noversample is not None:
                 proj.profileSmooth(ntraces,noversample)
         
