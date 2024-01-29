@@ -26,7 +26,7 @@ gpr_profile_for_interp = gp.gprpyProfile()
 ###############################################################
 
 # FOLDERS THAT CONTAIN DATA RAW AND PROCESSED DATA EVENTUALLY #
-raw_data_folder = 'proc/data_raw/'  
+raw_data_folder = '../GPR_Data'  
 proc_data_folder = 'proc/data_processed/'
 f_topo = 'proc/data_topo/'
 report_doc ='proc/report/'
