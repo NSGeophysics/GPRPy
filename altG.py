@@ -33,6 +33,7 @@ HEIGHT = 1
 HEADING = ('TkDefaultFont', 13,'bold')
 BTN_GO_W = 3
 
+
 class GPRPyApp:
     def __init__(self, master):
         self.window = master
@@ -54,6 +55,9 @@ class GPRPyApp:
         self.delimiter = None
         self.grid = False
 
+
+
+
         master.geometry('1024x768')
         master.title("GPR - Py")
         master.rowconfigure(0, minsize=766, weight=1)
@@ -62,7 +66,8 @@ class GPRPyApp:
 
         proj = gp.gprpyProfile()
 
-        btn_frm = tk.Frame(master, relief= tk.RAISED, bd = 2)
+        btn_frm = tk.Frame(master, relief= tk.RAISED, bd = 2)#, height= 700, width= 100)
+
         btn_frm.grid(row = 0, column= 0, sticky= 'ns', rowspan = 2)
         master.rowconfigure(1, weight=10) 
 
@@ -76,6 +81,7 @@ class GPRPyApp:
         canvas = FigureCanvasTkAgg(fig, master=self.window)
         canvas.get_tk_widget().grid(row=0,column=1,columnspan= 9,rowspan= 22,sticky='nsew')
         #canvas.get_tk_widget().grid(row=2,column=0,columnspan= figcolsp,rowspan= figrowsp,sticky='nsew')
+
         canvas.draw() 
         
 ####################################################################################### 
@@ -367,6 +373,7 @@ class GPRPyApp:
                           "or two columns (profile position, elevation).\n" 
                           "All coordinates in meters.")       
 
+
 ####################################################################################### 
         #Profile Controls
         ProfC_cpane = cp(btn_frm, 'Profile Controls -', 'Profile Controls +')
@@ -620,6 +627,12 @@ class GPRPyApp:
                           "a hyperbola is visible in the data. The plotted\n"
                           "hyperbola will disappear when the image is\n" 
                           "refreshed.")
+
+# Button and checkbutton, these will
+# appear in collapsible pane container
+        
+
+
 
 
 
