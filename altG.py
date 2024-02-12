@@ -32,6 +32,7 @@ WIDTH = 10
 HEIGHT = 1
 HEADING = ('TkDefaultFont', 13,'bold')
 
+
 class GPRPyApp:
     def __init__(self, master):
         self.window = master
@@ -53,7 +54,7 @@ class GPRPyApp:
         self.delimiter = None
         self.grid = False
 
-        self.window = master
+        self.window = master            #needed? check line 37
         master.geometry('1024x768')
         master.title("GPR - Py")
         master.rowconfigure(0, minsize=766, weight=1)
@@ -74,7 +75,9 @@ class GPRPyApp:
         a.get_xaxis().set_visible(False)
         a.get_yaxis().set_visible(False)
         canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.get_tk_widget().grid(row=1,column=1,columnspan= 9,rowspan= 22,sticky='nsew')
+        canvas.get_tk_widget().grid(row=0,column=1,columnspan= 9,rowspan= 22,sticky='nsew')
+        #canvas.get_tk_widget().grid(row=2,column=0,columnspan= figcolsp,rowspan= figrowsp,sticky='nsew')
+
 
         canvas.draw() 
 
@@ -466,7 +469,7 @@ class GPRPyApp:
         self.cursor_cid = canvas.mpl_connect('button_press_event', moved)
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
 
-        canvas.get_tk_widget().grid(row=2,column=0,columnspan=figcolsp, rowspan=figrowsp, sticky='nsew')
+        canvas.get_tk_widget().grid(row=0,column=1,columnspan=figcolsp, rowspan=figrowsp, sticky='nsew')
         canvas.draw()
 
     def undo(self,proj):
