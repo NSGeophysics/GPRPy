@@ -1,5 +1,5 @@
 import sys
-from tkinter import ttk
+from tkinter import messagebox, ttk
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
@@ -216,21 +216,25 @@ class GPRPyApp:
                           "Stop collecting location information\n"
                           "and save the locations you collected\n"
                           "in a text file.")
-        #Set X-Range
+        
+        #Set X-Range 
         lbl_xrng = tk.Label(VC_cpane.frame, text= "Set X - Range", font = HEADING)
         lbl_xrng.grid(row = 2, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        
+
         lbl_minx = tk.Label(VC_cpane.frame, text= "Min:")
         lbl_minx.grid(row = 3, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-    
-        tb_minx = tk.Text(VC_cpane.frame, height = 1, width= 3)
-        tb_minx.grid(row = 3, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+
+        #Changed to take input from text box
+        self.tb_minx = tk.Text(VC_cpane.frame, height = 1, width = 3)
+        self.tb_minx.grid(row = 3, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
 
         lbl_maxx = tk.Label(VC_cpane.frame, text= "Max:")
         lbl_maxx.grid(row = 3, column = 2, sticky= 'ew', padx= PAD, pady = PAD)
 
-        tb_maxx = tk.Text(VC_cpane.frame, height = 1, width= 3)
-        tb_maxx.grid(row = 3, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+        #Changed to take input from text box
+        self.tb_maxx = tk.Text(VC_cpane.frame, height = 1, width = 3)
+        self.tb_maxx.grid(row = 3, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+
 
         XrngButton = tk.Button(VC_cpane.frame,
             text="Go", fg="black",
@@ -242,19 +246,22 @@ class GPRPyApp:
         
 
         # Y range
+
         lbl_yrng = tk.Label(VC_cpane.frame, text= "Set Y - Range", font = HEADING)
         lbl_yrng.grid(row = 4, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        
+
         lbl_miny = tk.Label(VC_cpane.frame, text= "Min:")
         lbl_miny.grid(row = 5, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-    
-        tb_miny = tk.Text(VC_cpane.frame, height = 1, width= 3)
-        tb_miny.grid(row = 5, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+
+        self.tb_miny = tk.Text(VC_cpane.frame, height = 1, width = 3)
+        self.tb_miny.grid(row = 5, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+
         lbl_maxy = tk.Label(VC_cpane.frame, text= "Max:")
         lbl_maxy.grid(row = 5, column = 2, sticky= 'ew', padx= PAD, pady = PAD)
 
-        tb_maxy = tk.Text(VC_cpane.frame, height = 1, width= 3)
-        tb_maxy.grid(row = 5, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+        self.tb_maxy = tk.Text(VC_cpane.frame, height = 1, width = 3)
+        self.tb_maxy.grid(row = 5, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+
 
         YrngButton = tk.Button(VC_cpane.frame,
             text="Go", fg="black",
@@ -286,12 +293,19 @@ class GPRPyApp:
                           "and blue-white-red (bwr)\n" 
                           "data representation.")
         
+        # Go button for colour and contrast
+        PlotButton = tk.Button(VC_cpane.frame,
+            text="Go", fg="black",
+            command=lambda : [self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        PlotButton.config(height = HEIGHT, width = 3)         
+        PlotButton.grid(row=6, column= 3, sticky='nsew',padx = PAD, pady = PAD)
+        self.balloon.bind(PlotButton,"Set Colour and Contrast")
     
         # Aspect
         lbl_aspr = tk.Label(VC_cpane.frame, text= "Aspect Ratio", font = HEADING)
         lbl_aspr.grid(row = 7, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_aspr = tk.Text(VC_cpane.frame, height = 1, width= 3)
-        tb_aspr.grid(row = 7, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        self.tb_aspr = tk.Text(VC_cpane.frame, height=1, width=3)
+        self.tb_aspr.grid(row=7, column=1, sticky='ew', padx=PAD, pady=PAD)
         AspButton = tk.Button(VC_cpane.frame,
             text="Go", fg="black",
             command=lambda : [self.setAspect(),
@@ -308,8 +322,8 @@ class GPRPyApp:
         # Set Velocity
         lbl_velo = tk.Label(Velo_cpane.frame, text= "Set Velocity", font = HEADING)
         lbl_velo.grid(row = 0, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_velo = tk.Text(Velo_cpane.frame, height = 1, width= WIDTH)
-        tb_velo.grid(row = 0, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        self.tb_velo = tk.Text(Velo_cpane.frame, height = 1, width= WIDTH)
+        self.tb_velo.grid(row = 0, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
         setVelButton = tk.Button(Velo_cpane.frame, 
             text="Go", fg="black",
             command=lambda : [self.setVelocity(proj),
@@ -375,22 +389,30 @@ class GPRPyApp:
 
 
 ####################################################################################### 
-        #Profile Controls
+        # Profile Controls
         ProfC_cpane = cp(btn_frm, 'Profile Controls -', 'Profile Controls +')
-        ProfC_cpane.grid(row = 3, column = 0, sticky = 'ew',) 
+        ProfC_cpane.grid(row=3, column=0, sticky='ew')
 
-        # Adjust profile length; if trigger wheel is not good
-        lbl_adjprf = tk.Label(ProfC_cpane.frame, text= "Adjust Profile", font = HEADING)
-        lbl_adjprf.grid(row = 0, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_adjprf = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_adjprf.grid(row = 0, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        # Adjust Profile
+        lbl_adjprf = tk.Label(ProfC_cpane.frame, text="Adjust Profile", font=HEADING)
+        lbl_adjprf.grid(row=0, column=0, sticky='ew', padx=PAD, pady=PAD)
+
+        lbl_adjprfMin = tk.Label(ProfC_cpane.frame, text="Min X-Value:")
+        lbl_adjprfMin.grid(row=1, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_adjprfMin = tk.Text(ProfC_cpane.frame, height=1, width=3)  # Reduced width to 2
+        self.tb_adjprfMin.grid(row=1, column=1, sticky='ew', padx=PAD, pady=PAD)
+
+        lbl_adjprfMax = tk.Label(ProfC_cpane.frame, text="Max X- Value:")
+        lbl_adjprfMax.grid(row=1, column=2, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_adjprfMax = tk.Text(ProfC_cpane.frame, height=1, width=3)  # Kept width as 3
+        self.tb_adjprfMax.grid(row=1, column=3, sticky='ew', padx=PAD, pady=PAD)
 
         AdjProfileButton = tk.Button(ProfC_cpane.frame,
             text="Go", fg="black",
             command=lambda : [self.adjProfile(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        AdjProfileButton.config(height = 1, width = BTN_GO_W)         
-        AdjProfileButton.grid(row=0, column=2, sticky='nsew')
+        AdjProfileButton.config(height = 1, width = 2)         
+        AdjProfileButton.grid(row=1, column=4, sticky='nsew')
         self.balloon.bind(AdjProfileButton,
                           "Adjust the profile length to \n"
                           "known start and end positions\n"
@@ -399,234 +421,231 @@ class GPRPyApp:
 
         
         # Set new zero time
-        lbl_zt = tk.Label(ProfC_cpane.frame, text= " Set Zero Time", font = HEADING)
-        lbl_zt.grid(row = 1, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_zt = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_zt.grid(row = 1, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_zt = tk.Label(ProfC_cpane.frame, text=" Set Zero Time", font=HEADING)
+        lbl_zt.grid(row=2, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_zt = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_zt.grid(row=2, column=1, sticky='ew', padx=PAD, pady=PAD)
 
         SetZeroTimeButton = tk.Button(ProfC_cpane.frame,
-            text="Go", fg="black",
-            command=lambda : [self.setZeroTime(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        SetZeroTimeButton.config(height = 1, width = BTN_GO_W)         
-        SetZeroTimeButton.grid(row=1, column=2, sticky='nsew')    
+                                    text="Go", fg="black",
+                                    command=lambda: [self.setZeroTime(proj),
+                                                    self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        SetZeroTimeButton.config(height=1, width=BTN_GO_W)
+        SetZeroTimeButton.grid(row=2, column=2, sticky='nsew')
         self.balloon.bind(SetZeroTimeButton,
-                          "Set the travel time that \n" 
-                          "corresponds to the surface.")
-
+                        "Set the travel time that \n"
+                        "corresponds to the surface.")
 
 
         # TimeZero Adjust = align traces
-        lbl_altr = tk.Label(ProfC_cpane.frame, text= "Allign Traces", font = HEADING)
-        lbl_altr.grid(row = 2, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_altr = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_altr.grid(row = 2, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_altr = tk.Label(ProfC_cpane.frame, text="Allign Traces", font=HEADING)
+        lbl_altr.grid(row=3, column=0, sticky='ew', padx=PAD, pady=PAD)
+        tb_altr = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        tb_altr.grid(row=3, column=1, sticky='ew', padx=PAD, pady=PAD)
 
         TrAlignButton = tk.Button(ProfC_cpane.frame,
-            text="Go", fg="black",
-            command=lambda : [proj.alignTraces(),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        TrAlignButton.config(height = 1, width = BTN_GO_W)         
-        TrAlignButton.grid(row=2, column=2, sticky='nsew')
+                                text="Go", fg="black",
+                                command=lambda: [proj.alignTraces(),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        TrAlignButton.config(height=1, width=BTN_GO_W)
+        TrAlignButton.grid(row=3, column=2, sticky='nsew')
         self.balloon.bind(TrAlignButton,
-                         'Automatically shifts each trace up or down\n'
-                         'such that the maximum aplitudes of the individual\n'
-                         'traces align. Can lead to problems when the maxima\n' 
-                         'are not in the air waves. If the results are bad,\n' 
-                         'use the "undo" button.')
+                        'Automatically shifts each trace up or down\n'
+                        'such that the maximum aplitudes of the individual\n'
+                        'traces align. Can lead to problems when the maxima\n'
+                        'are not in the air waves. If the results are bad,\n'
+                        'use the "undo" button.')
 
-        
 
         # truncate Y
-        lbl_adjprf = tk.Label(ProfC_cpane.frame, text= "Truncate Y", font = HEADING)
-        lbl_adjprf.grid(row = 3, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_adjprf = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_adjprf.grid(row = 3, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_adjprf = tk.Label(ProfC_cpane.frame, text="Truncate Y", font=HEADING)
+        lbl_adjprf.grid(row=4, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_adjprf = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_adjprf.grid(row=4, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        truncYButton = tk.Button(ProfC_cpane.frame, 
-            text="Go", fg="black",
-            command=lambda : [self.truncateY(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        truncYButton.config(height = 1, width = BTN_GO_W)         
-        truncYButton.grid(row=3, column=2, sticky='nsew')
+        truncYButton = tk.Button(ProfC_cpane.frame,
+                                text="Go", fg="black",
+                                command=lambda: [self.truncateY(proj),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        truncYButton.config(height=1, width=BTN_GO_W)
+        truncYButton.grid(row=4, column=2, sticky='nsew')
         self.balloon.bind(truncYButton,
-                          "Remove data points at arrival times\n"
-                          "later than the chosen value. If velocity\n"
-                          "is given: remove data points at depths greater\n"
-                          "than the chosen value.")   
-        
-        #Cut Button
-        lbl_cut = tk.Label(ProfC_cpane.frame, text= "Cut Profile", font = HEADING)
-        lbl_cut.grid(row = 4, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        
-        lbl_cutx = tk.Label(ProfC_cpane.frame, text= "x - value")
-        lbl_cutx.grid(row = 5, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_cutx = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_cutx.grid(row = 5, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+                        "Remove data points at arrival times\n"
+                        "later than the chosen value. If velocity\n"
+                        "is given: remove data points at depths greater\n"
+                        "than the chosen value.")
 
-        lbl_cuty = tk.Label(ProfC_cpane.frame, text= "y - value")
-        lbl_cuty.grid(row = 5, column = 2, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_cuty = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_cuty.grid(row = 5, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+        # Cut Button
+        lbl_cut = tk.Label(ProfC_cpane.frame, text="Cut Profile", font=HEADING)
+        lbl_cut.grid(row=5, column=0, sticky='ew', padx=PAD, pady=PAD)
 
-        cutButton = tk.Button(ProfC_cpane.frame, 
-            text="Go", fg="black",
-            command=lambda : [self.cut(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        cutButton.config(height = 1, width = BTN_GO_W)         
-        cutButton.grid(row=5, column = 4, sticky='nsew')
+        lbl_cutx = tk.Label(ProfC_cpane.frame, text="x - value")
+        lbl_cutx.grid(row=6, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_cutx = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_cutx.grid(row=6, column=1, sticky='ew', padx=PAD, pady=PAD)
+
+        lbl_cuty = tk.Label(ProfC_cpane.frame, text="y - value")
+        lbl_cuty.grid(row=6, column=2, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_cuty = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_cuty.grid(row=6, column=3, sticky='ew', padx=PAD, pady=PAD)
+
+        cutButton = tk.Button(ProfC_cpane.frame,
+                            text="Go", fg="black",
+                            command=lambda: [self.cut(proj),
+                                            self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        cutButton.config(height=1, width=BTN_GO_W)
+        cutButton.grid(row=6, column=4, sticky='nsew')
         self.balloon.bind(cutButton,
-                          "trims data to desired along-profile range.") 
-
+                        "trims data to desired along-profile range.")
 
 
         # Dewow
-        lbl_dewow = tk.Label(ProfC_cpane.frame, text= "Dewow", font =  HEADING)
-        lbl_dewow.grid(row = 6, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_dewow = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_dewow.grid(row = 6, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_dewow = tk.Label(ProfC_cpane.frame, text="Dewow", font=HEADING)
+        lbl_dewow.grid(row=7, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_dewow = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_dewow.grid(row=7, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        DewowButton = tk.Button(ProfC_cpane.frame, 
-            text="Go", fg="black",
-            command=lambda : [self.dewow(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        DewowButton.config(height = 1, width = BTN_GO_W)         
-        DewowButton.grid(row=6, column=2, sticky='nsew')
+        DewowButton = tk.Button(ProfC_cpane.frame,
+                                text="Go", fg="black",
+                                command=lambda: [self.dewow(proj),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        DewowButton.config(height=1, width=BTN_GO_W)
+        DewowButton.grid(row=7, column=2, sticky='nsew')
         self.balloon.bind(DewowButton,
-                          "Trace-wise low-cut filter. Removes\n" 
-                          "from each trace a running mean of\n"
-                          "chosen window width.")
+                        "Trace-wise low-cut filter. Removes\n"
+                        "from each trace a running mean of\n"
+                        "chosen window width.")
 
 
         # Rem mean trace
-        lbl_rmt = tk.Label(ProfC_cpane.frame, text= "Remove Mean Traces", font =  HEADING)
-        lbl_rmt.grid(row = 7, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_rmt = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_rmt.grid(row = 7, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_rmt = tk.Label(ProfC_cpane.frame, text="Remove Mean Traces", font=HEADING)
+        lbl_rmt.grid(row=8, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_rmt = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_rmt.grid(row=8, column=1, sticky='ew', padx=PAD, pady=PAD)
 
         remMeanTraceButton = tk.Button(ProfC_cpane.frame,
-            text="Go", fg="black",
-            command=lambda : [self.remMeanTrace(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        remMeanTraceButton.config(height = 1, width = BTN_GO_W)         
-        remMeanTraceButton.grid(row=7, column=2, sticky='nsew')
+                                    text="Go", fg="black",
+                                    command=lambda: [self.remMeanTrace(proj),
+                                                        self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        remMeanTraceButton.config(height=1, width=BTN_GO_W)
+        remMeanTraceButton.grid(row=8, column=2, sticky='nsew')
         self.balloon.bind(remMeanTraceButton,
-                          "Removes from each trace the average\n" 
-                          "of its surrounding traces. This can be\n"
-                          "useful to remove air waves, ground\n" 
-                          "waves, or horizontal features.")
-        
-        # Smooth 
-        lbl_smth = tk.Label(ProfC_cpane.frame, text= "Smooth (Temp)", font =  HEADING)
-        lbl_smth.grid(row = 8, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_smth = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_smth.grid(row = 8, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+                        "Removes from each trace the average\n"
+                        "of its surrounding traces. This can be\n"
+                        "useful to remove air waves, ground\n"
+                        "waves, or horizontal features.")
 
-        SmoothButton = tk.Button(ProfC_cpane.frame, 
-            text="Go", fg="black",
-            command=lambda : [self.smooth(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        SmoothButton.config(height = 1, width = BTN_GO_W)         
-        SmoothButton.grid(row=8, column=2, sticky='nsew')
+        # Smooth
+        lbl_smth = tk.Label(ProfC_cpane.frame, text="Smooth (Temp)", font=HEADING)
+        lbl_smth.grid(row=9, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_smth1 = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_smth1.grid(row=9, column=1, sticky='ew', padx=PAD, pady=PAD)
+
+        SmoothButton = tk.Button(ProfC_cpane.frame,
+                                text="Go", fg="black",
+                                command=lambda: [self.smooth(proj),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        SmoothButton.config(height=1, width=BTN_GO_W)
+        SmoothButton.grid(row=9, column=2, sticky='nsew')
         self.balloon.bind(SmoothButton,
-                          "Trace-wise high-cut filter. Replaces\n" 
-                          "each sample within a trace by a\n"
-                          "running mean of chosen window width.")
+                        "Trace-wise high-cut filter. Replaces\n"
+                        "each sample within a trace by a\n"
+                        "running mean of chosen window width.")
 
 
         # profile Smoothing Button
-        lbl_pfsmth = tk.Label(ProfC_cpane.frame, text= "Profile Smoothing", font = HEADING)
-        lbl_pfsmth.grid(row = 9, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        
-        lbl_trnum = tk.Label(ProfC_cpane.frame, text= "Trace Number")
-        lbl_trnum.grid(row = 10, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_trnum = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_trnum.grid(row = 10, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_pfsmth = tk.Label(ProfC_cpane.frame, text="Profile Smoothing", font=HEADING)
+        lbl_pfsmth.grid(row=10, column=0, sticky='ew', padx=PAD, pady=PAD)
 
-        lbl_cpynum = tk.Label(ProfC_cpane.frame, text= "Copies Number")
-        lbl_cpynum.grid(row = 10, column = 2, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_cpynum = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_cpynum.grid(row = 10, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_trnum = tk.Label(ProfC_cpane.frame, text="Trace Number")
+        lbl_trnum.grid(row=11, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_trnum = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_trnum.grid(row=11, column=1, sticky='ew', padx=PAD, pady=PAD)
+
+        lbl_cpynum = tk.Label(ProfC_cpane.frame, text="Copies Number")
+        lbl_cpynum.grid(row=11, column=2, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_cpynum = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_cpynum.grid(row=11, column=3, sticky='ew', padx=PAD, pady=PAD)
 
         profSmButton = tk.Button(ProfC_cpane.frame,
-            text="Go", fg="black",
-            command=lambda : [self.profileSmooth(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        profSmButton.config(height = 1, width = BTN_GO_W)         
-        profSmButton.grid(row=10, column=4, sticky='nsew')
+                                text="Go", fg="black",
+                                command=lambda: [self.profileSmooth(proj),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
+        profSmButton.config(height=1, width=BTN_GO_W)
+        profSmButton.grid(row=11, column=4, sticky='nsew')
         self.balloon.bind(profSmButton,
-                          "First oversamples the profile (makes 'n' copies\n"
-                          "of each trace) and then replaces each trace by\n"
-                          "the mean of its neighboring 'm' traces."
-                          )
-        
+                        "First oversamples the profile (makes 'n' copies\n"
+                        "of each trace) and then replaces each trace by\n"
+                        "the mean of its neighboring 'm' traces."
+                        )
 
 
         # Gain
-        lbl_tpow = tk.Label(ProfC_cpane.frame, text= "Tpow", font =  HEADING)
-        lbl_tpow.grid(row = 11, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_smth = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_smth.grid(row = 11, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_tpow = tk.Label(ProfC_cpane.frame, text="Tpow", font=HEADING)
+        lbl_tpow.grid(row=12, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_smth = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_smth.grid(row=12, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        tpowButton = tk.Button(ProfC_cpane.frame, 
-            text="Go", fg="black",
-            command=lambda : [self.tpowGain(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        tpowButton = tk.Button(ProfC_cpane.frame,
+                            text="Go", fg="black",
+                            command=lambda: [self.tpowGain(proj),
+                                                self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
         tpowButton.config(height=1, width=BTN_GO_W)
-        tpowButton.grid(row=11, column=2, sticky='nsew')
+        tpowButton.grid(row=12, column=2, sticky='nsew')
         self.balloon.bind(tpowButton,
-                          "t-power gain. Increases the power of the\n"
-                          "signal by a factor of (travel time)^p, where\n"
-                          "the user provides p. This gain tends to be\n" 
-                          "less aggressive than agc.")
+                        "t-power gain. Increases the power of the\n"
+                        "signal by a factor of (travel time)^p, where\n"
+                        "the user provides p. This gain tends to be\n"
+                        "less aggressive than agc.")
 
-        lbl_agc = tk.Label(ProfC_cpane.frame, text= "AGC", font =  HEADING)
-        lbl_agc.grid(row = 12, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_agc = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_agc.grid(row = 12, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_agc = tk.Label(ProfC_cpane.frame, text="AGC", font=HEADING)
+        lbl_agc.grid(row=13, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_agc = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_agc.grid(row=13, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        agcButton = tk.Button(
-            text="Go",fg="black",
-            command=lambda : [self.agcGain(proj),
-                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        agcButton = tk.Button(ProfC_cpane.frame,
+                            text="Go", fg="black",
+                            command=lambda: [self.agcGain(proj),
+                                            self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
         agcButton.config(height=1, width=BTN_GO_W)
-        agcButton.grid(row=12, column=2, sticky='nsew')
+        agcButton.grid(row=13, column=2, sticky='nsew')
         self.balloon.bind(agcButton,
-                          "Automatic gain controll. Normalizes the power\n"
-                          "of the signal per given sample window along\n" 
-                          "each trace.")
+                        "Automatic gain controll. Normalizes the power\n"
+                        "of the signal per given sample window along\n"
+                        "each trace.")
 
         # show hyperbola
-        lbl_hypb = tk.Label(ProfC_cpane.frame, text= "Plot Hyperbola", font = HEADING)
-        lbl_hypb.grid(row = 13, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        
-        lbl_hypbcent = tk.Label(ProfC_cpane.frame, text= "Hyperbola Center on Profile [m]")
-        lbl_hypbcent.grid(row = 14, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_hypbcent = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_hypbcent.grid(row = 14, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_hypb = tk.Label(ProfC_cpane.frame, text="Plot Hyperbola", font=HEADING)
+        lbl_hypb.grid(row=14, column=0, sticky='ew', padx=PAD, pady=PAD)
 
-        lbl_hypbapx = tk.Label(ProfC_cpane.frame, text= "Hyperbola Apex Location [ns]")
-        lbl_hypbapx.grid(row = 14, column = 2, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_hypbapx = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_hypbapx.grid(row = 14, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_hypbcent = tk.Label(ProfC_cpane.frame, text="Hyperbola Center on Profile [m]")
+        lbl_hypbcent.grid(row=15, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_hypbcent = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_hypbcent.grid(row=15, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        lbl_hypbvelo = tk.Label(ProfC_cpane.frame, text= "Estimated Velocity [m/ns]")
-        lbl_hypbvelo.grid(row = 15, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
-        tb_hypbvelo = tk.Text(ProfC_cpane.frame, height = 1, width= WIDTH)
-        tb_hypbvelo.grid(row = 15, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
+        lbl_hypbapx = tk.Label(ProfC_cpane.frame, text="Hyperbola Apex Location [ns]")
+        lbl_hypbapx.grid(row=15, column=2, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_hypbapx = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_hypbapx.grid(row=15, column=3, sticky='ew', padx=PAD, pady=PAD)
 
-        hypButton = tk.Button(
-            text="show hyperb", fg="black",
-            command=lambda : [self.showHyp(proj,a), canvas.draw()])
-        hypButton.config(height = 1, width = BTN_GO_W)
-        hypButton.grid(row=15, column=2, sticky='nsew')
+        lbl_hypbvelo = tk.Label(ProfC_cpane.frame, text="Estimated Velocity [m/ns]")
+        lbl_hypbvelo.grid(row=16, column=0, sticky='ew', padx=PAD, pady=PAD)
+        self.tb_hypbvelo = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
+        self.tb_hypbvelo.grid(row=16, column=1, sticky='ew', padx=PAD, pady=PAD)
+
+        hypButton = tk.Button(ProfC_cpane.frame,
+                            text="show hyperb", fg="black",
+                            command=lambda: [self.showHyp(proj, a), canvas.draw()])
+        hypButton.config(height=1, width=BTN_GO_W)
+        hypButton.grid(row=16, column=2, sticky='nsew')
         self.balloon.bind(hypButton,
-                          "Draws a hyperbola depending on profile position,\n"
-                          "travel time, and estimated velocity. This can be\n" 
-                          "used to find the subsurface velocity when a\n"
-                          "a hyperbola is visible in the data. The plotted\n"
-                          "hyperbola will disappear when the image is\n" 
-                          "refreshed.")
+                        "Draws a hyperbola depending on profile position,\n"
+                        "travel time, and estimated velocity. This can be\n"
+                        "used to find the subsurface velocity when a\n"
+                        "a hyperbola is visible in the data. The plotted\n"
+                        "hyperbola will disappear when the image is\n"
+                        "refreshed.")
+
 
 # Button and checkbutton, these will
 # appear in collapsible pane container
@@ -851,34 +870,93 @@ class GPRPyApp:
                 print('saved picked file as "%s"' %(filename+'_3D.txt'))       
 
     #Set X-Range Function
-    def setXrng(self):
-        xlow = sd.askfloat("Input","Min X value",initialvalue=self.xrng[0])
-        if xlow is not None:
-            xhigh = sd.askfloat("Input","Max X value",initialvalue=self.xrng[1])
-            if xhigh is not None:
-                self.xrng=[xlow,xhigh]
+    # def setXrng(self):
+    #     xlow = sd.askfloat("Input","Min X value",initialvalue=self.xrng[0])
+    #     if xlow is not None:
+    #         xhigh = sd.askfloat("Input","Max X value",initialvalue=self.xrng[1])
+    #         if xhigh is not None:
+    #             self.xrng=[xlow,xhigh]
 
-    #Set Y-Range Function
+    # #Set Y-Range Function
+    # def setYrng(self):
+    #     ylow = sd.askfloat("Input","Min Y value",initialvalue=self.yrng[0])
+    #     if ylow is not None:            
+    #         yhigh = sd.askfloat("Input","Max Y value",initialvalue=self.yrng[1])
+    #         if yhigh is not None:
+    #             self.prevyrng=self.yrng
+    #             self.yrng=[ylow,yhigh]
+
+    def setXrng(self):
+        xlow_text = self.tb_minx.get("1.0", "end-1c")
+        xhigh_text = self.tb_maxx.get("1.0", "end-1c")
+        
+        try:
+            xlow = float(xlow_text)
+            xhigh = float(xhigh_text)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input. Please enter valid numeric values for X range.")
+            return
+        
+        if xlow >= xhigh:
+            messagebox.showerror("Error", "Minimum X value must be less than maximum X value.")
+            return
+
+        self.xrng = [xlow, xhigh]
+
+# Set Y-Range Function
     def setYrng(self):
-        ylow = sd.askfloat("Input","Min Y value",initialvalue=self.yrng[0])
-        if ylow is not None:            
-            yhigh = sd.askfloat("Input","Max Y value",initialvalue=self.yrng[1])
-            if yhigh is not None:
-                self.prevyrng=self.yrng
-                self.yrng=[ylow,yhigh]
+        ylow_text = self.tb_miny.get("1.0", "end-1c")
+        yhigh_text = self.tb_maxy.get("1.0", "end-1c")
+        
+        try:
+            ylow = float(ylow_text)
+            yhigh = float(yhigh_text)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input. Please enter valid numeric values for Y range.")
+            return
+        
+        if ylow >= yhigh:
+            messagebox.showerror("Error", "Minimum Y value must be less than maximum Y value.")
+            return
+
+        self.yrng = [ylow, yhigh]
+
+
+    def resetYrng(self,proj):
+        # Only needed in undo, and only if what you want to
+        # undo changed the y axis
+        if ("setVelocity" in proj.history[-1]) or ("topoCorrect" in proj.history[-1]) and not self.picking: 
+            self.yrng=self.prevyrng
 
     #Set Aspect Ratio Function
     def setAspect(self):
-        self.asp = sd.askfloat("Input","Plotting aspect ratio", initialvalue=self.asp)
+        aspect_ratio_text = self.tb_aspr.get("1.0", "end-1c")
+        try:
+            self.asp = float(aspect_ratio_text)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for aspect ratio. Please enter a valid number.")
+
 
     #######################################################################################
     #Velocity Controls functions
+    # def setVelocity(self,proj):
+    #     velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")        
+    #     if velocity is not None:
+    #         proj.setVelocity(velocity)
+    #         self.prevyrng=self.yrng
+    #         self.yrng=[0,np.max(proj.depth)]
+
     def setVelocity(self,proj):
-        velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")        
-        if velocity is not None:
+        velocity_str = self.tb_velo.get("1.0", "end-1c")
+        try:
+            velocity = float(velocity_str)
+            # Assuming proj is defined elsewhere in your code
             proj.setVelocity(velocity)
-            self.prevyrng=self.yrng
-            self.yrng=[0,np.max(proj.depth)]
+            self.prevyrng = self.yrng
+            self.yrng = [0, np.max(proj.depth)]
+        except ValueError:
+            tk.messagebox.showerror("Error", "Invalid input! Please enter a valid number.")
+
 
     #Antenna Separation Function
     def antennaSep(self,proj):
@@ -892,6 +970,7 @@ class GPRPyApp:
             mesbox.showinfo("Migration Error","You have to set the velocity first")
         proj.fkMigration()
 
+
     #Topo Correct Function
     def topoCorrect(self,proj):
         if proj.velocity is None:
@@ -903,142 +982,135 @@ class GPRPyApp:
             proj.topoCorrect(topofile,self.delimiter)
             self.prevyrng=self.yrng
             self.yrng=[proj.minTopo-np.max(proj.depth),proj.maxTopo]
+
+
+    # def topoCorrect(self, proj):
+    #     topofile = self.tb_topo.get("1.0", "end-1c")  # Get the value from the text box
+    #     if topofile:
+    #         if proj.velocity is None:
+    #             mesbox.showinfo("Topo Correct Error", "You have to set the velocity first")
+    #             return
+    #         out = self.getDelimiter()
+    #         proj.topoCorrect(topofile, self.delimiter)
+    #         self.prevyrng = self.yrng
+    #         self.yrng = [proj.minTopo - np.max(proj.depth), proj.maxTopo]
             
-    #Profile Smooth Function
-    def profileSmooth(self,proj):
-        ntraces = sd.askinteger("Input","Smooth over how many traces?")
-        if ntraces is not None:
-            noversample = sd.askinteger("Input","Make how many copies of each trace?\nRecommended: Same as number of traces to be smoothed.")
-            if noversample is not None:
-                proj.profileSmooth(ntraces,noversample)
-
-    #Start Picking Function
-    def startPicking(self,proj,fig,a,canvas):
-        self.picking = True
-        self.picked = np.asmatrix(np.empty((0,2)))
-        print("Picking mode on")
-        def addPoint(event):
-            self.picked = np.append(self.picked,np.asmatrix([event.xdata,event.ydata]),axis=0)
-            self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)
-            print(self.picked)
-        self.pick_cid = canvas.mpl_connect('button_press_event', addPoint)
-
-            
-    #Stop Picking Function
-    def stopPicking(self,proj,canvas):
-        filename = fd.asksaveasfilename()
-        if filename is not '':
-            self.picking = False
-            canvas.mpl_disconnect(self.pick_cid)
-            print("Picking mode off")
-            np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
-            print('saved picked file as "%s"' %(filename+'_profile.txt'))
-            # If we have 3D info, also plot it as 3D points
-            if proj.threeD is not None:
-                # First calculate along-track points
-                topoVal = proj.threeD[:,2]
-                npos = proj.threeD.shape[0]
-                steplen = np.sqrt(
-                    np.power( proj.threeD[1:npos,0]-proj.threeD[0:npos-1,0] ,2.0) + 
-                    np.power( proj.threeD[1:npos,1]-proj.threeD[0:npos-1,1] ,2.0) +
-                    np.power( proj.threeD[1:npos,2]-proj.threeD[0:npos-1,2] ,2.0)
-                )
-                alongdist = np.cumsum(steplen)
-                topoPos = np.append(0,alongdist)
-                pick3D = np.zeros((self.picked.shape[0],3))
-                # If profile is adjusted, need to start the picked at zero.
-                pickProfileShifted = self.picked[:,0] - np.min(proj.profilePos)
-                #for i in range(0,3):
-                for i in range(0,2):
-                    pick3D[:,i] = interp.pchip_interpolate(topoPos,
-                                                           proj.threeD[:,i],
-                                                           pickProfileShifted).squeeze()
-                                                           #self.picked[:,0]).squeeze()
-            
-                pick3D[:,2] = self.picked[:,1].squeeze()
-                    
-                np.savetxt(filename+'_3D.txt',pick3D,delimiter='\t')
-                print('saved picked file as "%s"' %(filename+'_3D.txt')) 
-
-
-    # Show hyperbola
-    def showHyp(self,proj,a):
-        x0 = sd.askfloat("Input","Hyperbola center on profile [m]", initialvalue=self.hypx)
-        if x0 is not None:
-            t0 = sd.askfloat("Input","Hyperbola apex location (time [ns])", initialvalue=self.hypt)
-            if t0 is not None:
-                v  = sd.askfloat("Input","Estimated velocity [m/ns]", initialvalue=self.hypv)
-                if v is not None:
-                    y=proj.profilePos-x0
-                    d=v*t0/2.0
-                    k=np.sqrt(d**2 + np.power(y,2))
-                    t2=2*k/v
-                    a.plot(proj.profilePos,t2,'--c',linewidth=3)
-                    self.hypx = x0
-                    self.hypt = t0
-                    self.hypv = v
-    
-    # Cut profile
-    def cut(self,proj):
-        minX = sd.askfloat("Input","Minimum profile position")
-        if minX is not None:
-            maxX = sd.askfloat("Input","Maximum profile position")
-            if maxX is not None:
-                proj.cut(minX,maxX)
-
-    def remMeanTrace(self,proj):
-        ntraces = sd.askinteger("Input","Remove mean over how many traces?")
-        if ntraces is not None:
-            proj.remMeanTrace(ntraces=ntraces)
-
-
-    def tpowGain(self,proj):
-        power = sd.askfloat("Input","Power for tpow gain?")
-        if power is not None:
-            proj.tpowGain(power=power)
         
 
-    def agcGain(self,proj):
-        window = sd.askinteger("Input","Window length for AGC?")
-        if window is not None:
-            proj.agcGain(window=window)
+    #######################################################################################################################
+    #Profile Controls functions
 
+    # AdjProfile to take input from text boxes
+    def adjProfile(self, proj):
+        flipit = messagebox.askyesno("Question", "Flip the profile (left to right)?")
+        if flipit:
+            proj.flipProfile()
+
+        # Get values from the text boxes
+        minPos = float(self.tb_adjprfMin.get("1.0", tk.END)) if self.tb_adjprfMin.get("1.0", tk.END).strip() else None
+        maxPos = float(self.tb_adjprfMax.get("1.0", tk.END)) if self.tb_adjprfMax.get("1.0", tk.END).strip() else None
+
+        if minPos is not None and maxPos is not None:
+            proj.adjProfile(minPos=minPos, maxPos=maxPos)
+            self.xrng = [minPos, maxPos]
+
+
+    #Set Zero Time Function
+    def setZeroTime(self, proj):
+        # Get the value from the textbox
+        newZeroTime_str = self.tb_zt.get("1.0", tk.END).strip()
+        
+        # Check if the input is valid and convert it to float
+        try:
+            newZeroTime = float(newZeroTime_str)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for new zero time.")
+            return
+        
+        # Perform the action with the new zero time
+        proj.setZeroTime(newZeroTime=newZeroTime)
+
+    # Truncate Y Function
     def truncateY(self,proj):
-        maxY = sd.askfloat("Input","Truncate at what y value\n" 
-                           "(travel time or depth)")
+        maxY = float(self.tb_adjprf.get("1.0", "end-1c"))  # Get input from text box
         if maxY is not None:
             proj.truncateY(maxY)
 
-    def setZeroTime(self,proj):
-        newZeroTime = sd.askfloat("Input","New zero time")
-        if newZeroTime is not None:
-            proj.setZeroTime(newZeroTime=newZeroTime)
 
-    def adjProfile(self,proj):
-        flipit = mesbox.askyesno("Question","Flip the profile (left to right)?")
-        if flipit:
-            proj.flipProfile()        
-        minPos = sd.askfloat("Input","Start x coordinate",initialvalue=self.xrng[0])
-        if minPos is not None:
-            maxPos = sd.askfloat("Input","End x coordinate",initialvalue=self.xrng[1])
-            if maxPos is not None:
-                proj.adjProfile(minPos=minPos,maxPos=maxPos)
-                self.xrng=[minPos,maxPos]
+    # Cut profile
+    def cut(self,proj):
+        minX = float(self.tb_cutx.get("1.0", "end-1c"))
+        if minX is not None:
+            maxX = float(self.tb_cuty.get("1.0", "end-1c"))
+            if maxX is not None:
+                proj.cut(minX,maxX)
+    
+    # Dewow Function
+    def dewow(self, proj):
+        # Get the value from the text box
+        window_value = self.tb_dewow.get("1.0", "end-1c")
         
-    def dewow(self,proj):
-        window = sd.askinteger("Input","Dewow window width (number of samples)")
-        if window is not None:
-            proj.dewow(window=window)
+        # Check if the input value is a valid numeric value
+        if not window_value.isdigit():
+            messagebox.showerror("Error", "Please enter a valid numeric value for window width.")
+            return
+        
+        window = float(window_value)
+        
+        proj.dewow(window=window)
 
+    # Remove Mean Trace Function
+    def remMeanTrace(self,proj):
+        ntraces = float(self.tb_rmt.get("1.0", "end-1c"))
+        if ntraces is not None:
+            proj.remMeanTrace(ntraces=ntraces)
 
+    # Smooth Function
     def smooth(self,proj):
-        window = sd.askinteger("Input","Smoothing window width (number of samples)")
+        window = float(self.tb_smth1.get("1.0", "end-1c"))
         if window is not None:
             proj.smooth(window=window)
+            
 
+    #Profile Smooth Function
+    def profileSmooth(self,proj):
+        ntraces = int(self.tb_trnum.get("1.0", "end-1c").strip())
+        if ntraces is not None:
+            noversample = int(self.tb_cpynum.get("1.0", "end-1c").strip())
+            if noversample is not None:
+                proj.profileSmooth(ntraces,noversample)
 
+    # Tpow Gain Function
+    def tpowGain(self,proj):
+        power = float(self.tb_smth.get("1.0", "end-1c"))
+        if power is not None:
+            proj.tpowGain(power=power)
 
+    # AGC Gain Function
+    def agcGain(self,proj):
+        window = float(self.tb_agc.get("1.0", "end-1c"))
+        if window is not None:
+            proj.agcGain(window=window)
 
+    # Show hyperbola
+    def showHyp(self, proj, a):
+        x0_text = self.tb_hypbcent.get("1.0", "end-1c").strip()  # Remove leading/trailing whitespace
+        if x0_text:
+            x0 = float(x0_text)
+            t0_text = self.tb_hypbapx.get("1.0", "end-1c").strip()
+            if t0_text:
+                t0 = float(t0_text)
+                v_text = self.tb_hypbvelo.get("1.0", "end-1c").strip()
+                if v_text:
+                    v = float(v_text)
+                    y = proj.profilePos - x0
+                    d = v * t0 / 2.0
+                    k = np.sqrt(d ** 2 + np.power(y, 2))
+                    t2 = 2 * k / v
+                    a.plot(proj.profilePos, t2, '--c', linewidth=3)
+                    self.hypx = x0
+                    self.hypt = t0
+                    self.hypv = v
 
 
     def getDelimiter(self):                
