@@ -1007,110 +1007,189 @@ class GPRPyApp:
             proj.flipProfile()
 
         # Get values from the text boxes
-        minPos = float(self.tb_adjprfMin.get("1.0", tk.END)) if self.tb_adjprfMin.get("1.0", tk.END).strip() else None
-        maxPos = float(self.tb_adjprfMax.get("1.0", tk.END)) if self.tb_adjprfMax.get("1.0", tk.END).strip() else None
+        minPos = self.tb_adjprfMin.get("1.0", tk.END).strip()
+        maxPos = self.tb_adjprfMax.get("1.0", tk.END).strip()
 
-        if minPos is not None and maxPos is not None:
-            proj.adjProfile(minPos=minPos, maxPos=maxPos)
-            self.xrng = [minPos, maxPos]
+        if not minPos or not maxPos:
+            messagebox.showerror("Error", "Please fill in both minimum and maximum positions.")
+            return
 
+        try:
+            minPos = float(minPos)
+            maxPos = float(maxPos)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for position.")
+            return
 
-    #Set Zero Time Function
+        proj.adjProfile(minPos=minPos, maxPos=maxPos)
+        self.xrng = [minPos, maxPos]
+
+    # Set Zero Time Function
     def setZeroTime(self, proj):
         # Get the value from the textbox
         newZeroTime_str = self.tb_zt.get("1.0", tk.END).strip()
-        
+
         # Check if the input is valid and convert it to float
         try:
             newZeroTime = float(newZeroTime_str)
         except ValueError:
             messagebox.showerror("Error", "Invalid input for new zero time.")
             return
-        
+
         # Perform the action with the new zero time
         proj.setZeroTime(newZeroTime=newZeroTime)
 
     # Truncate Y Function
-    def truncateY(self,proj):
-        maxY = float(self.tb_adjprf.get("1.0", "end-1c"))  # Get input from text box
-        if maxY is not None:
-            proj.truncateY(maxY)
+    def truncateY(self, proj):
+        maxY = self.tb_adjprf.get("1.0", "end-1c").strip()  # Get input from text box
+        if not maxY:
+            messagebox.showerror("Error", "Please fill in the maximum Y value.")
+            return
 
+        try:
+            maxY = float(maxY)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for maximum Y value.")
+            return
+
+        proj.truncateY(maxY)
 
     # Cut profile
-    def cut(self,proj):
-        minX = float(self.tb_cutx.get("1.0", "end-1c"))
-        if minX is not None:
-            maxX = float(self.tb_cuty.get("1.0", "end-1c"))
-            if maxX is not None:
-                proj.cut(minX,maxX)
-    
+    def cut(self, proj):
+        minX = self.tb_cutx.get("1.0", "end-1c").strip()
+        maxX = self.tb_cuty.get("1.0", "end-1c").strip()
+
+        if not minX or not maxX:
+            messagebox.showerror("Error", "Please fill in both minimum and maximum X values.")
+            return
+
+        try:
+            minX = float(minX)
+            maxX = float(maxX)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for X values.")
+            return
+
+        proj.cut(minX, maxX)
+
     # Dewow Function
     def dewow(self, proj):
         # Get the value from the text box
-        window_value = self.tb_dewow.get("1.0", "end-1c")
-        
+        window_value = self.tb_dewow.get("1.0", "end-1c").strip()
+
         # Check if the input value is a valid numeric value
         if not window_value.isdigit():
             messagebox.showerror("Error", "Please enter a valid numeric value for window width.")
             return
-        
+
         window = float(window_value)
-        
+
         proj.dewow(window=window)
 
     # Remove Mean Trace Function
-    def remMeanTrace(self,proj):
-        ntraces = float(self.tb_rmt.get("1.0", "end-1c"))
-        if ntraces is not None:
-            proj.remMeanTrace(ntraces=ntraces)
+    def remMeanTrace(self, proj):
+        ntraces = self.tb_rmt.get("1.0", "end-1c").strip()
+        if not ntraces:
+            messagebox.showerror("Error", "Please fill in the number of traces.")
+            return
+
+        try:
+            ntraces = float(ntraces)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for the number of traces.")
+            return
+
+        proj.remMeanTrace(ntraces=ntraces)
 
     # Smooth Function
-    def smooth(self,proj):
-        window = float(self.tb_smth1.get("1.0", "end-1c"))
-        if window is not None:
-            proj.smooth(window=window)
-            
+    def smooth(self, proj):
+        window = self.tb_smth1.get("1.0", "end-1c").strip()
+        if not window:
+            messagebox.showerror("Error", "Please fill in the window value.")
+            return
 
-    #Profile Smooth Function
-    def profileSmooth(self,proj):
-        ntraces = int(self.tb_trnum.get("1.0", "end-1c").strip())
-        if ntraces is not None:
-            noversample = int(self.tb_cpynum.get("1.0", "end-1c").strip())
-            if noversample is not None:
-                proj.profileSmooth(ntraces,noversample)
+        try:
+            window = float(window)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for window value.")
+            return
+
+        proj.smooth(window=window)
+
+    # Profile Smooth Function
+    def profileSmooth(self, proj):
+        ntraces = self.tb_trnum.get("1.0", "end-1c").strip()
+        noversample = self.tb_cpynum.get("1.0", "end-1c").strip()
+
+        if not ntraces or not noversample:
+            messagebox.showerror("Error", "Please fill in both the number of traces and the oversample value.")
+            return
+
+        try:
+            ntraces = int(ntraces)
+            noversample = int(noversample)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for number of traces or oversample value.")
+            return
+
+        proj.profileSmooth(ntraces, noversample)
 
     # Tpow Gain Function
-    def tpowGain(self,proj):
-        power = float(self.tb_smth.get("1.0", "end-1c"))
-        if power is not None:
-            proj.tpowGain(power=power)
+    def tpowGain(self, proj):
+        power = self.tb_smth.get("1.0", "end-1c").strip()
+        if not power:
+            messagebox.showerror("Error", "Please fill in a value.")
+            return
+
+        try:
+            power = float(power)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for power value.")
+            return
+
+        proj.tpowGain(power=power)
 
     # AGC Gain Function
-    def agcGain(self,proj):
-        window = float(self.tb_agc.get("1.0", "end-1c"))
-        if window is not None:
-            proj.agcGain(window=window)
+    def agcGain(self, proj):
+        window = self.tb_agc.get("1.0", "end-1c").strip()
+        if not window:
+            messagebox.showerror("Error", "Please provide a value.")
+            return
+
+        try:
+            window = float(window)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input.")
+            return
+
+        proj.agcGain(window=window)
 
     # Show hyperbola
     def showHyp(self, proj, a):
         x0_text = self.tb_hypbcent.get("1.0", "end-1c").strip()  # Remove leading/trailing whitespace
-        if x0_text:
+        t0_text = self.tb_hypbapx.get("1.0", "end-1c").strip()
+        v_text = self.tb_hypbvelo.get("1.0", "end-1c").strip()
+
+        if not x0_text or not t0_text or not v_text:
+            messagebox.showerror("Error", "Please fill in all the hyperbola parameters.")
+            return
+
+        try:
             x0 = float(x0_text)
-            t0_text = self.tb_hypbapx.get("1.0", "end-1c").strip()
-            if t0_text:
-                t0 = float(t0_text)
-                v_text = self.tb_hypbvelo.get("1.0", "end-1c").strip()
-                if v_text:
-                    v = float(v_text)
-                    y = proj.profilePos - x0
-                    d = v * t0 / 2.0
-                    k = np.sqrt(d ** 2 + np.power(y, 2))
-                    t2 = 2 * k / v
-                    a.plot(proj.profilePos, t2, '--c', linewidth=3)
-                    self.hypx = x0
-                    self.hypt = t0
-                    self.hypv = v
+            t0 = float(t0_text)
+            v = float(v_text)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for hyperbola parameters.")
+            return
+
+        y = proj.profilePos - x0
+        d = v * t0 / 2.0
+        k = np.sqrt(d ** 2 + np.power(y, 2))
+        t2 = 2 * k / v
+        a.plot(proj.profilePos, t2, '--c', linewidth=3)
+        self.hypx = x0
+        self.hypt = t0
+        self.hypv = v
 
 
     def getDelimiter(self):                
