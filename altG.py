@@ -1,11 +1,17 @@
+import subprocess
 import sys
 from tkinter import filedialog, messagebox, ttk
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
 from tkinter import messagebox as mesbox
+from click import Group
 import matplotlib as mpl
 from matplotlib import mlab
+from pytest import Item
+from sympy import Range
+from torch import view_as_complex, view_as_complex_copy
+from traitlets import HasTraits, Instance
 mpl.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -21,10 +27,14 @@ from tkinter.ttk import *
 # created in separate file
 from collapsiblepane import CollapsiblePane as cp
 from mayavi import mlab
-# import vtkpip
-
+import vtk
+import numpy as np
 from mayavi import mlab
- 
+import matlab.engine
+
+
+
+
 # Making root window or parent window
 
 
@@ -88,7 +98,6 @@ class GPRPyApp:
         #canvas.get_tk_widget().grid(row=2,column=0,columnspan= figcolsp,rowspan= figrowsp,sticky='nsew')
 
         canvas.draw() 
-        
         
 ####################################################################################### 
         #File Operation Pane
@@ -662,55 +671,56 @@ class GPRPyApp:
         importDataCubeBtn.config(height=HEIGHT, width=WIDTH)         
         importDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
         self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window with data.")
+        
 
+    
 
 # Button and checkbutton, these will
 # appear in collapsible pane container
         
     def load_vtk_file(self):
         # Open a file dialog to select the VTK file
-        vtk_file = filedialog.askopenfilename(filetypes=[("VTK files", "*.vtk"), ("VTS files", "*.vts")])
-        
-        if vtk_file:
+        self.vtk_file = filedialog.askopenfilename(filetypes=[("VTK files", "*.vtk"), ("VTS files", "*.vts")])
+
+        if self.vtk_file:
             # Call function to display the VTK file
-            self.display_vtk_file(vtk_file)
+            self.display_vtk_file(self.vtk_file)
 
-    # def display_vtk_file(self, vtk_file):
-    #     # Create a Mayavi scene
-    #     scene = mlab.figure(bgcolor=(1, 1, 1))
-
-    #     # Load and visualize the VTK file
-    #     data = mlab.pipeline.open(vtk_file)
-    #     surface = mlab.pipeline.iso_surface(data, opacity=0.5)
-
-    #     # Embed the Mayavi scene into a Tkinter widget
-    #     mayavi_widget = vtk.IVTKWithCrustAndBrowser(size=(800, 600))
-    #     mayavi_widget.setCentralWidget(scene)
-
-    #     # Add the Mayavi widget to the tab
-    #     mayavi_widget.setParent(self.tab2)
-    #     mayavi_widget.grid(row=0, column=0, sticky='nsew')
-            
     def display_vtk_file(self, vtk_file):
-        # Create a Mayavi scene
-        scene = mlab.figure(bgcolor=(1, 1, 1))
-
-        # Load and visualize the VTK file with volume rendering
+        # Open the VTK file
         data = mlab.pipeline.open(vtk_file)
-        volume = mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0, vmax=1)
 
-        # Adjust volume rendering properties as needed
-        volume._volume_property.scalar_opacity_unit_distance = 10.0
-        volume._volume_property.scalar_opacity = np.array([0.0, 0.2, 0.4, 0.8, 1.0])
+    
+        # Display the outline
+        outline = mlab.pipeline.outline(data)
 
-        # Embed the Mayavi scene into a Tkinter widget
-        mayavi_widget = vtk.IVTKWithCrustAndBrowser(size=(800, 600))
-        mayavi_widget.setCentralWidget(scene)
+        # Display the isosurface
+        isosurface = mlab.pipeline.iso_surface(data)
 
-        # Add the Mayavi widget to the tab
-        mayavi_widget.setParent(self.tab2)
-        mayavi_widget.grid(row=0, column=0, sticky='nsew')
+        # Create a scalar cut plane
+        scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)
 
+    
+        def on_cut_plane_move(obj, evt):
+            # Get the position of the ScalarCutPlane along the z-axis
+            origin = scalar_cut_plane.implicit_plane.origin
+
+            # Retrieve the data points at 2cm intervals along the z-axis
+            for i in range(41):  # Assuming 41 lines of GPR data
+                z_position = origin[2] + i * 0.02  # 2cm intervals
+                for j in range(500):  # 500 data points per line
+                    x = j * 0.02  # 2cm intervals along the x-axis
+                    y = i * 0.02  # 2cm intervals along the y-axis
+                    z = z_position
+                    g = ...  # Retrieve GPR measurement value at (x, y, z)
+                    # Record the XYZG points
+                    print(f"X: {x}, Y: {y}, Z: {z}, G: {g}")
+
+        # Add a callback function to the ScalarCutPlane to handle its move event
+        scalar_cut_plane.implicit_plane.widget.add_observer('InteractionEvent', on_cut_plane_move)
+
+      
+            
 
     # #For testing might work for displaying vtk file into a datacube
     # def display_vtk_file(self, vtk_file):
