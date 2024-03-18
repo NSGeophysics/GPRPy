@@ -1,4 +1,5 @@
 import sys
+import customtkinter as ctk
 from tkinter import filedialog, messagebox, ttk
 import tkinter as tk
 from tkinter import filedialog as fd
@@ -44,7 +45,11 @@ class GPRPyApp:
 
     
     def __init__(self, master):
+        LIGHT_MODE = "light"
+        ctk.set_appearance_mode(LIGHT_MODE)
+        ctk.set_default_color_theme("dark-blue")
         self.window = master
+
         normscrwidt=1280 #1024
         normscrhigt=720 #768
         self.widfac=normscrwidt/normscrhigt
@@ -66,14 +71,15 @@ class GPRPyApp:
         master.title("GPR - Py")
         master.rowconfigure(0, minsize=766, weight=1)
         master.columnconfigure(1, minsize=766, weight=1)
-        master.tk.call('source', 'Azure/azure.tcl')
-        master.tk.call('set_theme','light')
+
 
         proj = gp.gprpyProfile()
 
-        btn_frm = tk.Frame(master, relief= tk.RAISED, bd = 2, width= 400)
+        btn_frm = ctk.CTkScrollableFrame(master,border_width= 1, width = 450)
     
         btn_frm.grid(row = 0, column= 0, sticky= 'ns', rowspan = 2)
+        btn_frm.grid_propagate()
+        btn_frm.configure()
         master.rowconfigure(1, weight=10) 
 
         fig=Figure(figsize=(self.widfac,self.highfac))
@@ -93,23 +99,23 @@ class GPRPyApp:
 ####################################################################################### 
         #File Operation Pane
         #Contains all buttons and labels relation to File Operations
-        FM_cpane = cp(btn_frm, 'File Controls -', 'File Controls +')
-        FM_cpane.grid(row = 0, column = 0, sticky = 'ew')
+        FM_cpane = ccp(btn_frm, 'File Controls -', 'File Controls +')
+        FM_cpane.grid(row = 0, column = 0, columnspan=2, sticky = 'ew')
 
-        LoadButton = tk.Button(FM_cpane.frame,
-            text="Import Data", fg="black",
+        LoadButton = ctk.CTkButton(FM_cpane.frame,
+            text="Import Data", 
             command=lambda : [self.loadData(proj), 
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        LoadButton.config(height = HEIGHT, width = WIDTH)         
+        LoadButton.configure(height = HEIGHT, width = WIDTH)         
         LoadButton.grid(row=0, column=0, sticky='nsew',pady = PAD)
         self.balloon.bind(LoadButton,"Load .gpr, .DT1, or .DZT data.")
 
-        undoButton = tk.Button(FM_cpane.frame,
-            text="Undo",
+        undoButton = ctk.CTkButton(FM_cpane.frame,
+            text="Undo", fg_color="black",
             command=lambda : [self.resetYrng(proj),
-                              self.undo(proj),
+                              self.undo(proj), 
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        undoButton.config(height = HEIGHT, width = WIDTH)
+        undoButton.configure(height = HEIGHT, width = WIDTH)
         undoButton.grid(row=1, column=0, sticky='ew',pady= PAD )
         self.balloon.bind(undoButton,
                           '"Undoes" the most recent processing step and\n' 
@@ -121,10 +127,10 @@ class GPRPyApp:
 
         
 
-        SaveButton = tk.Button(FM_cpane.frame, 
-            text="Save Data", fg="black",
+        SaveButton = ctk.CTkButton(FM_cpane.frame,
+            text="Save Data", 
             command=lambda : self.saveData(proj))
-        SaveButton.config(height = HEIGHT, width = WIDTH)         
+        SaveButton.configure(height = HEIGHT, width = WIDTH)         
         SaveButton.grid(row= 4, column=0, sticky='ew',pady = PAD)
         self.balloon.bind(SaveButton,
                           'saves the processed data including its history in a\n'
@@ -133,10 +139,10 @@ class GPRPyApp:
                           'Visualization settings such as "set x-range" or\n'
                           '"contrast" will not be saved.')
 
-        PrintButton = tk.Button(FM_cpane.frame, 
-            text="Print Figure", fg="black",
+        PrintButton = ctk.CTkButton(FM_cpane.frame,
+            text="Print Figure", fg_color="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig))
-        PrintButton.config(height = HEIGHT, width = WIDTH)         
+        PrintButton.configure(height = HEIGHT, width = WIDTH)         
         PrintButton.grid(row=5, column=0, sticky='ew',pady = PAD)
         self.balloon.bind(PrintButton,
                           "Saves the current visible figure in a pdf with \n"
@@ -146,10 +152,10 @@ class GPRPyApp:
 
 
         # Export to VTK
-        VTKButton = tk.Button(FM_cpane.frame, 
-            text="Export to VTK", fg="black",
+        VTKButton = ctk.CTkButton(FM_cpane.frame,
+            text="Export to VTK", fg_color="black",
             command = lambda : self.exportVTK(proj))
-        VTKButton.config(height = HEIGHT, width = WIDTH)
+        VTKButton.configure(height = HEIGHT, width = WIDTH)
         VTKButton.grid(row=6, column=0, sticky='ew',pady = PAD)
         self.balloon.bind(VTKButton,
                           "Exports the processed figure to a\n"
@@ -160,10 +166,10 @@ class GPRPyApp:
 
         
         # Write script
-        HistButton = tk.Button(FM_cpane.frame, 
-            text="Write Script", fg="black",
+        HistButton = ctk.CTkButton(FM_cpane.frame,
+            text="Write Script", fg_color="black",
             command=lambda : self.writeHistory(proj))
-        HistButton.config(height = HEIGHT, width = WIDTH)         
+        HistButton.configure(height = HEIGHT, width = WIDTH)         
         HistButton.grid(row=7, column=0, sticky='ew',pady = PAD)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce the \n'
@@ -395,6 +401,7 @@ class GPRPyApp:
 ####################################################################################### 
         # Profile Controls
         ProfC_cpane = cp(btn_frm, 'Profile Controls -', 'Profile Controls +')
+        ProfC_cpane.bind("<KeyPress>", lambda event:EnableFramePropagate(btn_frm))
         ProfC_cpane.grid(row=3, column=0, sticky='ew')
 
 
@@ -656,10 +663,10 @@ class GPRPyApp:
         DataC_cpane = cp(btn_frm, 'DataCube +', 'DataCube +')
         DataC_cpane.grid(row=4, column=0, sticky='ew')
 
-        importDataCubeBtn = tk.Button(DataC_cpane.frame,
-            text="DataCube", fg="black",
+        importDataCubeBtn = ctk.CTkButton(DataC_cpane.frame,
+            text="DataCube", fg_color="black",
             command=self.load_vtk_file) 
-        importDataCubeBtn.config(height=HEIGHT, width=WIDTH)         
+        importDataCubeBtn.configure(height=HEIGHT, width=WIDTH)         
         importDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
         self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window with data.")
 
@@ -845,12 +852,12 @@ class GPRPyApp:
 
     def saveData(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".gpr")
-        if filename is not '':
+        if filename != '':
             proj.save(filename)
 
     def exportVTK(self,proj):                    
         outfile = fd.asksaveasfilename()
-        if outfile is not '':
+        if outfile != '':
             #thickness = sd.askfloat("Input","Profile thickness [m]")
             thickness = 0
             if self.asp is None:
@@ -871,9 +878,9 @@ class GPRPyApp:
     #Print Figure
     def printProfileFig(self,proj,fig):
         figname = fd.asksaveasfilename(defaultextension=".pdf")
-        if figname is not '':
+        if figname != '':
             dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
-            if dpi is not None:
+            if dpi != None:
                 fig.savefig(figname, format='pdf', dpi=dpi)        
                 # Put what you did in history
                 if self.asp is None:
@@ -886,7 +893,7 @@ class GPRPyApp:
     #For Write Script
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
-        if filename is not '':
+        if filename != '':
             proj.writeHistory(filename)
             print("Wrote script to " + filename)
 
@@ -921,14 +928,14 @@ class GPRPyApp:
     #Stop Picking Function
     def stopPicking(self,proj,canvas):
         filename = fd.asksaveasfilename()
-        if filename is not '':
+        if filename != '':
             self.picking = False
             canvas.mpl_disconnect(self.pick_cid)
             print("Picking mode off")
             np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
             print('saved picked file as "%s"' %(filename+'_profile.txt'))
             # If we have 3D info, also plot it as 3D points
-            if proj.threeD is not None:
+            if proj.threeD != None:
                 # First calculate along-track points
                 topoVal = proj.threeD[:,2]
                 npos = proj.threeD.shape[0]
@@ -1062,7 +1069,7 @@ class GPRPyApp:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
         topofile = fd.askopenfilename()
-        if topofile is not '':
+        if topofile != '':
             out = self.getDelimiter()    
             proj.topoCorrect(topofile,self.delimiter)
             self.prevyrng=self.yrng
@@ -1306,7 +1313,7 @@ def main():#
 	rightcol=9
 	figrowsp=19+1
 	
-	root = tk.Tk() #; root.iconbitmap()
+	root = ctk.CTk() #; root.iconbitmap()
 
 	GPRPyApp(root)
 
