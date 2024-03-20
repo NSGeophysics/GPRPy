@@ -22,6 +22,7 @@ import os
 import Pmw
 import scipy.interpolate as interp
 from tkinter.ttk import *
+import topLevel_test
 
 # Importing Collapsible Pane class that we have
 # created in separate file
@@ -30,7 +31,7 @@ from mayavi import mlab
 import vtk
 import numpy as np
 from mayavi import mlab
-import matlab.engine
+# import matlab.engine
 
 
 
@@ -76,8 +77,6 @@ class GPRPyApp:
         master.title("GPR - Py")
         master.rowconfigure(0, minsize=766, weight=1)
         master.columnconfigure(1, minsize=766, weight=1)
-        master.tk.call('source', 'Azure/azure.tcl')
-        master.tk.call('set_theme','light')
 
         proj = gp.gprpyProfile()
 
@@ -698,7 +697,7 @@ class GPRPyApp:
         isosurface = mlab.pipeline.iso_surface(data)
 
         # Create a scalar cut plane
-        scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)
+        scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)    
 
     
         def on_cut_plane_move(obj, evt):
@@ -823,7 +822,7 @@ class GPRPyApp:
         a.set_xlabel("profile position [m]", fontsize=mpl.rcParams['font.size'])
         a.xaxis.tick_top()
         a.xaxis.set_label_position('top')
-        if self.asp is not None:
+        if self.asp != None:
             a.set_aspect(self.asp)
 
         # Set grid
@@ -838,7 +837,7 @@ class GPRPyApp:
 
         # Allow for cursor coordinates being displayed        
         def moved(event):
-            if event.xdata is not None and event.ydata is not None:
+            if event.xdata != None and event.ydata != None:
                 canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
 
         self.cursor_cid = canvas.mpl_connect('button_press_event', moved)
@@ -855,12 +854,14 @@ class GPRPyApp:
 
     def saveData(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".gpr")
-        if filename is not '':
+        if filename != '':
             proj.save(filename)
 
-    def exportVTK(self,proj):                    
+    def exportVTK(self,proj):      
+        # dw = topLevel_test.Info_Collect()    
+        # trigger interface to collect cube details          
         outfile = fd.asksaveasfilename()
-        if outfile is not '':
+        if outfile != '':
             #thickness = sd.askfloat("Input","Profile thickness [m]")
             thickness = 0
             if self.asp is None:
@@ -876,14 +877,15 @@ class GPRPyApp:
                     proj.exportVTK(outfile,gpsinfo=filename,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
             else:
                 proj.exportVTK(outfile,gpsinfo=proj.threeD,thickness=thickness,delimiter=self.delimiter,aspect=aspect)
+            
             print('... done with exporting to VTK.')
 
     #Print Figure
     def printProfileFig(self,proj,fig):
         figname = fd.asksaveasfilename(defaultextension=".pdf")
-        if figname is not '':
+        if figname != '':
             dpi = sd.askinteger("Input","Resolution in dots per inch? (Recommended: 600)")
-            if dpi is not None:
+            if dpi != None:
                 fig.savefig(figname, format='pdf', dpi=dpi)        
                 # Put what you did in history
                 if self.asp is None:
@@ -896,7 +898,7 @@ class GPRPyApp:
     #For Write Script
     def writeHistory(self,proj):        
         filename = fd.asksaveasfilename(defaultextension=".py")
-        if filename is not '':
+        if filename != '':
             proj.writeHistory(filename)
             print("Wrote script to " + filename)
 
@@ -931,14 +933,14 @@ class GPRPyApp:
     #Stop Picking Function
     def stopPicking(self,proj,canvas):
         filename = fd.asksaveasfilename()
-        if filename is not '':
+        if filename != '':
             self.picking = False
             canvas.mpl_disconnect(self.pick_cid)
             print("Picking mode off")
             np.savetxt(filename+'_profile.txt',self.picked,delimiter='\t')
             print('saved picked file as "%s"' %(filename+'_profile.txt'))
             # If we have 3D info, also plot it as 3D points
-            if proj.threeD is not None:
+            if proj.threeD != None:
                 # First calculate along-track points
                 topoVal = proj.threeD[:,2]
                 npos = proj.threeD.shape[0]
@@ -967,17 +969,17 @@ class GPRPyApp:
     #Set X-Range Function
     # def setXrng(self):
     #     xlow = sd.askfloat("Input","Min X value",initialvalue=self.xrng[0])
-    #     if xlow is not None:
+    #     if xlow != None:
     #         xhigh = sd.askfloat("Input","Max X value",initialvalue=self.xrng[1])
-    #         if xhigh is not None:
+    #         if xhigh != None:
     #             self.xrng=[xlow,xhigh]
 
     # #Set Y-Range Function
     # def setYrng(self):
     #     ylow = sd.askfloat("Input","Min Y value",initialvalue=self.yrng[0])
-    #     if ylow is not None:            
+    #     if ylow != None:            
     #         yhigh = sd.askfloat("Input","Max Y value",initialvalue=self.yrng[1])
-    #         if yhigh is not None:
+    #         if yhigh != None:
     #             self.prevyrng=self.yrng
     #             self.yrng=[ylow,yhigh]
 
@@ -1036,7 +1038,7 @@ class GPRPyApp:
     #Velocity Controls functions
     # def setVelocity(self,proj):
     #     velocity =  sd.askfloat("Input","Radar wave velocity [m/ns]?")        
-    #     if velocity is not None:
+    #     if velocity != None:
     #         proj.setVelocity(velocity)
     #         self.prevyrng=self.yrng
     #         self.yrng=[0,np.max(proj.depth)]
@@ -1072,7 +1074,7 @@ class GPRPyApp:
             mesbox.showinfo("Topo Correct Error","You have to set the velocity first")
             return
         topofile = fd.askopenfilename()
-        if topofile is not '':
+        if topofile != '':
             out = self.getDelimiter()    
             proj.topoCorrect(topofile,self.delimiter)
             self.prevyrng=self.yrng
