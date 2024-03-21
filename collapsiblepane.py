@@ -37,7 +37,7 @@ class CollapsiblePane(ttk.Frame):
         # main reason to do this is Button do not support
         # variable option but checkbutton do
         self._button = ttk.Checkbutton(self, variable = self._variable,
-                            command = self._activate, style ="ToolButton")
+                            command = self._activate, style ="Toolbutton")
         self._button.grid(row = 0, column = 0)
  
         # This will create a separator

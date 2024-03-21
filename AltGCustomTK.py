@@ -18,7 +18,6 @@ import Pmw
 import scipy.interpolate as interp
 from tkinter.ttk import *
 import topLevel_test
-import toggleFrame
 
 
 # Importing Collapsible Pane class that we have
@@ -40,7 +39,7 @@ PAD = 4
 WIDTH = 10
 HEIGHT = 1
 HEADING = ('TkDefaultFont', 13,'bold')
-BTN_GO_W = 3
+BTN_GO_W = 2
 
 
 class GPRPyApp:
@@ -114,8 +113,7 @@ class GPRPyApp:
         s = ttk.Style()
         # Create style used by default for all Frames
         s.configure('TFrame', background='#d3d3d3')
-        s.configure('TButton',background="#1f1f60")
-        s.configure('TButton.Label',background="white")
+        s.configure('TButton', font=('Helvetica', 12))
         
 
 
@@ -129,7 +127,7 @@ class GPRPyApp:
 
 
         undoButton = ctk.CTkButton(FM_cpane.frame,
-            text="Undo", fg_color="black",
+            text="Undo",
             command=lambda : [self.resetYrng(proj),
                               self.undo(proj), 
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
@@ -158,7 +156,7 @@ class GPRPyApp:
                           '"contrast" will not be saved.')
 
         PrintButton = ctk.CTkButton(FM_cpane.frame,
-            text="Print Figure", fg_color="black",
+            text="Print Figure", 
             command=lambda : self.printProfileFig(proj=proj,fig=fig))
         PrintButton.configure(height = HEIGHT, width = WIDTH)         
         PrintButton.grid(row=5, column=0, sticky='ew',pady = PAD)
@@ -171,7 +169,7 @@ class GPRPyApp:
 
         # Export to VTK
         VTKButton = ctk.CTkButton(FM_cpane.frame,
-            text="Export to VTK", fg_color="black",
+            text="Export to VTK",
             command = lambda : self.exportVTK(proj))
         VTKButton.configure(height = HEIGHT, width = WIDTH)
         VTKButton.grid(row=6, column=0, sticky='ew',pady = PAD)
@@ -185,7 +183,7 @@ class GPRPyApp:
         
         # Write script
         HistButton = ctk.CTkButton(FM_cpane.frame,
-            text="Write Script", fg_color="black",
+            text="Write Script",
             command=lambda : self.writeHistory(proj))
         HistButton.configure(height = HEIGHT, width = WIDTH)         
         HistButton.grid(row=7, column=0, sticky='ew',pady = PAD)
@@ -211,39 +209,39 @@ class GPRPyApp:
 
 
         # Full view
-        FullButton = tk.Button(VC_cpane.frame,
-            text="Full View", fg="black",
+        FullButton = ctk.CTkButton(VC_cpane.frame,
+            text="Full View", 
             command=lambda : [self.setFullView(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        FullButton.config(height = HEIGHT, width = WIDTH)         
+        FullButton.configure(height = HEIGHT, width = WIDTH)         
         FullButton.grid(row=0, column=0, sticky='ew', padx = PAD, pady = PAD)
         self.balloon.bind(FullButton,"Resets x- and y-axis limits to full data.")
 
         
         # Grid button
-        GridButton = tk.Button(VC_cpane.frame,
-            text="Grid", fg="black",
+        GridButton = ctk.CTkButton(VC_cpane.frame,
+            text="Grid", 
             command=lambda : [self.toggleGrid(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        GridButton.config(height = HEIGHT, width = WIDTH)         
+        GridButton.configure(height = HEIGHT, width = WIDTH)         
         GridButton.grid(row = 0, column=1, sticky='ew', padx = PAD, pady = PAD)
         self.balloon.bind(GridButton,"Toggles grid on/off.")
 
-        startPickButton = tk.Button(VC_cpane.frame,
-            text="start pick", fg="black",
+        startPickButton = ctk.CTkButton(VC_cpane.frame,
+            text="start pick", 
             command=lambda : self.startPicking(proj,fig=fig,a=a,canvas=canvas))        
-        startPickButton.config(height = HEIGHT, width = WIDTH) 
+        startPickButton.configure(height = HEIGHT, width = WIDTH) 
         startPickButton.grid(row=1, column=0, sticky='ew',padx = PAD, pady = PAD)
         self.balloon.bind(startPickButton,
                           "Start collecting location information\n" 
                           "by clicking on the profile.")  
         
 
-        stopPickButton = tk.Button(VC_cpane.frame,
-            text="stop pick", fg="black",
+        stopPickButton = ctk.CTkButton(VC_cpane.frame,
+            text="stop pick", 
             command=lambda : [self.stopPicking(proj,canvas),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        stopPickButton.config(height = HEIGHT, width = WIDTH) 
+        stopPickButton.configure(height = HEIGHT, width = WIDTH) 
         stopPickButton.grid(row=1, column=1, sticky='ew',padx = PAD, pady = PAD)
         self.balloon.bind(stopPickButton,
                           "Stop collecting location information\n"
@@ -269,11 +267,11 @@ class GPRPyApp:
         self.tb_maxx.grid(row = 3, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
 
 
-        XrngButton = tk.Button(VC_cpane.frame,
-            text="Go", fg="black",
+        XrngButton = ctk.CTkButton(VC_cpane.frame,
+            text="Go", 
             command=lambda : [self.setXrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        XrngButton.config(height = HEIGHT, width = 3)      
+        XrngButton.configure(height = HEIGHT, width = 3)      
         XrngButton.grid(row=3, column=4, sticky='nsew',padx = PAD, pady = PAD)
         self.balloon.bind(XrngButton,"Set the x-axis display limits.")
         
@@ -295,11 +293,11 @@ class GPRPyApp:
         self.tb_maxy.grid(row = 5, column = 3, sticky= 'ew', padx= PAD, pady = PAD)
 
 
-        YrngButton = tk.Button(VC_cpane.frame,
-            text="Go", fg="black",
+        YrngButton = ctk.CTkButton(VC_cpane.frame,
+            text="Go", 
             command=lambda : [self.setYrng(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        YrngButton.config(height = HEIGHT, width = 3)         
+        YrngButton.configure(height = HEIGHT, width = 3)         
         YrngButton.grid(row=5, column= 4, sticky='nsew',padx = PAD, pady = PAD)
         self.balloon.bind(YrngButton,"Set the y-axis display limits.")
 
@@ -325,10 +323,10 @@ class GPRPyApp:
                           "data representation.")
         
         # Go button for colour and contrast
-        PlotButton = tk.Button(VC_cpane.frame,
-            text="Go", fg="black",
+        PlotButton = ctk.CTkButton(VC_cpane.frame,
+            text="Go", 
             command=lambda : [self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        PlotButton.config(height = HEIGHT, width = 3)         
+        PlotButton.configure(height = HEIGHT, width = 3)         
         PlotButton.grid(row=6, column= 3, sticky='nsew',padx = PAD, pady = PAD)
         self.balloon.bind(PlotButton,"Set Colour and Contrast")
     
@@ -337,11 +335,11 @@ class GPRPyApp:
         lbl_aspr.grid(row = 7, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
         self.tb_aspr = tk.Text(VC_cpane.frame, height=1, width=3)
         self.tb_aspr.grid(row=7, column=1, sticky='ew', padx=PAD, pady=PAD)
-        AspButton = tk.Button(VC_cpane.frame,
-            text="Go", fg="black",
+        AspButton = ctk.CTkButton(VC_cpane.frame,
+            text="Go", 
             command=lambda : [self.setAspect(),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])                              
-        AspButton.config(height = HEIGHT, width = 3)      
+        AspButton.configure(height = HEIGHT, width = 3)      
         AspButton.grid(row=7, column=3, sticky='nsew',padx = PAD, pady = PAD)
         self.balloon.bind(lbl_aspr, "Set the aspect ratio between x- and y-axis.")
     
@@ -355,11 +353,11 @@ class GPRPyApp:
         lbl_velo.grid(row = 0, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
         self.tb_velo = tk.Text(Velo_cpane.frame, height = 1, width= WIDTH)
         self.tb_velo.grid(row = 0, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
-        setVelButton = tk.Button(Velo_cpane.frame, 
-            text="Go", fg="black",
+        setVelButton = ctk.CTkButton(Velo_cpane.frame, 
+            text="Go", 
             command=lambda : [self.setVelocity(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        setVelButton.config(height = 1, width = 3)         
+        setVelButton.configure(height = 1, width = 3)         
         setVelButton.grid(row=0, column=3, sticky='nsew')
         self.balloon.bind(setVelButton,
                           "Set the known subsurface radar velocity. This\n" 
@@ -369,11 +367,11 @@ class GPRPyApp:
 
         
         # Correct for antenna separation
-        antennaSepButton = tk.Button(Velo_cpane.frame,
-            text="Antenna Sep Correct", fg="black",
+        antennaSepButton = ctk.CTkButton(Velo_cpane.frame,
+            text="Antenna Sep Correct", 
             command=lambda : [self.antennaSep(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        antennaSepButton.config(height = HEIGHT, width = WIDTH+10)         
+        antennaSepButton.configure(height = HEIGHT, width = WIDTH+10)         
         antennaSepButton.grid(row=1, column=0, sticky='ew', padx= PAD, pady = PAD)
         self.balloon.bind(antennaSepButton,                        
                           "If the antenna offset is provided, this corrects for\n"
@@ -388,11 +386,11 @@ class GPRPyApp:
         lbl_mig.grid(row = 2, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
         tb_mig = tk.Text(Velo_cpane.frame, height = 1, width= WIDTH )
         tb_mig.grid(row = 2, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
-        migButton = tk.Button(Velo_cpane.frame, 
-            text="Go", fg="black",
+        migButton = ctk.CTkButton(Velo_cpane.frame, 
+            text="Go", 
             command=lambda : [self.fkMigration(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        migButton.config(height = 1, width = 3)         
+        migButton.configure(height = 1, width = 3)         
         migButton.grid(row=2, column=3, sticky='nsew')
         self.balloon.bind(migButton,
                           "Stolt's fk migration using a code originally written\n"
@@ -406,11 +404,11 @@ class GPRPyApp:
         lbl_topo.grid(row = 3, column = 0, sticky= 'ew', padx= PAD, pady = PAD)
         tb_topo = tk.Text(Velo_cpane.frame, height = 1, width= WIDTH)
         tb_topo.grid(row = 3, column = 1, sticky= 'ew', padx= PAD, pady = PAD)
-        topoCorrectButton = tk.Button(Velo_cpane.frame,
-            text="Go", fg="black",
+        topoCorrectButton = ctk.CTkButton(Velo_cpane.frame,
+            text="Go", 
             command=lambda : [self.topoCorrect(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        topoCorrectButton.config(height = 1, width = 3)
+        topoCorrectButton.configure(height = 1, width = 3)
         topoCorrectButton.grid(row=3, column=3, sticky='nsew')
         self.balloon.bind(topoCorrectButton,
                           "Reads a comma- or tab-separated file containing\n" 
@@ -423,6 +421,7 @@ class GPRPyApp:
         # Profile Controls
         ProfC_cpane = cp(btn_frm, 'Profile Controls -', 'Profile Controls +')
         ProfC_cpane.grid(row=3, column=0, sticky='ew')
+        ProfC_cpane.columnconfigure(2,weight=100)
 
 
 
@@ -440,11 +439,11 @@ class GPRPyApp:
         self.tb_adjprfMax = tk.Text(ProfC_cpane.frame, height=1, width=3)  # Kept width as 3
         self.tb_adjprfMax.grid(row=1, column=3, sticky='ew', padx=PAD, pady=PAD)
 
-        AdjProfileButton = tk.Button(ProfC_cpane.frame,
-            text="Go", fg="black",
+        AdjProfileButton = ctk.CTkButton(ProfC_cpane.frame,
+            text="Go", 
             command=lambda : [self.adjProfile(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
-        AdjProfileButton.config(height = 1, width = 2)         
+        AdjProfileButton.configure(height = 1, width = 2)         
         AdjProfileButton.grid(row=1, column=4, sticky='nsew')
         self.balloon.bind(AdjProfileButton,
                           "Adjust the profile length to \n"
@@ -459,11 +458,11 @@ class GPRPyApp:
         self.tb_zt = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_zt.grid(row=2, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        SetZeroTimeButton = tk.Button(ProfC_cpane.frame,
-                                    text="Go", fg="black",
+        SetZeroTimeButton = ctk.CTkButton(ProfC_cpane.frame,
+                                    text="Go",
                                     command=lambda: [self.setZeroTime(proj),
                                                     self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        SetZeroTimeButton.config(height=1, width=BTN_GO_W)
+        SetZeroTimeButton.configure(height=1, width=BTN_GO_W)
         SetZeroTimeButton.grid(row=2, column=2, sticky='nsew')
         self.balloon.bind(SetZeroTimeButton,
                         "Set the travel time that \n"
@@ -476,11 +475,11 @@ class GPRPyApp:
         tb_altr = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         tb_altr.grid(row=3, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        TrAlignButton = tk.Button(ProfC_cpane.frame,
-                                text="Go", fg="black",
+        TrAlignButton = ctk.CTkButton(ProfC_cpane.frame,
+                                text="Go", 
                                 command=lambda: [proj.alignTraces(),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        TrAlignButton.config(height=1, width=BTN_GO_W)
+        TrAlignButton.configure(height=1, width=BTN_GO_W)
         TrAlignButton.grid(row=3, column=2, sticky='nsew')
         self.balloon.bind(TrAlignButton,
                         'Automatically shifts each trace up or down\n'
@@ -496,11 +495,11 @@ class GPRPyApp:
         self.tb_adjprf = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_adjprf.grid(row=4, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        truncYButton = tk.Button(ProfC_cpane.frame,
-                                text="Go", fg="black",
+        truncYButton = ctk.CTkButton(ProfC_cpane.frame,
+                                text="Go", 
                                 command=lambda: [self.truncateY(proj),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        truncYButton.config(height=1, width=BTN_GO_W)
+        truncYButton.configure(height=1, width=BTN_GO_W)
         truncYButton.grid(row=4, column=2, sticky='nsew')
         self.balloon.bind(truncYButton,
                         "Remove data points at arrival times\n"
@@ -522,11 +521,11 @@ class GPRPyApp:
         self.tb_cuty = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_cuty.grid(row=6, column=3, sticky='ew', padx=PAD, pady=PAD)
 
-        cutButton = tk.Button(ProfC_cpane.frame,
-                            text="Go", fg="black",
+        cutButton = ctk.CTkButton(ProfC_cpane.frame,
+                            text="Go", 
                             command=lambda: [self.cut(proj),
                                             self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        cutButton.config(height=1, width=BTN_GO_W)
+        cutButton.configure(height=1, width=BTN_GO_W)
         cutButton.grid(row=6, column=4, sticky='nsew')
         self.balloon.bind(cutButton,
                         "trims data to desired along-profile range.")
@@ -538,11 +537,11 @@ class GPRPyApp:
         self.tb_dewow = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_dewow.grid(row=7, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        DewowButton = tk.Button(ProfC_cpane.frame,
-                                text="Go", fg="black",
+        DewowButton = ctk.CTkButton(ProfC_cpane.frame,
+                                text="Go", 
                                 command=lambda: [self.dewow(proj),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        DewowButton.config(height=1, width=BTN_GO_W)
+        DewowButton.configure(height=1, width=BTN_GO_W)
         DewowButton.grid(row=7, column=2, sticky='nsew')
         self.balloon.bind(DewowButton,
                         "Trace-wise low-cut filter. Removes\n"
@@ -556,11 +555,11 @@ class GPRPyApp:
         self.tb_rmt = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_rmt.grid(row=8, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        remMeanTraceButton = tk.Button(ProfC_cpane.frame,
-                                    text="Go", fg="black",
+        remMeanTraceButton = ctk.CTkButton(ProfC_cpane.frame,
+                                    text="Go", 
                                     command=lambda: [self.remMeanTrace(proj),
                                                         self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        remMeanTraceButton.config(height=1, width=BTN_GO_W)
+        remMeanTraceButton.configure(height=1, width=BTN_GO_W)
         remMeanTraceButton.grid(row=8, column=2, sticky='nsew')
         self.balloon.bind(remMeanTraceButton,
                         "Removes from each trace the average\n"
@@ -574,11 +573,11 @@ class GPRPyApp:
         self.tb_smth1 = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_smth1.grid(row=9, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        SmoothButton = tk.Button(ProfC_cpane.frame,
-                                text="Go", fg="black",
+        SmoothButton = ctk.CTkButton(ProfC_cpane.frame,
+                                text="Go", 
                                 command=lambda: [self.smooth(proj),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        SmoothButton.config(height=1, width=BTN_GO_W)
+        SmoothButton.configure(height=1, width=BTN_GO_W)
         SmoothButton.grid(row=9, column=2, sticky='nsew')
         self.balloon.bind(SmoothButton,
                         "Trace-wise high-cut filter. Replaces\n"
@@ -600,11 +599,11 @@ class GPRPyApp:
         self.tb_cpynum = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_cpynum.grid(row=11, column=3, sticky='ew', padx=PAD, pady=PAD)
 
-        profSmButton = tk.Button(ProfC_cpane.frame,
-                                text="Go", fg="black",
+        profSmButton = ctk.CTkButton(ProfC_cpane.frame,
+                                text="Go", 
                                 command=lambda: [self.profileSmooth(proj),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        profSmButton.config(height=1, width=BTN_GO_W)
+        profSmButton.configure(height=1, width=BTN_GO_W)
         profSmButton.grid(row=11, column=4, sticky='nsew')
         self.balloon.bind(profSmButton,
                         "First oversamples the profile (makes 'n' copies\n"
@@ -619,11 +618,11 @@ class GPRPyApp:
         self.tb_smth = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_smth.grid(row=12, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        tpowButton = tk.Button(ProfC_cpane.frame,
-                            text="Go", fg="black",
+        tpowButton = ctk.CTkButton(ProfC_cpane.frame,
+                            text="Go", 
                             command=lambda: [self.tpowGain(proj),
                                                 self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        tpowButton.config(height=1, width=BTN_GO_W)
+        tpowButton.configure(height=1, width=BTN_GO_W)
         tpowButton.grid(row=12, column=2, sticky='nsew')
         self.balloon.bind(tpowButton,
                         "t-power gain. Increases the power of the\n"
@@ -636,11 +635,11 @@ class GPRPyApp:
         self.tb_agc = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_agc.grid(row=13, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        agcButton = tk.Button(ProfC_cpane.frame,
-                            text="Go", fg="black",
+        agcButton = ctk.CTkButton(ProfC_cpane.frame,
+                            text="Go", 
                             command=lambda: [self.agcGain(proj),
                                             self.plotProfileData(proj, fig=fig, a=a, canvas=canvas)])
-        agcButton.config(height=1, width=BTN_GO_W)
+        agcButton.configure(height=1, width=BTN_GO_W)
         agcButton.grid(row=13, column=2, sticky='nsew')
         self.balloon.bind(agcButton,
                         "Automatic gain controll. Normalizes the power\n"
@@ -666,10 +665,10 @@ class GPRPyApp:
         self.tb_hypbvelo = tk.Text(ProfC_cpane.frame, height=1, width=WIDTH)
         self.tb_hypbvelo.grid(row=16, column=1, sticky='ew', padx=PAD, pady=PAD)
 
-        hypButton = tk.Button(ProfC_cpane.frame,
-                            text="show hyperb", fg="black",
+        hypButton = ctk.CTkButton(ProfC_cpane.frame,
+                            text="show hyperb", 
                             command=lambda: [self.showHyp(proj, a), canvas.draw()])
-        hypButton.config(height=1, width=BTN_GO_W)
+        hypButton.configure(height=1, width=BTN_GO_W)
         hypButton.grid(row=16, column=2, sticky='nsew')
         self.balloon.bind(hypButton,
                         "Draws a hyperbola depending on profile position,\n"
@@ -686,7 +685,7 @@ class GPRPyApp:
         DataC_cpane.pack_propagate
 
         importDataCubeBtn = ctk.CTkButton(DataC_cpane.frame,
-            text="DataCube", fg_color="black",
+            text="DataCube", 
             command=self.load_vtk_file) 
         importDataCubeBtn.configure(height=HEIGHT, width=WIDTH)         
         importDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
@@ -697,7 +696,7 @@ class GPRPyApp:
         Interp_cpane.grid(row=5, column=0, sticky='ew')
 
         makeDataCubeBtn = ctk.CTkButton(Interp_cpane.frame,
-            text="Interpolate", fg_color="black",
+            text="Interpolate",
             command=self.loadInfoCollectScreen) 
         makeDataCubeBtn.configure(height=HEIGHT, width=WIDTH)         
         makeDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
