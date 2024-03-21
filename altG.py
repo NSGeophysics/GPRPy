@@ -847,7 +847,7 @@ class GPRPyApp:
         self.scalar_cut_plane.implicit_plane.origin = (current_position[0], current_position[1], new_z)
 
         # Create a scalar cut plane
-        scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)    
+        # scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)    
         # Force update visualization
         self.scalar_cut_plane.implicit_plane.scene.render()
 
