@@ -33,6 +33,12 @@ import numpy as np
 from mayavi import mlab
 # import matlab.engine
 
+from tvtk.api import tvtk
+import pyvista as pv
+from vtk.util.numpy_support import vtk_to_numpy
+import matplotlib.pyplot as plt
+from tkinter import filedialog
+import tkinter as tk
 
 
 

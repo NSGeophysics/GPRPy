@@ -17,6 +17,9 @@ import os
 import Pmw
 import scipy.interpolate as interp
 from tkinter.ttk import *
+import topLevel_test
+import toggleFrame
+
 
 # Importing Collapsible Pane class that we have
 # created in separate file
@@ -45,8 +48,8 @@ class GPRPyApp:
 
     
     def __init__(self, master):
-        LIGHT_MODE = "light"
-        ctk.set_appearance_mode(LIGHT_MODE)
+        MODE = "dark"
+        ctk.set_appearance_mode(MODE)
         ctk.set_default_color_theme("dark-blue")
         self.window = master
 
@@ -71,18 +74,20 @@ class GPRPyApp:
         master.title("GPR - Py")
         master.rowconfigure(0, minsize=766, weight=1)
         master.columnconfigure(1, minsize=766, weight=1)
+        # master.propagate = True
 
 
         proj = gp.gprpyProfile()
 
-        btn_frm = ctk.CTkScrollableFrame(master,border_width= 1, width = 450)
+        btn_frm = ctk.CTkScrollableFrame(master,border_width= 1, width = 570, bg_color="light grey",fg_color="light grey")
     
         btn_frm.grid(row = 0, column= 0, sticky= 'ns', rowspan = 2)
-        btn_frm.grid_propagate()
-        btn_frm.configure()
+        # btn_frm.grid_propagate(0)
+        btn_frm.columnconfigure(1, minsize=570, weight=1)
+        btn_frm.grid_propagate = 1
         master.rowconfigure(1, weight=10) 
 
-        fig=Figure(figsize=(self.widfac,self.highfac))
+        fig=Figure(figsize=(self.widfac,self.highfac),facecolor="#d3d3d3")
         a=fig.add_subplot(111)
         mpl.rcParams.update({'font.size': mpl.rcParams['font.size']*self.widfac})
         a.tick_params(direction='out',length=6*self.widfac,width=self.highfac)
@@ -96,11 +101,23 @@ class GPRPyApp:
         canvas.draw() 
         
         
+        
 ####################################################################################### 
         #File Operation Pane
         #Contains all buttons and labels relation to File Operations
-        FM_cpane = ccp(btn_frm, 'File Controls -', 'File Controls +')
-        FM_cpane.grid(row = 0, column = 0, columnspan=2, sticky = 'ew')
+        FM_cpane = cp(btn_frm, 'File Controls -', 'File Controls +')
+        FM_cpane.grid(row = 0, column = 0, sticky = 'ew')
+        FM_cpane.grid_propagate = True
+
+        #Set frame color:
+        # Initialize style
+        s = ttk.Style()
+        # Create style used by default for all Frames
+        s.configure('TFrame', background='#d3d3d3')
+        s.configure('TButton',background="#1f1f60")
+        s.configure('TButton.Label',background="white")
+        
+
 
         LoadButton = ctk.CTkButton(FM_cpane.frame,
             text="Import Data", 
@@ -109,6 +126,7 @@ class GPRPyApp:
         LoadButton.configure(height = HEIGHT, width = WIDTH)         
         LoadButton.grid(row=0, column=0, sticky='nsew',pady = PAD)
         self.balloon.bind(LoadButton,"Load .gpr, .DT1, or .DZT data.")
+
 
         undoButton = ctk.CTkButton(FM_cpane.frame,
             text="Undo", fg_color="black",
@@ -187,6 +205,9 @@ class GPRPyApp:
         #View Control Pane and all buttons within it
         VC_cpane = cp(btn_frm, 'View Controls -', 'View Controls +')
         VC_cpane.grid(row = 1, column = 0, sticky = 'ew',) 
+        VC_cpane.grid_propagate = True
+        VC_cpane.columnconfigure(1, minsize=570, weight=1)
+
 
 
         # Full view
@@ -401,7 +422,6 @@ class GPRPyApp:
 ####################################################################################### 
         # Profile Controls
         ProfC_cpane = cp(btn_frm, 'Profile Controls -', 'Profile Controls +')
-        ProfC_cpane.bind("<KeyPress>", lambda event:EnableFramePropagate(btn_frm))
         ProfC_cpane.grid(row=3, column=0, sticky='ew')
 
 
@@ -659,21 +679,42 @@ class GPRPyApp:
                         "hyperbola will disappear when the image is\n"
                         "refreshed.")
         
-        # DataCube Button
-        DataC_cpane = cp(btn_frm, 'DataCube +', 'DataCube +')
+        # DataCube Button CP ==========================================================================
+        DataC_cpane = cp(btn_frm, 'DataCube -', 'DataCube +')
         DataC_cpane.grid(row=4, column=0, sticky='ew')
+        DataC_cpane.grid_propagate
+        DataC_cpane.pack_propagate
 
         importDataCubeBtn = ctk.CTkButton(DataC_cpane.frame,
             text="DataCube", fg_color="black",
             command=self.load_vtk_file) 
         importDataCubeBtn.configure(height=HEIGHT, width=WIDTH)         
         importDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
-        self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window with data.")
+        self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window to view data cube.")
 
+        # # Interpolation CP =====================================================================
+        Interp_cpane = cp(btn_frm, 'Interpolate -', 'Interpolate +')
+        Interp_cpane.grid(row=5, column=0, sticky='ew')
+
+        makeDataCubeBtn = ctk.CTkButton(Interp_cpane.frame,
+            text="Interpolate", fg_color="black",
+            command=self.loadInfoCollectScreen) 
+        makeDataCubeBtn.configure(height=HEIGHT, width=WIDTH)         
+        makeDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
+        self.balloon.bind(makeDataCubeBtn, "Click to open the interface to create datacube.")
+
+
+        
+
+        
+        
 
 # Button and checkbutton, these will
 # appear in collapsible pane container
-        
+    
+    def loadInfoCollectScreen(self):
+            nw = topLevel_test.Info_Collect()
+
     def load_vtk_file(self):
         # Open a file dialog to select the VTK file
         vtk_file = filedialog.askopenfilename(filetypes=[("VTK files", "*.vtk"), ("VTS files", "*.vts")])
