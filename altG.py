@@ -1,3 +1,5 @@
+import csv
+import dataclasses
 import subprocess
 import sys
 from tkinter import filedialog, messagebox, ttk
@@ -5,9 +7,12 @@ import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
 from tkinter import messagebox as mesbox
+from aiohttp import DataQueue
 from click import Group
+import dataclasses_json
 import matplotlib as mpl
 from matplotlib import mlab
+from matplotlib import pyplot as plt
 from pytest import Item
 from sympy import Range
 from torch import view_as_complex, view_as_complex_copy
@@ -33,9 +38,12 @@ import numpy as np
 from mayavi import mlab
 # import matlab.engine
 
-
-
-
+from tvtk.api import tvtk
+import pyvista as pv
+from vtk.util.numpy_support import vtk_to_numpy
+import matplotlib.pyplot as plt
+from tkinter import filedialog
+import tkinter as tk
 # Making root window or parent window
 
 
@@ -671,84 +679,377 @@ class GPRPyApp:
         importDataCubeBtn.grid(row=0, column=0, sticky='nsew', pady=PAD)
         self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window with data.")
         
+        exportBtn = tk.Button(DataC_cpane.frame,
+                              text="ExportCsv", fg="black",
+                              command=self.prompt_export_data_points)  # Changed to prompt for export
+        exportBtn.config(height=HEIGHT, width=WIDTH)
+        exportBtn.grid(row=1, column=0, sticky='nsew', pady=PAD)
+        self.balloon.bind(importDataCubeBtn, "Click to open the Mayavi window with data.")
 
-    
+
+
+        # Move Up and Move Down buttons
+        move_up_btn = tk.Button(DataC_cpane.frame, 
+                                text="Move Up 2cm", command=lambda: self.move_cut_plane('up', 2))
+        move_up_btn.grid(row=2, column=0, sticky='ew', pady=2)
+
+        move_down_btn = tk.Button(DataC_cpane.frame, text="Move Down 2cm", command=lambda: self.move_cut_plane('down', 2))
+        move_down_btn.grid(row=3, column=0, sticky='ew', pady=2)
+
+        new_slice_button = tk.Button(DataC_cpane.frame, 
+                                     text="Start New Slice", fg="black", command=self.reset_data_points_for_new_slice)
+        new_slice_button.config(height=HEIGHT, width=WIDTH)
+        new_slice_button.grid(row=4, column=0, sticky='nsew', pady=PAD)
+
+
+        # Inside your GUI setup where you define buttons
+        generate_data_btn = tk.Button(DataC_cpane.frame, text="Generate Data", fg="black", command=self.generate_data_for_current_position)
+        generate_data_btn.config(height=HEIGHT, width=WIDTH)
+        generate_data_btn.grid(row=5, column=0, sticky='nsew', pady=PAD)
+        
+        self.data_points = []
+        self.scalar_cut_plane = None 
 
 # Button and checkbutton, these will
 # appear in collapsible pane container
         
+
+    # def load_vtk_file(self):
+    #     # Open a file dialog to select the VTK or VTS file
+    #     self.vtk_file = filedialog.askopenfilename(filetypes=[("VTK files", "*.vtk"), ("VTS files", "*.vts")])
+    #     if self.vtk_file:
+    #         # Call function to read and display the VTK file
+    #         self.display_vtk_file()
+
+    # def display_vtk_file(self):
+    #     vtk_dataset = self.read_vtk_file(self.vtk_file)
+        
+    #     # Convert VTK dataset to numpy array
+    #     np_data = vtk_to_numpy(vtk_dataset.GetPointData().GetScalars())
+    #     dims = vtk_dataset.GetDimensions()
+    #     np_data = np_data.reshape(dims, order='F')  # Reshape according to VTK array layout
+
+    #     fig = plt.figure()
+    #     ax = fig.add_subplot(111, projection='3d')
+
+    #     # Basic visualization: plotting slices as 2D planes in 3D space
+    #     for i in range(dims[2]):  # Iterate over Z-axis slices
+    #         slice = np_data[:, :, i]
+            
+    #         x, y = np.mgrid[0:slice.shape[0], 0:slice.shape[1]]
+    #         z = np.full(slice.shape, i)
+            
+    #         # Plotting the slice
+    #         ax.contourf(x, y, z, zdir='z', levels=[i-0.5, i+0.5], cmap="viridis", alpha=0.5)
+    #         ax.contourf(x, y, slice, zdir='z', offset=i, cmap="viridis")
+
+    #     ax.set_xlabel('X axis')
+    #     ax.set_ylabel('Y axis')
+    #     ax.set_zlabel('Z axis')
+    #     plt.show()
+        
+    # def read_vtk_file(self, filename):
+    #     # Determines file extension to choose appropriate reader
+    #     if filename.endswith(".vtk"):
+    #         reader = vtk.vtkStructuredPointsReader()
+    #     elif filename.endswith(".vts"):
+    #         reader = vtk.vtkXMLStructuredGridReader()
+    #     else:
+    #         raise ValueError("Unsupported file format")
+    #     reader.SetFileName(filename)
+    #     reader.Update()
+    #     return reader.GetOutput()
+
+    # def extract_slice(self, vtk_dataset, slice_index):
+    #     # Assumes the slice is along the Z-axis for simplicity
+    #     dims = vtk_dataset.GetDimensions()
+    #     if slice_index < 0 or slice_index >= dims[2]:
+    #         raise ValueError("Slice index out of range.")
+
+    #     # Extracting the slice (example for structured points, adjust if necessary)
+    #     slice_data = vtk_to_numpy(vtk_dataset.GetPointData().GetScalars())
+    #     slice_shape = (dims[1], dims[0])  # Assuming XY plane slices
+    #     slice_array = slice_data[slice_index * dims[0] * dims[1]:(slice_index + 1) * dims[0] * dims[1]]
+    #     slice_array = slice_array.reshape(slice_shape)
+
+    #     return slice_array
+
+    # def plot_slice(self, slice_array):
+    #     plt.imshow(slice_array, cmap='viridis', origin='lower')
+    #     plt.colorbar()
+    #     plt.show()
+
+    # def prompt_export_data_points(self):
+    #     filepath = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+    #     if filepath:
+    #         self.export_data_points(filepath)
+        
+
+    def generate_data_for_current_position(self):
+        if not hasattr(self, 'scalar_cut_plane'):
+            print("Scalar cut plane is not initialized.")
+            return
+
+        current_position = self.scalar_cut_plane.implicit_plane.origin
+        print(f"Generating data for point:{ current_position}")
+
+        z_depth = current_position[2]  # Use the Z component
+        self.generate_slice_data(z_depth)
+        print(f"Data generated for Z={z_depth} with {len(self.data_points)} points.")
+
+    def generate_slice_data(self, z_depth):
+        x_start, x_end, x_interval = 0, 10, 0.02  # Define grid boundaries and step size
+        y_start, y_end, y_interval = 0, 10, 0.02
+
+        self.data_points = []  # Clear existing points for a new slice
+
+        for x in np.arange(x_start, x_end, x_interval):
+            for y in np.arange(y_start, y_end, y_interval):
+                if len(self.data_points) >= 500:
+                    print(f"Reached 500 data points limit. Stopping data generation.")
+                    return  # Stop adding more points once 500 have been added
+                g_value = self.get_scalar_value_at_point(x, y, z_depth)
+                if g_value is not None:
+                    self.data_points.append((x, y, z_depth, g_value))
+                    # Temporary print statement for debugging:
+                    print(f"X: {x}, Y: {y}, Z: {z_depth}, G: {g_value}")
+
+        print(f"Generated slice at Z={z_depth} with {len(self.data_points)} points.")
+        
+    def reset_data_points_for_new_slice(self):
+        self.data_points = []  # Reset the list to empty
+        print("Data points reset for a new slice.")
+        
     def load_vtk_file(self):
         # Open a file dialog to select the VTK file
         self.vtk_file = filedialog.askopenfilename(filetypes=[("VTK files", "*.vtk"), ("VTS files", "*.vts")])
-
         if self.vtk_file:
             # Call function to display the VTK file
-            self.display_vtk_file(self.vtk_file)
+            self.display_vtk_file()
 
-    def display_vtk_file(self, vtk_file):
-        # Open the VTK file
-        data = mlab.pipeline.open(vtk_file)
 
-    
-        # Display the outline
-        outline = mlab.pipeline.outline(data)
+    def move_cut_plane(self, direction, step=2.0):
+        if not hasattr(self, 'scalar_cut_plane'):
+            print("Scalar cut plane is not initialized.")
+            return
 
-        # Display the isosurface
-        isosurface = mlab.pipeline.iso_surface(data)
+        # Calculate the new Z depth based on direction
+        current_position = self.scalar_cut_plane.implicit_plane.origin
+        if direction == 'up':
+            new_z = current_position[2] + step / 100.0  # Convert cm to meters if necessary
+        elif direction == 'down':
+            new_z = current_position[2] - step / 100.0
+        else:
+            print("Invalid direction. Use 'up' or 'down'.")
+            return
+
+        # Update the plane's Z position
+        self.scalar_cut_plane.implicit_plane.origin = (current_position[0], current_position[1], new_z)
 
         # Create a scalar cut plane
         scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)    
+        # Force update visualization
+        self.scalar_cut_plane.implicit_plane.scene.render()
+
+        # Generate data points for the new slice
+        #self.generate_slice_data(new_z)
 
     
-        def on_cut_plane_move(obj, evt):
-            # Get the position of the ScalarCutPlane along the z-axis
-            origin = scalar_cut_plane.implicit_plane.origin
+                
+    def display_vtk_file(self):
+        src = mlab.pipeline.open(self.vtk_file)
 
-            # Retrieve the data points at 2cm intervals along the z-axis
-            for i in range(41):  # Assuming 41 lines of GPR data
-                z_position = origin[2] + i * 0.02  # 2cm intervals
-                for j in range(500):  # 500 data points per line
-                    x = j * 0.02  # 2cm intervals along the x-axis
-                    y = i * 0.02  # 2cm intervals along the y-axis
-                    z = z_position
-                    g = ...  # Retrieve GPR measurement value at (x, y, z)
-                    # Record the XYZG points
-                    print(f"X: {x}, Y: {y}, Z: {z}, G: {g}")
+        try:
+            if hasattr(src.outputs[0], 'input'):
+                vtk_dataset = src.outputs[0].input  # Accessing the input to AssignAttribute
+                if hasattr(vtk_dataset, 'point_data'):
+                    scalar_range = vtk_dataset.point_data.scalars.range
+                else:
+                    raise AttributeError("Failed to find point_data in vtk_dataset.")
+            else:
+                raise AttributeError("src.outputs[0] does not have 'input'.")
+        except AttributeError as e:
+            print(e)
+            return  # Exit if we cannot correctly access the dataset
 
-        # Add a callback function to the ScalarCutPlane to handle its move event
-        scalar_cut_plane.implicit_plane.widget.add_observer('InteractionEvent', on_cut_plane_move)
+        # Generate contour levels within the valid scalar range of the data
+        contour_levels = [scalar_range[0] + (scalar_range[1] - scalar_range[0]) * 0.25,
+                        scalar_range[0] + (scalar_range[1] - scalar_range[0]) * 0.75]
 
-      
-            
+        mlab.pipeline.iso_surface(src, contours=contour_levels, opacity=0.3)
+        self.scalar_cut_plane = mlab.pipeline.scalar_cut_plane(src, plane_orientation='z_axes')
 
-    # #For testing might work for displaying vtk file into a datacube
+        # mlab.axes(xlabel='X', ylabel='Y', zlabel='Z', nb_labels=5)
+        # # Retrieve the bounds of your dataset for grid alignment
+
+        # mlab.draw()
+
+        # After initializing self.scalar_cut_plane
+        self.scalar_cut_plane.implicit_plane.widget.add_observer('InteractionEvent', self.on_cut_plane_move)
+
+        # Inside display_vtk_file, after successfully loading the dataset
+        self.current_vtk_dataset = vtk_dataset  # Ensure this references your loaded VTK dataset object
+
+
+    def on_cut_plane_move(self, obj, evt):
+        origin = self.scalar_cut_plane.implicit_plane.origin
+        # Decompose the origin into x, y, and z components
+        x, y, z = origin
+
+        # Call get_scalar_value_at_point with x, y, z as separate arguments
+        g_value = self.get_scalar_value_at_point(x, y, z)
+        
+        # Store the coordinates and scalar value
+        self.data_points.append((x, y, z, g_value))
+        
+        # Print the current X, Y, Z, and G values
+        print(f"X: {x}, Y: {y}, Z: {z}, G: {g_value}")
+
+        # Optionally update text in the visualization to show current coordinates
+        # This part assumes you have a method or logic to manage the text display correctly
+        # Make sure to check or implement logic to avoid overlaying multiple text instances
+        self.update_coord_text(x, y, z, g_value)
+
+    def update_coord_text(self, x, y, z, g_value):
+        # Assuming 'coord_text' is an attribute to store the text object
+        # Check if it exists and remove it before creating a new one to avoid overlay
+        if hasattr(self, 'coord_text'):
+            self.coord_text.remove()
+
+        # Display new coordinates as text
+        self.coord_text = mlab.text(0.01, 0.01, f"X: {x:.2f}, Y: {y:.2f}, Z: {z:.2f}, G: {g_value:.2f}", width=0.25)
+        mlab.draw()
+
+
+    def get_scalar_value_at_point(self, x, y, z):
+        # Ensure 'self.current_vtk_dataset' is properly set to your VTK dataset
+        vtk_data = self.current_vtk_dataset
+
+        # Assuming 'vtk_data' has been properly set up to refer to your current dataset
+        point = [x, y, z]
+        point_data = tvtk.PolyData(points=[point])
+        probe = tvtk.ProbeFilter()
+        probe.set_input_data(point_data)
+        probe.set_source_data(vtk_data)
+        probe.update()
+
+        if probe.output.point_data.scalars:
+            scalar_value = probe.output.point_data.scalars.to_array()[0]
+            return scalar_value
+        else:
+            return None  # No scalar value was interpolated at this point
+
+        
+    def automated_data_sampling(self):
+        x_start, x_end, x_interval = 0, 10, 0.02
+        y_start, y_end, y_interval = 0, 10, 0.02
+        z_depth = 0.5  # Example depth, adjust based on your requirements
+
+        self.reset_data_points_for_new_slice()
+
+        for x in np.arange(x_start, x_end, x_interval):
+            for y in np.arange(y_start, y_end, y_interval):
+                g_value = self.get_scalar_value_at_point(x, y, z_depth)
+                if g_value is not None:
+                    self.data_points.append((x, y, z_depth, g_value))
+
+        print(f"Collected {len(self.data_points)} data points for the new slice.")
+        
+
+    def get_scalar_value_at_point(self, x, y, z):
+        # This implementation needs to access the scalar value from your dataset at the (x, y, z) location.
+        # The actual implementation will depend on how your dataset is structured.
+        # The following is a placeholder that assumes you can directly query your dataset.
+
+        vtk_data = self.current_vtk_dataset  # Ensure this is set to your dataset when loaded.
+
+        # Construct a point and use a probe to get the scalar value at this point
+        point = [x, y, z]
+        point_data = tvtk.PolyData(points=[point])
+        probe = tvtk.ProbeFilter()
+        probe.set_input_data(point_data)
+        probe.set_source_data(vtk_data)
+        probe.update()
+
+        if probe.output.point_data.scalars:
+            scalar_value = probe.output.point_data.scalars.to_array()[0]
+            return scalar_value
+        else:
+            return None  # Handle cases where no data is interpolated at the point
+
+
+    def prompt_export_data_points(self):
+        # Prompt the user for a file path to export
+        filepath = filedialog.asksaveasfilename(defaultextension=".csv",
+                                                filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+        if filepath:
+            self.export_data_points(filepath)
+
+
+    def export_data_points(self, filepath):
+            with open(filepath, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['X', 'Y', 'Z', 'G'])  # Header
+                for point in self.data_points:
+                    writer.writerow(point)
+            print(f"Data points exported to {filepath}")
+
+    # if the data is a strucutred grid we use this 
+    # def get_scalar_value_at_point(self, src, point):
+    #     # Assuming src is a structured grid source for simplicity
+    #     vtk_data = src.outputs[0]
+    #     if isinstance(vtk_data, tvtk.StructuredGrid):
+    #         x, y, z = point
+    #         spacing = vtk_data.spacing
+    #         origin = vtk_data.origin
+    #         i = int(round((x - origin[0]) / spacing[0]))
+    #         j = int(round((y - origin[1]) / spacing[1]))
+    #         k = int(round((z - origin[2]) / spacing[2]))
+    #         try:
+    #             scalar_value = vtk_data.point_data.scalars[i, j, k]
+    #             return scalar_value
+    #         except IndexError:
+    #             return None  # Point is outside the grid
+    #     return None  # Placeholder for non-structured grid data
+
+
     # def display_vtk_file(self, vtk_file):
-    #     # Create a Mayavi scene
-    #     scene = mlab.figure(bgcolor=(1, 1, 1))
+    #     # Open the VTK file
+    #     data = mlab.pipeline.open(vtk_file)
 
-    #     # Load the VTK file using vtkXMLImageDataReader
-    #     reader = vtk.vtkXMLImageDataReader()
-    #     reader.SetFileName(vtk_file)
-    #     reader.Update()
+    #     # Display the isosurface
+    #     isosurface = mlab.pipeline.iso_surface(data)
 
-    #     # Get the output from the reader
-    #     data = reader.GetOutput()
+    #     # Create a scalar cut plane
+    #     scalar_cut_plane = mlab.pipeline.scalar_cut_plane(data)
 
-    #     # Create a scalar field from the VTK data
-    #     scalar_field = mlab.pipeline.scalar_field(data)
+    #     def on_cut_plane_move(obj, evt):
+    #         # Get the position of the ScalarCutPlane along the z-axis
+    #         origin = scalar_cut_plane.implicit_plane.origin
 
-    #     # Create a volume visualization of the scalar field (data cube)
-    #     volume = mlab.pipeline.volume(scalar_field, vmin=0, vmax=1)
+    #         # Retrieve the data points at 2cm intervals along the z-axis
+    #         for i in range(50):  # Assuming 50 lines of GPR data
+    #             z_position = origin[2] + i * 0.02  # 2cm intervals
+    #             for j in range(500):  # 500 data points per line
+    #                 x = j * 0.02  # 2cm intervals along the x-axis
+    #                 y = i * 0.02  # 2cm intervals along the y-axis
+    #                 z = z_position
+    #                 g = ...  # Retrieve GPR measurement value at (x, y, z)
+    #                 # Record the XYZG points
+    #                 print(f"X: {x}, Y: {y}, Z: {z}, G: {g}")
 
-    #     # Embed the Mayavi scene into a Tkinter widget
-    #     mayavi_widget = vtk.IVTKWithCrustAndBrowser(size=(800, 600))
-    #     mayavi_widget.setCentralWidget(scene)
+    #     # Add a callback function to the ScalarCutPlane to handle its move event
+    #     scalar_cut_plane.implicit_plane.widget.add_observer('InteractionEvent', on_cut_plane_move)
 
-    #     # Add the Mayavi widget to the tab
-    #     mayavi_widget.setParent(self.tab2)
-    #     mayavi_widget.grid(row=0, column=0, sticky='nsew')
+    # def display_vtk_file(self, vtk_file):
+    #     # Define the preloaded modules you want to include
+    #     preloaded_modules = ['-m', 'Outline', '-m', 'IsoSurface', '-m', 'ScalarCutPlane']
 
-
+    #     # Call Mayavi2 with the appropriate arguments to display the VTK file
+    #     mayavi_command = ['mayavi2', '-d', vtk_file] + preloaded_modules
+    #     subprocess.run(mayavi_command)
+            
+   
     ####################################################################################### 
     #File operations functions
         
