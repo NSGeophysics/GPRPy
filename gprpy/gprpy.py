@@ -305,6 +305,7 @@ class gprpyProfile:
         yrng         yrng value used to prepare the figure
         xrng         xrng value used to prepare the figure
         asp          asp value used to prepare the figure
+        ax           figure axis
 
         '''
         dx=self.profilePos[3]-self.profilePos[2]
@@ -367,8 +368,9 @@ class gprpyProfile:
         plt.gca().set_xlabel("profile position [m]")
         plt.gca().xaxis.tick_top()
         plt.gca().xaxis.set_label_position('top')
+        ax = plt.gca()
         
-        return contrast, color, yrng, xrng, asp
+        return contrast, color, yrng, xrng, asp, ax
        
     
     def showProfile(self, **kwargs):
@@ -386,8 +388,9 @@ class gprpyProfile:
         asp          aspect ratio [default: None, meaning automatic]
 
         '''
-        self.prepProfileFig(**kwargs)
-        plt.show(block=False)
+        contrast, color, yrng, xrng, asp, ax = self.prepProfileFig(**kwargs)
+        #plt.show(block=False)
+        return ax
 
 
     def printProfile(self, figname, dpi=600, **kwargs):
@@ -406,7 +409,7 @@ class gprpyProfile:
         asp          aspect ratio [default: None, meaning automatic]
 
         '''
-        contrast, color, yrng, xrng, asp = self.prepProfileFig(**kwargs)
+        contrast, color, yrng, xrng, asp, ax = self.prepProfileFig(**kwargs)
         plt.savefig(figname, format='pdf', dpi=dpi)
         plt.close('all')
         # Put what you did in history
