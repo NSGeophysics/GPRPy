@@ -92,7 +92,7 @@ class gprpyProfile:
             histstr = "mygpr.importdata('%s')" %(filename)
             self.history.append(histstr)                                
             
-        elif file_ext==".DZT":
+        elif file_ext==".DZT"  or file_ext==".dzt":
 
             self.data, self.info = gprIO_DZT.readdzt(filename)
 
