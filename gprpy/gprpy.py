@@ -40,6 +40,8 @@ class gprpyProfile:
         if filename is not None:
             self.importdata(filename)                 
         
+    def bandPassFilter(self):
+        print('place holder')
     def importdata(self,filename):
         '''
         Loads .gpr (native GPRPy), .DT1 (Sensors and Software),
