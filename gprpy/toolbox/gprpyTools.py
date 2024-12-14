@@ -7,6 +7,19 @@ import scipy.signal as signal
 import time
 from tqdm import tqdm
 
+def getAvgFreqSpectra(data,dt):
+    dt = dt/1e9 #convert to seconds
+    fs = 1/dt
+    fft_freq = np.linspace(0, fs / 2, data.shape[0]//2)
+    fft_freq = fft_freq/1e6 #convert to MHz
+    
+    fft_amp_all = np.zeros((len(fft_freq),data.shape[1]))
+    for i in range(0,data.shape[1]):
+        amp = data[:,i]
+        fft_amp = np.abs(np.fft.fft(amp, amp.size))
+        fft_amp = fft_amp[0:fft_amp.size // 2]
+        fft_amp_all[:,i] = fft_amp
+    return fft_freq,np.mean(fft_amp_all,axis=1)
 
 def bpData(data, lowFreq, highFreq, dt, order=1):
     """
@@ -24,8 +37,7 @@ def bpData(data, lowFreq, highFreq, dt, order=1):
     Outputs: 
     fData = a filtered (along columns) numpy array that is nt x ns (nt = time samples, ns = number of recievers)
     """
-    #YOU PROBABLY WANT TO ADD THIS TO THE LIST OF DEPENDENCIES
-    from scipy import signal
+
 
     #pull data from structure to manipulate
 
