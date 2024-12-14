@@ -39,9 +39,10 @@ class gprpyProfile:
         
         if filename is not None:
             self.importdata(filename)                 
+    
         
-    def bandPassFilter(self):
-        print('place holder')
+        
+    
     def importdata(self,filename):
         '''
         Loads .gpr (native GPRPy), .DT1 (Sensors and Software),
@@ -512,6 +513,34 @@ class gprpyProfile:
         histstr = "mygpr.setZeroTime(%g)" %(newZeroTime)
         self.history.append(histstr)  
 
+    def bpFilter(self, lowFreq, highFreq, order=1):
+        """
+        Apply a trace by trace bandpass filter defined by two frequencies
+
+        Parameters
+        ----------
+        lowFreq : Low Frequency Corner in MHz
+            DESCRIPTION.
+        highFreq : High Frequency Corner in MHz
+            DESCRIPTION.
+        order : from SCIPY butter: The order of the filter. For ‘bandpass’ and ‘bandstop’ filters, the resulting order of the final second-order sections (‘sos’) matrix is 2*N, with N the number of biquad sections of the desired system., optional
+
+        Returns
+        -------
+        filtered Data
+
+        """
+        
+        # Store previous state for undo (copy from Alain Below)
+        self.storePrevious()
+        #calcalute dt, assume equally spaced time array
+        dt = self.twtt[1] - self.twtt[0]
+        #convert to array, but will return matrix
+        data = np.array(self.data)
+        self.data = tools.bpData(data, lowFreq, highFreq,dt)
+        # Put in history
+        histstr = "mygpr.bpFilter(%d,%d)" %(lowFreq, highFreq)
+        self.history.append(histstr)
         
     def dewow(self,window):
         '''

@@ -8,6 +8,50 @@ import time
 from tqdm import tqdm
 
 
+def bpData(data, lowFreq, highFreq, dt, order=1):
+    """
+    Author: Brady Flinchum
+    Date: 12/14/2024
+    Dependencies: Scipy 
+    Applies a band-pass filter to each trace (column in 2d array)
+    Inputs
+    data = a numpy array that is nt x ns (nt = time samples, ns = number of recievers)
+    lf = lower corner frequency (MHz)
+    hf = upper corner frequency (MHz)
+    
+    order = order of the bp filter (required for sp.signal.butter)
+    
+    Outputs: 
+    fData = a filtered (along columns) numpy array that is nt x ns (nt = time samples, ns = number of recievers)
+    """
+    #YOU PROBABLY WANT TO ADD THIS TO THE LIST OF DEPENDENCIES
+    from scipy import signal
+
+    #pull data from structure to manipulate
+
+    #CONVERT UNITS
+    dt = dt*1e-9 #from ns to s
+    lowFreq = lowFreq*1e6 #from MHz to Hz
+    highFreq = highFreq*1e6 #from MHz to Hz
+    
+    nq = 1/(2*dt) #nyquist frequency
+    
+    #Scale the frequencies to the nyquist frequency (required for butter)
+    wl = lowFreq / nq
+    wh = highFreq / nq
+    
+    b, a = signal.butter(order, [wl, wh], btype="bandpass")
+    
+    #initialize filtered structure
+    fData = np.zeros(data.shape) 
+    
+    #Filter each trace of teh data
+    for i in range(0, data.shape[1]):
+        #rint(len( data[:, i]))
+        fData[:, i] = signal.filtfilt(b, a, data[:, i],axis=0)
+    fData = np.matrix(fData) #Make matrix not array to stay consistent with Alain work  
+    return fData
+        
 def alignTraces(data):
     '''
     Aligns the traces in the profile such that their maximum 
