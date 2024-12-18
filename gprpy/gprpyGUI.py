@@ -362,9 +362,9 @@ class GPRPyApp:
         
         #BRADY FLINCHUM ADD BP BUTTON
         bpFilterButton = tk.Button(
-            text="Band-Pass Filter",fg="black")
-            # command=lambda : [self.agcGain(proj),
-            #                   self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+            text="Band-Pass Filter",fg="black",
+            command=lambda : [self.bpFilter(proj),
+                              self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         bpFilterButton.config(height=1, width=2*halfwid)
         bpFilterButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
 
@@ -622,8 +622,16 @@ class GPRPyApp:
         window = sd.askinteger("Input","Window length for AGC?")
         if window is not None:
             proj.agcGain(window=window)
+     
+    #BRADY FLINCHUM ADDED 12/18
+    def bpFilter(self,proj):
+        low = sd.askfloat("Input","Low Frequency (MHz)")
+        high = sd.askfloat("Input","High Frequency (MHz)")
+        #makePlot = mesbox.askyesno("Question","Plot the new Frequency Spectrum?")
+        if low is not None and high is not None:
+            proj.bpFilter(low,high)
             
-
+                
     def truncateY(self,proj):
         maxY = sd.askfloat("Input","Truncate at what y value\n" 
                            "(travel time or depth)")
