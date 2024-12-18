@@ -515,6 +515,8 @@ class gprpyProfile:
 
     def bpFilter(self, lowFreq, highFreq, order=1):
         """
+        Author: Brady Flinchum
+        Date: 12/14/2024
         Apply a trace by trace bandpass filter defined by two frequencies
 
         Parameters
@@ -527,10 +529,9 @@ class gprpyProfile:
 
         Returns
         -------
-        filtered Data
+        trace bandpass filtered data filtered Data
 
         """
-        
         # Store previous state for undo (copy from Alain Below)
         self.storePrevious()
         #calcalute dt, assume equally spaced time array
@@ -541,6 +542,34 @@ class gprpyProfile:
         # Put in history
         histstr = "mygpr.bpFilter(%d,%d)" %(lowFreq, highFreq)
         self.history.append(histstr)
+        
+    def plotFreqSpectrum(self,isLog=False):
+        """
+        Author: Brady Flinchum
+        Date: 12/14/2024
+        
+        This is just a method to plot the average frequency spectrum of all the
+        traces in the data set. I put this in here to double check the bp filter
+        method above. The function itself is found in tools.gprTools.
+        
+        Alain: Not sure how you handle figures and pop ups, so I have no idea
+        how this would play in the GUI.
+        """
+        
+        data = np.array(self.data) #Convert from "matrix" to 2D numpy array
+        dt = self.twtt[1] - self.twtt[0] #calcualte dt
+        
+        freq,amp = tools.getAvgFreqSpectra(data,dt) #Do the calcuation
+        
+        #PLOT
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(freq,amp,c='k',lw=2)
+        if isLog:
+            ax.set_yscale('log')
+            print('made it here')
+        ax.set_ylabel('Amplitude')
+        ax.set_xlabel('Frequency (MHz)')
         
     def dewow(self,window):
         '''

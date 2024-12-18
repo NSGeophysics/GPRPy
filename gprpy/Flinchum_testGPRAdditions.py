@@ -6,7 +6,7 @@ Created on Sat Dec 14 04:35:09 2024
 @author: bflinch
 """
 
-import gprpy as gp
+import gprpy.gprpy as gp
 
 testFile = '/Users/bflinch/Dropbox/Clemson/Research/ResearchProjects/BotanicalGardens_Oak/Data/DATA07/LINE79.DT1'
 

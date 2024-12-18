@@ -359,13 +359,21 @@ class GPRPyApp:
                           "Automatic gain controll. Normalizes the power\n"
                           "of the signal per given sample window along\n" 
                           "each trace.")
+        
+        #BRADY FLINCHUM ADD BP BUTTON
+        bpFilterButton = tk.Button(
+            text="Band-Pass Filter",fg="black")
+            # command=lambda : [self.agcGain(proj),
+            #                   self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
+        bpFilterButton.config(height=1, width=2*halfwid)
+        bpFilterButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
 
         # show hyperbola
         hypButton = tk.Button(
             text="show hyperb", fg="black",
             command=lambda : [self.showHyp(proj,a), canvas.draw()])
         hypButton.config(height = 1, width = 2*halfwid)
-        hypButton.grid(row=12, column=rightcol, sticky='nsew',columnspan=colsp)
+        hypButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(hypButton,
                           "Draws a hyperbola depending on profile position,\n"
                           "travel time, and estimated velocity. This can be\n" 
@@ -382,7 +390,7 @@ class GPRPyApp:
             command=lambda : [self.setVelocity(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         setVelButton.config(height = 1, width = 2*halfwid)         
-        setVelButton.grid(row=13, column=rightcol, sticky='nsew',columnspan=colsp)
+        setVelButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(setVelButton,
                           "Set the known subsurface radar velocity. This\n" 
                           "turns the y-axis from travel time to depth.\n"
@@ -396,7 +404,7 @@ class GPRPyApp:
             command=lambda : [self.antennaSep(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         antennaSepButton.config(height = 1, width = 2*halfwid)         
-        antennaSepButton.grid(row=14, column=rightcol, sticky='nsew',columnspan=colsp)
+        antennaSepButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(antennaSepButton,                        
                           "If the antenna offset is provided, this corrects for\n"
                           "distortion of arrival times near the surface due to\n"
@@ -411,7 +419,7 @@ class GPRPyApp:
             command=lambda : [self.fkMigration(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         migButton.config(height = 1, width = 2*halfwid)         
-        migButton.grid(row=15, column=rightcol, sticky='nsew',columnspan=colsp)
+        migButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(migButton,
                           "Stolt's fk migration using a code originally written\n"
                           "in Matlab for the CREWES software package.\n" 
@@ -425,7 +433,7 @@ class GPRPyApp:
             command=lambda : [self.topoCorrect(proj),
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         topoCorrectButton.config(height = 1, width = 2*halfwid)
-        topoCorrectButton.grid(row=16, column=rightcol, sticky='nsew',columnspan=colsp)
+        topoCorrectButton.grid(row=17, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(topoCorrectButton,
                           "Reads a comma- or tab-separated file containing\n" 
                           "either 3 columns (easting, northing, elevation)\n" 
@@ -438,7 +446,7 @@ class GPRPyApp:
             text="start pick", fg="black",
             command=lambda : self.startPicking(proj,fig=fig,a=a,canvas=canvas))        
         startPickButton.config(height = 1, width = halfwid)
-        startPickButton.grid(row=17, column=rightcol, sticky='nsew',columnspan=1)
+        startPickButton.grid(row=18, column=rightcol, sticky='nsew',columnspan=1)
         self.balloon.bind(startPickButton,
                           "Start collecting location information\n" 
                           "by clicking on the profile.")  
@@ -450,7 +458,7 @@ class GPRPyApp:
                               self.plotProfileData(proj,fig=fig,a=a,canvas=canvas)])
         
         stopPickButton.config(height = 1, width = halfwid)
-        stopPickButton.grid(row=17, column=rightcol+1, sticky='nsew',columnspan=1)
+        stopPickButton.grid(row=18, column=rightcol+1, sticky='nsew',columnspan=1)
         self.balloon.bind(stopPickButton,
                           "Stop collecting location information\n"
                           "and save the locations you collected\n"
@@ -461,7 +469,7 @@ class GPRPyApp:
             text="save data", fg="black",
             command=lambda : self.saveData(proj))
         SaveButton.config(height = 1, width = 2*halfwid)         
-        SaveButton.grid(row=18, column=rightcol, sticky='nsew',columnspan=colsp)
+        SaveButton.grid(row=19, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(SaveButton,
                           'saves the processed data including its history in a\n'
                           '.gpr file. The resulting file will contain absolute\n'
@@ -476,7 +484,7 @@ class GPRPyApp:
             text="print figure", fg="black",
             command=lambda : self.printProfileFig(proj=proj,fig=fig))
         PrintButton.config(height = 1, width = 2*halfwid)         
-        PrintButton.grid(row=19, column=rightcol, sticky='nsew',columnspan=colsp)
+        PrintButton.grid(row=20, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(PrintButton,
                           "Saves the current visible figure in a pdf with \n"
                           "chosen resolution. If there is a hyperbola on\n" 
@@ -489,7 +497,7 @@ class GPRPyApp:
             text="export to VTK", fg="black",
             command = lambda : self.exportVTK(proj))
         VTKButton.config(height = 1, width = 2*halfwid)
-        VTKButton.grid(row=20, column=rightcol, sticky='nsew',columnspan=colsp)
+        VTKButton.grid(row=21, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(VTKButton,
                           "Exports the processed figure to a\n"
                           "VTK format, that can be read by\n" 
@@ -503,7 +511,7 @@ class GPRPyApp:
             text="write script", fg="black",
             command=lambda : self.writeHistory(proj))
         HistButton.config(height = 1, width = 2*halfwid)         
-        HistButton.grid(row=21, column=rightcol, sticky='nsew',columnspan=colsp)
+        HistButton.grid(row=22, column=rightcol, sticky='nsew',columnspan=colsp)
         self.balloon.bind(HistButton,
                           'Writes a python script to reproduce the \n'
                           'current status.\n'
@@ -614,6 +622,7 @@ class GPRPyApp:
         window = sd.askinteger("Input","Window length for AGC?")
         if window is not None:
             proj.agcGain(window=window)
+            
 
     def truncateY(self,proj):
         maxY = sd.askfloat("Input","Truncate at what y value\n" 
