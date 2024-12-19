@@ -7,7 +7,92 @@ import scipy.signal as signal
 import time
 from tqdm import tqdm
 
+def getAvgFreqSpectra(data,dt):
+    """
+    Author: Brady Flinchum
+    Date: 12/14/2024
+    
+    This method calculates the average frequency spectra of all the traces in
+    the data set. It returns the frequency vector in MHz. There is no zero padding
+    so if the sample rate is large, then the spectrum will likely not be smooth looking.
+    
+    Parameters
+    ----------
+    data : data, which needs to be a mxn array. This usually means it needs
+           to be converted from the gprpy matrix form.
+    dt : Assumed to be in ns. The sampling interval determined by the data.
 
+    Returns
+    -------
+    fft_freq : The frequency vector, converted to MHz assuming dt was given in ns.
+    mean_fft_amp: The average amplitude of all the traces in teh data set.
+
+    """
+    
+    dt = dt/1e9 #convert ns to seconds
+    fs = 1/dt #Get the sampling frequency
+    
+    #Calculate the frequency vector for plotting the fft (see numpy fft for more info )
+    fft_freq = np.linspace(0, fs / 2, data.shape[0]//2)
+    fft_freq = fft_freq/1e6 #convert to MHz
+    
+    #Create a 2D array to store all of the spectrums for averaging later
+    #**This might be able to be vectorized?
+    fft_amp_all = np.zeros((len(fft_freq),data.shape[1]))
+    
+    #Loop over all traces
+    for i in range(0,data.shape[1]):
+        amp = data[:,i] #Amplitude of single trace
+        fft_amp = np.abs(np.fft.fft(amp, amp.size)) #Get the magnitude of the FFT. This has both negative  and postive frequencies and is symetrical (see numpy fft for more)
+        fft_amp = fft_amp[0:fft_amp.size // 2] #Extracat only the first half of the data
+        fft_amp_all[:,i] = fft_amp #Store the amplitude spectrum in the intialized array
+    
+    mean_fft_amp = np.mean(fft_amp_all,axis=1) #Take the mean of all the amplitudes. The peak should match the Frequency of the antenna used!
+    return fft_freq,mean_fft_amp
+
+def bpData(data, lowFreq, highFreq, dt, order=1):
+    """
+    Author: Brady Flinchum
+    Date: 12/14/2024
+    Dependencies: Scipy 
+    Applies a band-pass filter to each trace (column in 2d array)
+    Inputs
+    data = a numpy array that is nt x ns (nt = time samples, ns = number of recievers)
+    lf = lower corner frequency (MHz)
+    hf = upper corner frequency (MHz)
+    
+    order = order of the bp filter (required for sp.signal.butter)
+    
+    Outputs: 
+    fData = a filtered (along columns) numpy array that is nt x ns (nt = time samples, ns = number of recievers)
+    """
+
+
+    #pull data from structure to manipulate
+
+    #CONVERT UNITS
+    dt = dt*1e-9 #from ns to s
+    lowFreq = lowFreq*1e6 #from MHz to Hz
+    highFreq = highFreq*1e6 #from MHz to Hz
+    
+    nq = 1/(2*dt) #nyquist frequency
+    
+    #Scale the frequencies to the nyquist frequency (required for butter)
+    wl = lowFreq / nq
+    wh = highFreq / nq
+    
+    b, a = signal.butter(order, [wl, wh], btype="bandpass")
+    
+    #initialize filtered structure
+    fData = np.zeros(data.shape) 
+    
+    #Filter each trace of teh data
+    for i in range(0, data.shape[1]):
+        #rint(len( data[:, i]))
+        fData[:, i] = signal.filtfilt(b, a, data[:, i],axis=0)
+    fData = np.matrix(fData) #Make matrix not array to stay consistent with Alain work  
+    return fData
+        
 def alignTraces(data):
     '''
     Aligns the traces in the profile such that their maximum 
