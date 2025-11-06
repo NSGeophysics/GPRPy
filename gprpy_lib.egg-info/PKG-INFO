@@ -1,3 +1,29 @@
+Metadata-Version: 2.4
+Name: gprpy-lib
+Version: 2.0.0
+Summary: GPRPy - a Python library for ground penetrating radar processing and visualization
+Home-page: https://github.com/NSGeophysics/GPRPy
+Author: Alain Plattner
+Author-email: plattner@alumni.ethz.ch
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: pyevtk
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary
+
 # GPRPy
 
 Open-source Ground Penetrating Radar processing and visualization software. Supported by the National Science Foundation under grants [EAR-1550732](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550732) and [EAR-2022671](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2022671)
@@ -10,7 +36,7 @@ GPRPy is now a Python library for processing and visualizing Ground Penetrating 
 
 **In the following instructions, if you use Windows, use the comands `python` and `pip`. If you use Mac or Linux, use the commands `python3` and `pip3` instead.**
 
-1) Download the GPRPy software from 
+1) Download the GPRPy software from
    [https://github.com/NSGeophysics/GPRPy/archive/master.zip](https://github.com/NSGeophysics/GPRPy/archive/master.zip). <br/>
    Save the file somewhere on your computer and extract the zip folder. <br/>
    As an **alternative**, you can install git from [https://git-scm.com/](https://git-scm.com/), then run in a command prompt:<br/>

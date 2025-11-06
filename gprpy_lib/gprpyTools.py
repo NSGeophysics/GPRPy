@@ -5,7 +5,6 @@ import scipy.interpolate as interp
 import scipy.signal as signal
 # For progress bar
 import time
-from tqdm import tqdm
 
 
 def alignTraces(data):
@@ -73,7 +72,7 @@ def dewow(data,window):
         newdata[0:halfwid+1,:] = data[0:halfwid+1,:]-avgsmp
 
         # for each sample in the middle
-        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+        for smp in range(halfwid,totsamps-halfwid+1):
             winstart = int(smp - halfwid)
             winend = int(smp + halfwid)
             avgsmp = np.matrix.mean(data[winstart:winend+1,:],0)
@@ -120,7 +119,7 @@ def smooth(data,window):
         newdata[0:halfwid+1,:] = np.matrix.mean(data[0:halfwid+1,:],0)
 
         # for each sample in the middle
-        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+        for smp in range(halfwid,totsamps-halfwid+1):
             winstart = int(smp - halfwid)
             winend = int(smp + halfwid)
             newdata[smp,:] = np.matrix.mean(data[winstart:winend+1,:],0)
@@ -164,7 +163,7 @@ def remMeanTrace(data,ntraces):
         newdata[:,0:halfwid+1] = data[:,0:halfwid+1]-avgtr
         
         # For each trace in the middle
-        for tr in tqdm(range(halfwid,tottraces-halfwid+1)):   
+        for tr in range(halfwid,tottraces-halfwid+1):
             winstart = int(tr - halfwid)
             winend = int(tr + halfwid)
             avgtr=np.matrix.mean(data[:,winstart:winend+1],1)                
@@ -221,7 +220,7 @@ def profileSmooth(data,profilePos,ntraces=1,noversample=1):
         newdata[:,0:halfwid+1] = np.matrix.mean(data[:,0:halfwid+1],1)
         
         # For each trace in the middle
-        for tr in tqdm(range(halfwid,tottraces-halfwid+1)):   
+        for tr in range(halfwid,tottraces-halfwid+1):
             winstart = int(tr - halfwid)
             winend = int(tr + halfwid)
             newdata[:,tr] = np.matrix.mean(data[:,winstart:winend+1],1) 
@@ -282,7 +281,7 @@ def agcGain(data,window):
         energy = np.maximum(np.linalg.norm(data[0:halfwid+1,:],axis=0),eps)
         newdata[0:halfwid+1,:] = np.divide(data[0:halfwid+1,:],energy)
         
-        for smp in tqdm(range(halfwid,totsamps-halfwid+1)):
+        for smp in range(halfwid,totsamps-halfwid+1):
             winstart = int(smp - halfwid)
             winend = int(smp + halfwid)
             energy = np.maximum(np.linalg.norm(data[winstart:winend+1,:],axis=0),eps)
@@ -509,7 +508,7 @@ def linStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
                   for the given data, tVals, and vVals
     '''
     linStAmp=np.zeros((len(tVals),len(vVals)))
-    for vi in tqdm(range(0,len(vVals))):       
+    for vi in range(0,len(vVals)):
         for ti in range(0,len(tVals)):
             t = tVals[ti] + typefact*profilePos/vVals[vi]
             tindices = (np.round((t-twtt[0])/(twtt[3]-twtt[2]))).astype(int)
@@ -545,7 +544,7 @@ def hypStackedAmplitude(data,profilePos,twtt,vVals,tVals,typefact):
     '''
     hypStAmp=np.zeros((len(tVals),len(vVals)))
     x2 = np.power(typefact*profilePos,2.0)
-    for vi in tqdm(range(0,len(vVals))):       
+    for vi in range(0,len(vVals)):
         for ti in range(0,len(tVals)):
             t = np.sqrt(x2 + 4*np.power(tVals[ti]/2.0 * vVals[vi],2.0))/vVals[vi]
             tindices = (np.round((t-twtt[0])/(twtt[3]-twtt[2]))).astype(int)
@@ -610,7 +609,7 @@ def linStackedAmplitude_alt1(data,profilePos,twtt,vVals,tVals,typefact):
     '''
     linStAmp=np.zeros((len(tVals),len(vVals)))
     f = interp.interp2d(profilePos, twtt, data)        
-    for vi in  tqdm(range(0,len(vVals))):
+    for vi in  range(0,len(vVals)):
         for ti in range(0,len(tVals)):
             t = tVals[ti] + typefact*profilePos/vVals[vi]            
             vals = np.diagonal(np.asmatrix(f(profilePos, t)))
@@ -643,7 +642,7 @@ def linStackedAmplitude_alt2(data,profilePos,twtt,vVals,tVals,typefact):
     linStAmp=np.zeros((len(tVals),len(vVals)))
     
     tVals = np.asmatrix(tVals).transpose()   
-    for vi in tqdm(range(0,len(vVals))):
+    for vi in range(0,len(vVals)):
         t = tVals + typefact*profilePos/vVals[vi]
         tindices = (np.round((t-twtt[0])/(twtt[3]-twtt[2]))).astype(int)
         for ti in range(0,len(tVals)):
