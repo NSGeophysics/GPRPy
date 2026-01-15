@@ -31,7 +31,7 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
    if you downloaded GPRPy directly onto your desktop. Then type the following and press enter afterward:<br/>
    `python installMigration.py`<br/>
    Then type the following and press enter afterward:<br/>
-   `pip install .`<br/>
+   `python -m pip install .`<br/>
    **don't forget the period "." at the end of the `pip install` command**
 
 
@@ -74,7 +74,7 @@ If you have any troubles getting the software running, please send me an email o
 
 ## Uninstalling GPRPy
 To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
-`pip uninstall gprpy`
+`python -m pip uninstall gprpy`
 
 ## News
 Follow [@GPRPySoftware](https://twitter.com/GPRPySoftware) on twitter to hear about news and updates.
