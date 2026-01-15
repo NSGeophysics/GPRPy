@@ -32,7 +32,7 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
    `python installMigration.py`<br/>
    Then type the following and press enter afterward:<br/>
    `python -m pip install .`<br/>
-   **don't forget the period "." at the end of the `pip install` command**
+   **don't forget the period "." at the end of the ` pyhon -m pip install .` command**
 
 
 ## Running the software
