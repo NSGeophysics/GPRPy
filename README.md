@@ -1,20 +1,17 @@
-# GPRPy
+# GPRPy-lib
 
-Open-source Ground Penetrating Radar processing and visualization software. Supported by the National Science Foundation under grants [EAR-1550732](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550732) and [EAR-2022671](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2022671)
+GPRPy-lib is a Python library for processing and visualizing Ground Penetrating Radar (GPR) data. It is designed to be used in a Jupyter Notebook environment, providing a flexible and interactive way to work with GPR data.
 
-Please cite https://library.seg.org/doi/10.1190/tle39050332.1
-
-GPRPy is now a Python library for processing and visualizing Ground Penetrating Radar (GPR) data. It is designed to be used in a Jupyter Notebook environment, providing a flexible and interactive way to work with GPR data.
+It's a fork of the original [GPRPy software](https://github.com/NSGeophysics/GPRPy), with some modifications and improvements. 
 
 ## Installation
 
 **In the following instructions, if you use Windows, use the comands `python` and `pip`. If you use Mac or Linux, use the commands `python3` and `pip3` instead.**
 
 1) Download the GPRPy software from 
-   [https://github.com/NSGeophysics/GPRPy/archive/master.zip](https://github.com/NSGeophysics/GPRPy/archive/master.zip). <br/>
+   [https://github.com/allanspadini/GPRPy-lib](https://github.com/allanspadini/GPRPy-lib/archive/refs/heads/master.zip). <br/>
    Save the file somewhere on your computer and extract the zip folder. <br/>
-   As an **alternative**, you can install git from [https://git-scm.com/](https://git-scm.com/), then run in a command prompt:<br/>
-   `git clone https://github.com/NSGeophysics/GPRPy.git`<br/>
+   `git clone https://github.com/allanspadini/GPRPy-lib.git`<br/>
    The advantage of the latter is that you can easily update your software by running from the GPRPy folder in a command prompt:<br/>
    `git pull origin master`
 
@@ -25,8 +22,8 @@ GPRPy is now a Python library for processing and visualizing Ground Penetrating 
 
 4) In the command prompt, change to the directory  where you downloaded the GPRPy files.
    This is usually through a command like for example<br/>
-   `cd Desktop\GPRPy`<br/>
-   if you downloaded GPRPy directly onto your desktop. Then type the following and press enter afterward:<br/>
+   `cd Desktop\GPRPy-lib`<br/>
+   if you downloaded GPRPy-lib directly onto your desktop. Then type the following and press enter afterward:<br/>
    `pip install .`<br/>
    **don't forget the period "." at the end of the `pip install` command**
 
@@ -68,5 +65,4 @@ For a more detailed example, please see the Jupyter Notebook in the `examples` d
 To uninstall GPRPy, simply run, in the (Anaconda) command prompt<br/>
 `pip uninstall gprpy`
 
-## News
-Follow [@GPRPySoftware](https://twitter.com/GPRPySoftware) on twitter to hear about news and updates.
+
