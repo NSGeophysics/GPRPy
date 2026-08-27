@@ -57,8 +57,8 @@ where myscriptname.py is the name of your automatically generated script. Note t
 
 
 ## Uninstalling GPRPy
-To uninstall GPRPy, simply run, in the Anaconda Prompt or terminal<br/>
-`conda env -n remove gprpy`
+To uninstall GPRPy, simply run, in the Anaconda Prompt (or terminal after `conda activate`)<br/>
+`pip uninstall gprpy`
 
 ## News
 Follow [@GPRPySoftware](https://twitter.com/GPRPySoftware) on twitter to hear about news and updates.
