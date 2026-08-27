@@ -48,10 +48,6 @@ You can also directly select one by running either<br/>
 `gprpy p`<br/>
 or<br/>
 `gprpy c`<br/>
-or<br/>
-`python -m gprpy p`<br/>
-or<br/>
-`python -m gprpy c`
 
 
 ## Running automatically generated scripts
