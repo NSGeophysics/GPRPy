@@ -21,14 +21,10 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
 2) Install anaconda or miniconda [https://www.anaconda.com/download](https://www.anaconda.com/download)
 
 3) Once the installation finished, open a command prompt:
-   On Windows: click on Start, then enter "Anaconda Prompt", without the quotation marks into the "Search programs and files" field. On Mac or Linux, open the regular terminal.
+   On Windows: click on Start, then enter "Anaconda Prompt", without the quotation marks into the "Search programs and files" field.
+   On Mac or Linux, open the regular terminal and run `conda activate`.
 
-4) Run the following command in the command prompt<br/>
-   `conda create -n gprpy python=3.13.12 -y`
-
-5) Run `conda activate gprpy`
-
-6) Change to the directory  where you downloaded the GPRPy files.
+5) Change to the directory  where you downloaded the GPRPy files.
    This is usually through a command like for example<br/>
    `cd Desktop\GPRPy`<br/>
    if you downloaded GPRPy directly onto your desktop. Then type the following and press enter afterward:<br/>
@@ -39,9 +35,7 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
 
 
 ## Running the software
-After installation, you can run the script from the Anaconda Prompt (or your Python-enabled prompt) by first activating the environment<br/>
-`conda activate gprpy`
-and then starting the program by running<br/>
+After installation, you can run the script from the Anaconda Prompt (or terminal after running `conda activate`) by running<br/>
 `gprpy`<br/>
 
 The first time you run GPRPy it could take a while to initialize. GPRPy will ask you if you want to run the profile [p] or WARR / CMP [c] user interface. Type<br/>
@@ -61,9 +55,9 @@ or<br/>
 
 
 ## Running automatically generated scripts
-To run automatically generated scripts, open the command prompt that can run python (for example Anaconda Prompt), switch to the folder with the automatically generated script and run<br/>
+To run automatically generated scripts, open Anaconda Prompt (or the terminal and run `conda activate`), switch to the folder with the automatically generated script and run<br/>
 `python myscriptname.py`<br/>
-where myscriptname.py is the name of your automatically generated script.  
+where myscriptname.py is the name of your automatically generated script. Note that the data need to be in the directories referenced by `myscriptname.py`. 
 
 
 ## Uninstalling GPRPy
