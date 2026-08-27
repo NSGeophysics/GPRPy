@@ -30,7 +30,7 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
    if you downloaded GPRPy directly onto your desktop. Then type the following and press enter afterward:<br/>
    `python installMigration.py`<br/>
    Then type the following and press enter afterward:<br/>
-   `python -m pip install .`<br/>
+   `pip install .`<br/>
    **don't forget the period "." at the end of the ` pyhon -m pip install .` command**
 
 
