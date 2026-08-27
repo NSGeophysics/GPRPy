@@ -32,5 +32,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['tqdm','numpy','scipy','matplotlib','Pmw','pyevtk']
+    install_requires=['tqdm','numpy','scipy','matplotlib==3.10.8','Pmw','pyevtk']
 )
