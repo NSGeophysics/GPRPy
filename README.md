@@ -22,7 +22,7 @@ Please cite https://library.seg.org/doi/10.1190/tle39050332.1
 
 3) Once the installation finished, open a command prompt:
    On Windows: click on Start, then enter "Anaconda Prompt", without the quotation marks into the "Search programs and files" field.
-   On Mac or Linux, open the regular terminal and run<br/>
+   On Mac or Linux, open the regular terminal. In the command prompt/terminal, run<br/>
    `conda activate`<br/>
 
 5) Change to the directory  where you downloaded the GPRPy files.
