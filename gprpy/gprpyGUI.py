@@ -836,6 +836,9 @@ class GPRPyApp:
         def moved(event):
             if event.xdata is not None and event.ydata is not None:
                 canvas.get_tk_widget().itemconfigure(tag, text="(x = %5.5g, y = %5.5g)" % (event.xdata, event.ydata))
+                # use these coordinates as starting values for Hyperbolae
+                self.hypx = event.xdata
+                self.hypt = event.ydata
                 
         self.cursor_cid = canvas.mpl_connect('button_press_event', moved)
         tag = canvas.get_tk_widget().create_text(20, 20, text="", anchor="nw")
